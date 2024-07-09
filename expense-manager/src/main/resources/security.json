@@ -1,0 +1,28 @@
+[
+  {
+    "path": "/api/user",
+    "params": [],
+    "pathVariables": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "type": "STRING"
+        },
+        {
+          "key": "fullName",
+          "type": "STRING"
+        },
+        {
+          "key": "lastName",
+          "type": "STRING"
+        },
+        {
+          "key": "age",
+          "type": "INTEGER"
+        }
+      ]
+    }
+  }
+]
