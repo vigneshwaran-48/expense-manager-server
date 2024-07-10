@@ -32,4 +32,10 @@ public class UserCacheRepository implements UserRepository {
     public User update(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    @Cacheable(value = "users", key = "#email")
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

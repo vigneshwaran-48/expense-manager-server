@@ -8,21 +8,46 @@
       "fields": [
         {
           "key": "name",
-          "type": "STRING"
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20,
+          "mandatory": "true"
         },
         {
           "key": "fullName",
-          "type": "STRING"
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25,
+          "mandatory": "true"
         },
         {
           "key": "lastName",
-          "type": "STRING"
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20
         },
         {
           "key": "age",
-          "type": "INTEGER"
+          "type": "INTEGER",
+          "mandatory": "true"
+        },
+        {
+          "key": "email",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
         }
       ]
     }
+  },
+  {
+    "path": "/api/user/{userId}",
+    "params": [],
+    "pathVariables": [
+      {
+        "name": "userId"
+      }
+    ],
+    "method": "GET"
   }
 ]
