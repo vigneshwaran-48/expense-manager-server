@@ -1,5 +1,6 @@
 package com.vapps.expense.service;
 
+import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.UserService;
@@ -22,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
-    public void addUser(UserDTO user) throws AppException {
+    public UserDTO addUser(UserDTO user) throws AppException {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Email already exists!");
         }
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
             LOGGER.error("Error while creating user, SavedUser is null!");
             throw new AppException("Error while creating user!");
         }
+        return savedUser.toDTO();
     }
 
     @Override
@@ -42,4 +44,30 @@ public class UserServiceImpl implements UserService {
         }
         return Optional.of(user.get().toDTO());
     }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public UserDTO updateUser(String userId, UserDTO user) throws AppException {
+        UserDTO existingUser = getUser(userId).get();
+        user.setId(userId);
+        user.setEmail(existingUser.getEmail());
+        if (user.getAge() == 0) {
+            user.setAge(existingUser.getAge());
+        }
+        if (user.getFirstName() == null) {
+            user.setFirstName(existingUser.getFirstName());
+        }
+        if (user.getLastName() == null) {
+            user.setLastName(existingUser.getLastName());
+        }
+        if (user.getName() == null) {
+            user.setName(existingUser.getName());
+        }
+        User updatedUser = userRepository.update(User.build(user));
+        if (updatedUser == null) {
+            throw new AppException("Error while updating user!");
+        }
+        return updatedUser.toDTO();
+    }
+
 }

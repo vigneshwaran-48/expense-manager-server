@@ -1,7 +1,6 @@
 package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.UserDTO;
-import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.dto.response.UserResponse;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.UserService;
@@ -21,11 +20,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<Response> createUser(@RequestBody UserDTO user, HttpServletRequest request)
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserDTO user, HttpServletRequest request)
             throws AppException {
-        userService.addUser(user);
+        UserDTO userDTO = userService.addUser(user);
         return ResponseEntity.ok(
-                new Response(HttpStatus.OK.value(), "Created User", LocalDateTime.now(), request.getServletPath()));
+                new UserResponse(HttpStatus.OK.value(), "Created User", LocalDateTime.now(), request.getServletPath(),
+                        userDTO));
     }
 
     @GetMapping("/{userId}")
@@ -34,8 +34,17 @@ public class UserController {
         UserDTO userDTO = userService.getUser(userId)
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST.value(), "User " + "not found"));
         return ResponseEntity.ok(
-                new UserResponse(HttpStatus.OK.value(), "Created User", LocalDateTime.now(), request.getServletPath(),
+                new UserResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         userDTO));
     }
 
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserDTO user,
+            HttpServletRequest request) throws AppException {
+
+        UserDTO updatedUser = userService.updateUser(userId, user);
+        return ResponseEntity.ok(
+                new UserResponse(HttpStatus.OK.value(), "Updated User", LocalDateTime.now(), request.getServletPath(),
+                        updatedUser));
+    }
 }
