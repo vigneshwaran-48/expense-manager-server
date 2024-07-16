@@ -7,7 +7,9 @@ import java.util.Optional;
 
 public interface UserService {
 
-    void addUser(UserDTO user) throws AppException;
+    UserDTO addUser(UserDTO user) throws AppException;
 
     Optional<UserDTO> getUser(String userId) throws AppException;
+
+    UserDTO updateUser(String userId, UserDTO user) throws AppException;
 }

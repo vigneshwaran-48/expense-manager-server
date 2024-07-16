@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -41,6 +42,15 @@ public class RestControllerAdviceHandler {
                 new AppErrorResponse(HttpStatus.BAD_REQUEST.value(), "Upload size is larger", LocalDateTime.now(),
                         request.getServletPath());
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleException(AccessDeniedException ex, HttpServletRequest request) {
+        LOGGER.error(ex.getMessage(), ex);
+        AppErrorResponse response =
+                new AppErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage(), LocalDateTime.now(),
+                        request.getServletPath());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
 }
