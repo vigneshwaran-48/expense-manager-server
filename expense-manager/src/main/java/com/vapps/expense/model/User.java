@@ -17,6 +17,7 @@ public class User {
     private String lastName;
     private int age;
     private String email;
+    private String image;
 
     public UserDTO toDTO() {
         UserDTO userDTO = new UserDTO();
@@ -26,6 +27,7 @@ public class User {
         userDTO.setFirstName(firstName);
         userDTO.setLastName(lastName);
         userDTO.setEmail(email);
+        userDTO.setImage(image);
         return userDTO;
     }
 
@@ -37,6 +39,7 @@ public class User {
         user.setAge(userDTO.getAge());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
+        user.setImage(userDTO.getImage());
         return user;
     }
 
