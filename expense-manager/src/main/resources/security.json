@@ -93,5 +93,10 @@
         }
       ]
     }
+  },
+  {
+    "path": "/api/user/profile",
+    "params": [],
+    "method": "GET"
   }
 ]

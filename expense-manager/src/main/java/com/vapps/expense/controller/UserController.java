@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @RestController
@@ -46,5 +47,17 @@ public class UserController {
         return ResponseEntity.ok(
                 new UserResponse(HttpStatus.OK.value(), "Updated User", LocalDateTime.now(), request.getServletPath(),
                         updatedUser));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponse> getProfile(HttpServletRequest request, Principal principal)
+            throws AppException {
+
+        String userId = principal.getName();
+        UserDTO userDTO =
+                userService.getUser(userId).orElseThrow(() -> new AppException(401, "Current user not " + "exists!"));
+        return ResponseEntity.ok(
+                new UserResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        userDTO));
     }
 }
