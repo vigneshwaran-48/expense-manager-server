@@ -1,7 +1,7 @@
 package com.vapps.expense.repository.mongo;
 
 import com.vapps.expense.model.Family;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface FamilyMongoRepository extends JpaRepository<Family, String> {
+public interface FamilyMongoRepository extends MongoRepository<Family, String> {
 }

@@ -1,10 +1,10 @@
 package com.vapps.expense.repository.mongo;
 
 import com.vapps.expense.model.FamilyMember;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface FamilyMemberMongoRepository extends JpaRepository<FamilyMember, String> {
+public interface FamilyMemberMongoRepository extends MongoRepository<FamilyMember, String> {
     List<FamilyMember> findByFamilyId(String familyId);
 }
