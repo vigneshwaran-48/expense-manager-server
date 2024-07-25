@@ -1,0 +1,102 @@
+[
+  {
+    "path": "/api/user",
+    "params": [],
+    "pathVariables": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "id",
+          "type": "STRING",
+          "mandatory": "true"
+        },
+        {
+          "key": "name",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20,
+          "mandatory": "true"
+        },
+        {
+          "key": "firstName",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25,
+          "mandatory": "true"
+        },
+        {
+          "key": "lastName",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "age",
+          "type": "INTEGER",
+          "mandatory": "true"
+        },
+        {
+          "key": "email",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        },
+        {
+          "key": "image"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/user/{userId}",
+    "params": [],
+    "pathVariables": [
+      {
+        "name": "userId"
+      }
+    ],
+    "method": "GET"
+  },
+  {
+    "path": "/api/user/{userId}",
+    "params": [],
+    "pathVariables": [
+      {
+        "name": "userId"
+      }
+    ],
+    "method": "PATCH",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "firstName",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25
+        },
+        {
+          "key": "lastName",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "age",
+          "type": "INTEGER"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/user/profile",
+    "params": [],
+    "method": "GET"
+  }
+]
