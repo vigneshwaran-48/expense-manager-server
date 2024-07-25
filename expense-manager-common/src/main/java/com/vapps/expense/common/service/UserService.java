@@ -11,5 +11,5 @@ public interface UserService {
 
     Optional<UserDTO> getUser(String userId) throws AppException;
 
-    UserDTO updateUser(String userId, UserDTO user) throws AppException;
+    UserDTO updateUser(String currentUserId, String userId, UserDTO user) throws AppException;
 }

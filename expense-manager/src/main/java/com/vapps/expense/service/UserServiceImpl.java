@@ -46,8 +46,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @UserIdValidator(positions = 0)
-    public UserDTO updateUser(String userId, UserDTO user) throws AppException {
+    @UserIdValidator(positions = {0, 1})
+    public UserDTO updateUser(String currentUserId, String userId, UserDTO user) throws AppException {
+        if (!currentUserId.equals(userId)) {
+            // TODO In future this may be like admin can edit members.
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You don't have access to update user!");
+        }
         UserDTO existingUser = getUser(userId).get();
         user.setId(userId);
         user.setEmail(existingUser.getEmail());
