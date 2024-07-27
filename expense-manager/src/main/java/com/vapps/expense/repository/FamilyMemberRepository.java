@@ -15,6 +15,8 @@ public interface FamilyMemberRepository {
 
     List<FamilyMember> findByFamilyId(String familyId);
 
+    Optional<FamilyMember> findByMemberId(String memberId);
+
     Optional<FamilyMember> findByFamilyIdAndMemberId(String familyId, String memberId);
 
     boolean existsByFamilyIdAndMemberId(String familyId, String memberId);

@@ -38,6 +38,12 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
 
     @Override
     @Cacheable(value = "familyMember", key = "'family_member_' + #memberId")
+    public Optional<FamilyMember> findByMemberId(String memberId) {
+        return familyMemberRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    @Cacheable(value = "familyMember", key = "'family_member_' + #memberId")
     public Optional<FamilyMember> findByFamilyIdAndMemberId(String familyId, String memberId) {
         return familyMemberRepository.findByFamilyIdAndMemberId(familyId, memberId);
     }
