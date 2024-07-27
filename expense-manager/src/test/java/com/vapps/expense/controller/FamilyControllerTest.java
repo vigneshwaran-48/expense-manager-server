@@ -46,6 +46,8 @@ public class FamilyControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String familyId;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyControllerTest.class);
     private static final String USER_ID = "testing_user_id";
 
@@ -89,6 +91,40 @@ public class FamilyControllerTest {
     @Test
     @Order(1)
     public void shouldCreateFamily() throws Exception {
+
+        String description = "Testing family";
+        FamilyDTO.Visibility visibility = FamilyDTO.Visibility.PRIVATE;
+        String familyName = "Testing";
+
+        FamilyCreationPayload familyDTO = new FamilyCreationPayload();
+        familyDTO.setDescription(description);
+        familyDTO.setVisibility(visibility);
+        familyDTO.setName(familyName);
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/family").with(
+                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
+                                        ".CREATE"))))
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(familyDTO)))
+                .andExpect(status().isOk()).andReturn();
+
+        FamilyResponse familyResponse =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
+        assertThat(familyResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        FamilyDTO family = familyResponse.getFamily();
+        assertThat(family.getId()).isNotNull().isNotBlank();
+        assertThat(family.getCreatedTime()).isNotNull();
+        assertThat(family.getName()).isEqualTo(familyName);
+        assertThat(family.getVisibility()).isEqualTo(visibility);
+        assertThat(family.getDescription()).isEqualTo(description);
+
+        familyId = family.getId();
+
+        logTestCasePassed("Create Family", "Tests family creation");
+    }
+
+    @Test
+    @Order(2)
+    public void shouldAddMemberToFamily() throws Exception {
 
         String description = "Testing family";
         FamilyDTO.Visibility visibility = FamilyDTO.Visibility.PRIVATE;
