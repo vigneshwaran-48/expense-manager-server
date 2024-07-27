@@ -38,4 +38,10 @@ public class FamilyCacheRepository implements FamilyRepository {
     public void deleteById(String id) {
         familyRepository.deleteById(id);
     }
+
+    @Override
+    @Cacheable(value = "family", key = "'created_by_' + #createdById")
+    public Optional<Family> findByCreatedById(String createdById) {
+        return familyRepository.findByCreatedById(createdById);
+    }
 }

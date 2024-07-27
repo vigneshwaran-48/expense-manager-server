@@ -13,4 +13,6 @@ public interface FamilyRepository {
     Family update(Family family);
 
     void deleteById(String id);
+
+    Optional<Family> findByCreatedById(String createdById);
 }

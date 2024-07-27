@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class FamilyMemberCacheRepository implements FamilyMemberRepository {
@@ -33,5 +34,10 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
         return familyMemberRepository.findByFamilyId(familyId);
     }
 
+    @Override
+    @Cacheable(value = "familyMember", key = "'family_member_' + #memberId")
+    public Optional<FamilyMember> findByMemberId(String memberId) {
+        return familyMemberRepository.findByMemberId(memberId);
+    }
 
 }

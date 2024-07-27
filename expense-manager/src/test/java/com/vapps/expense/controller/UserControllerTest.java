@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
+import static com.vapps.expense.util.TestUtil.logTestCasePassed;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -236,12 +237,7 @@ public class UserControllerTest {
         logTestCasePassed("Update User", "Updating already existing user");
     }
 
-    private void logTestCasePassed(String name, String description) {
-        LOGGER.info("\n----------------------------------------------------------------------\n");
-        LOGGER.info("Test case: {} is passed", name);
-        LOGGER.info("Description: {}", description);
-        LOGGER.info("\n----------------------------------------------------------------------\n");
-    }
+
 
     @Data
     private static class UpdateUserDTO {

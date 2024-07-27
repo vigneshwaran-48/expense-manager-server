@@ -4,7 +4,9 @@ import com.vapps.expense.model.FamilyMember;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FamilyMemberMongoRepository extends MongoRepository<FamilyMember, String> {
     List<FamilyMember> findByFamilyId(String familyId);
+    Optional<FamilyMember> findByMemberId(String memberId);
 }
