@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,8 +47,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @UserIdValidator(positions = 0)
-    public UserDTO updateUser(String userId, UserDTO user) throws AppException {
+    @UserIdValidator(positions = { 0, 1 })
+    public UserDTO updateUser(String currentUserId, String userId, UserDTO user) throws AppException {
+        if (!currentUserId.equals(userId)) {
+            // TODO In future this may be like admin can edit members.
+            LOGGER.error("User {} trying to update user {}", currentUserId, userId);
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You don't have access to update user!");
+        }
         UserDTO existingUser = getUser(userId).get();
         user.setId(userId);
         user.setEmail(existingUser.getEmail());
@@ -68,6 +74,11 @@ public class UserServiceImpl implements UserService {
             throw new AppException("Error while updating user!");
         }
         return updatedUser.toDTO();
+    }
+
+    @Override
+    public List<UserDTO> findAllUser() throws AppException {
+        return userRepository.findAll().stream().map(User::toDTO).toList();
     }
 
 }

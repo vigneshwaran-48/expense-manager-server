@@ -98,5 +98,33 @@
     "path": "/api/user/profile",
     "params": [],
     "method": "GET"
+  },
+  {
+    "path": "/api/family",
+    "params": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "type": "STRING",
+          "mandatory": "true",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "description",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25
+        },
+        {
+          "key": "visibility",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^(PRIVATE|PUBLIC)$"
+        }
+      ]
+    }
   }
 ]

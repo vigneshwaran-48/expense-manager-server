@@ -1,8 +1,11 @@
 package com.vapps.expense.aspect;
 
+import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
+import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.UserService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,12 +18,15 @@ import org.springframework.http.HttpStatus;
 import java.util.Optional;
 
 @Aspect
-public class UserAspect {
+public class EntityIdValidationAspect {
 
     @Autowired
     private UserService userService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserAspect.class);
+    @Autowired
+    private FamilyService familyService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntityIdValidationAspect.class);
 
     @Before("@annotation(userIdValidator)")
     public void checkUserExists(JoinPoint joinPoint, UserIdValidator userIdValidator) throws AppException {
@@ -39,6 +45,32 @@ public class UserAspect {
             if (user.isEmpty()) {
                 LOGGER.error("User {} not exists", id);
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "User " + id + " not exists!");
+            }
+        }
+    }
+
+    @Before("@annotation(familyIdValidator)")
+    public void checkFamilyExists(JoinPoint joinPoint, FamilyIdValidator familyIdValidator) throws AppException {
+        int[] positionsToCheck = familyIdValidator.positions();
+        String userId = (String) joinPoint.getArgs()[familyIdValidator.userIdPosition()];
+
+        if (userId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "User Id is required!");
+        }
+
+        Object[] args = joinPoint.getArgs();
+
+        for (int position : positionsToCheck) {
+            String id = (String) args[position];
+
+            if (id == null) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Family Id is required!");
+            }
+
+            Optional<FamilyDTO> family = familyService.getFamilyById(userId, id);
+            if (family.isEmpty()) {
+                LOGGER.error("Family {} not exists", id);
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Family " + id + " not exists!");
             }
         }
     }

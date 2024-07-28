@@ -41,9 +41,10 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserDTO user,
-            HttpServletRequest request) throws AppException {
+            HttpServletRequest request, Principal principal) throws AppException {
 
-        UserDTO updatedUser = userService.updateUser(userId, user);
+        String currentUserId = principal.getName();
+        UserDTO updatedUser = userService.updateUser(currentUserId, userId, user);
         return ResponseEntity.ok(
                 new UserResponse(HttpStatus.OK.value(), "Updated User", LocalDateTime.now(), request.getServletPath(),
                         updatedUser));
