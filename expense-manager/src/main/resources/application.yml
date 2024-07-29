@@ -18,3 +18,8 @@ logging:
     org:
       springframework:
         security: trace
+
+mail:
+  google:
+    appPassword: fkcxjpqnsziwtivn
+    email: familyexpensemanager.vapps@gmail.com
