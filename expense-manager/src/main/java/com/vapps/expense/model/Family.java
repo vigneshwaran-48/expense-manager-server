@@ -20,6 +20,7 @@ public class Family {
     private String description;
     private Visibility visibility;
     private LocalDateTime createdTime;
+    private String image;
 
     @DocumentReference
     private User createdBy;
@@ -32,6 +33,7 @@ public class Family {
         familyDTO.setVisibility(visibility);
         familyDTO.setCreatedBy(createdBy.toDTO());
         familyDTO.setCreatedTime(createdTime);
+        familyDTO.setImage(image);
         return familyDTO;
     }
 
@@ -43,6 +45,7 @@ public class Family {
         family.setVisibility(familyDTO.getVisibility());
         family.setCreatedBy(User.build(familyDTO.getCreatedBy()));
         family.setCreatedTime(familyDTO.getCreatedTime());
+        family.setImage(familyDTO.getImage());
         return family;
     }
 }

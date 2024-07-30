@@ -2,9 +2,11 @@ package com.vapps.expense.service;
 
 import com.vapps.expense.annotation.InvitationIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
+import com.vapps.expense.common.dto.FamilyMemberDTO;
 import com.vapps.expense.common.dto.InvitationDTO;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.EmailService;
+import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.model.Invitation;
 import com.vapps.expense.repository.InvitationRepository;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
 import java.util.Optional;
 
@@ -25,11 +28,14 @@ public class InvitationServiceImpl implements InvitationService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private FamilyService familyService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(InvitationServiceImpl.class);
 
     @Override
     @UserIdValidator(positions = 0)
-    public InvitationDTO sendInvitation(String userId, InvitationDTO invitation) throws AppException {
+    public InvitationDTO sendInvitation(String userId, InvitationDTO invitation, Context context) throws AppException {
         checkDuplicateInvitation(userId, invitation);
         Invitation invitationModel = Invitation.build(invitation);
         Invitation savedInvitation = invitationRepository.save(invitationModel);
@@ -37,7 +43,7 @@ public class InvitationServiceImpl implements InvitationService {
             throw new AppException("Error while saving invitation!");
         }
         emailService.sendEmail(savedInvitation.getRecipient().getEmail(), savedInvitation.getTitle(),
-                savedInvitation.getContent());
+                "invitation-template", context);
         return savedInvitation.toDTO();
     }
 
@@ -82,6 +88,15 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     private void handleFamilyInvitationAccept(InvitationDTO invitation) throws AppException {
-
+        String familyId = (String) invitation.getProperties().get(InvitationDTO.InvitationProps.FAMILY_ID);
+        FamilyMemberDTO.Role role =
+                (FamilyMemberDTO.Role) invitation.getProperties().get(InvitationDTO.InvitationProps.ROLE);
+        if (familyId == null) {
+            throw new AppException("Family id missing in the invitation!");
+        }
+        if (role == null) {
+            throw new AppException("Role is missing in the invitation!");
+        }
+        familyService.addMember(invitation.getFrom().getId(), familyId, invitation.getRecipient().getId(), role);
     }
 }

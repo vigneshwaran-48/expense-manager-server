@@ -4,9 +4,11 @@ import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
+import com.vapps.expense.common.dto.InvitationDTO;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.FamilyService;
+import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.model.Family;
 import com.vapps.expense.model.FamilyMember;
@@ -18,8 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -33,6 +38,9 @@ public class FamilyServiceImpl implements FamilyService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private InvitationService invitationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
 
@@ -163,5 +171,39 @@ public class FamilyServiceImpl implements FamilyService {
         if (updatedFamilyMember == null) {
             throw new AppException("Error while update member's role!");
         }
+    }
+
+    @Override
+    @UserIdValidator(positions = { 0, 2 })
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
+            throws AppException {
+        Optional<FamilyMember> userMember = familyMemberRepository.findByMemberId(userId);
+
+        if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed invite member to this family!");
+        }
+
+        Map<String, Object> invitationProps = new HashMap<>();
+        invitationProps.put(InvitationDTO.InvitationProps.FAMILY_ID, familyId);
+        invitationProps.put(InvitationDTO.InvitationProps.ROLE, role);
+
+        UserDTO from = userService.getUser(userId).get();
+        UserDTO member = userService.getUser(memberId).get();
+
+        InvitationDTO invitationDTO = new InvitationDTO();
+        invitationDTO.setType(InvitationDTO.Type.FAMILY_INVITE);
+        invitationDTO.setFrom(from);
+        invitationDTO.setTitle("You got invitation to join a family");
+        invitationDTO.setRecipient(member);
+        invitationDTO.setProperties(invitationProps);
+
+        FamilyDTO familyDTO = getFamilyById(userId, familyId).get();
+        Context context = new Context();
+        context.setVariable("familyDescription", familyDTO.getDescription());
+        context.setVariable("familyName", familyDTO.getName());
+        context.setVariable("content", "Hi " + member.getName() + ", " + from.getName() + " invites you to his family");
+
+        invitationService.sendInvitation(userId, invitationDTO, context);
     }
 }

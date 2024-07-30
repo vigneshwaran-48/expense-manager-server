@@ -2,6 +2,9 @@ spring:
   application:
     name: Expense Manager
 
+  main:
+    allow-circular-references: true
+
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
@@ -21,5 +24,5 @@ logging:
 
 mail:
   google:
-    appPassword: fkcxjpqnsziwtivn
-    email: familyexpensemanager.vapps@gmail.com
+    appPassword: ${FAMILY_EXPENSE_MANAGER_APP_PASSWORD}
+    email: ${FAMILY_EXPENSE_MANAGER_EMAIL_ID}

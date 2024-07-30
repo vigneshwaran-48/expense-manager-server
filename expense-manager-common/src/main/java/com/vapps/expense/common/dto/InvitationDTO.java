@@ -7,6 +7,11 @@ import java.util.Map;
 @Data
 public class InvitationDTO {
 
+    public static class InvitationProps {
+        public static final String FAMILY_ID = "FAMILY_ID";
+        public static final String ROLE = "ROLE";
+    }
+
     public enum Type {
         FAMILY_INVITE
     }

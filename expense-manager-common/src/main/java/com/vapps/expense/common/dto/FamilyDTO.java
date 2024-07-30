@@ -17,5 +17,6 @@ public class FamilyDTO {
     private Visibility visibility;
     private UserDTO createdBy;
     private LocalDateTime createdTime;
+    private String image;
 
 }
