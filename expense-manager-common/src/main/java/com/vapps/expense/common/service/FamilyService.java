@@ -21,4 +21,6 @@ public interface FamilyService {
     void removeMember(String userId, String familyId, String memberId) throws AppException;
 
     void updateRole(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
+
+    void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
 }
