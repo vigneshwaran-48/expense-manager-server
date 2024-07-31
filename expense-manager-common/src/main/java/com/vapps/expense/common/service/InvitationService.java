@@ -4,6 +4,7 @@ import com.vapps.expense.common.dto.InvitationDTO;
 import com.vapps.expense.common.exception.AppException;
 import org.thymeleaf.context.Context;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface InvitationService {
@@ -15,5 +16,7 @@ public interface InvitationService {
     void rejectInvitation(String userId, String id) throws AppException;
 
     Optional<InvitationDTO> getInvitation(String id) throws AppException;
+
+    List<InvitationDTO> getAllInvitations(String userId) throws AppException;
 
 }

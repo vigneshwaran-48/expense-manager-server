@@ -197,12 +197,12 @@ public class FamilyServiceImpl implements FamilyService {
         invitationDTO.setTitle("You got invitation to join a family");
         invitationDTO.setRecipient(member);
         invitationDTO.setProperties(invitationProps);
+        invitationDTO.setContent("Hi " + member.getName() + ", " + from.getName() + " invites you to his family");
 
         FamilyDTO familyDTO = getFamilyById(userId, familyId).get();
         Context context = new Context();
         context.setVariable("familyDescription", familyDTO.getDescription());
         context.setVariable("familyName", familyDTO.getName());
-        context.setVariable("content", "Hi " + member.getName() + ", " + from.getName() + " invites you to his family");
 
         invitationService.sendInvitation(userId, invitationDTO, context);
     }

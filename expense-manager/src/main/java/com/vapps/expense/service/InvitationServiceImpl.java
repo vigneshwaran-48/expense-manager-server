@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -42,6 +43,8 @@ public class InvitationServiceImpl implements InvitationService {
         if (savedInvitation == null) {
             throw new AppException("Error while saving invitation!");
         }
+        context.setVariable("title", invitation.getTitle());
+        context.setVariable("content", invitation.getContent());
         emailService.sendEmail(savedInvitation.getRecipient().getEmail(), savedInvitation.getTitle(),
                 "invitation-template", context);
         return savedInvitation.toDTO();
@@ -78,6 +81,12 @@ public class InvitationServiceImpl implements InvitationService {
             return Optional.empty();
         }
         return Optional.of(invitation.get().toDTO());
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<InvitationDTO> getAllInvitations(String userId) throws AppException {
+        return invitationRepository.findByRecipientId(userId).stream().map(Invitation::toDTO).toList();
     }
 
     private void checkDuplicateInvitation(String userId, InvitationDTO invitation) throws AppException {

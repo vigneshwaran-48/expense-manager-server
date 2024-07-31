@@ -29,8 +29,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/user")
                         .access(hasAnyScope("ExpenseManager.User.CREATE", "ExpenseManager.User.ALL"))
                         .requestMatchers(HttpMethod.PATCH, "/api/user/**")
-                        .access(hasAnyScope("ExpenseManager.User.UPDATE", "ExpenseManager.User.ALL")).anyRequest()
-                        .authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+                        .access(hasAnyScope("ExpenseManager.User.UPDATE", "ExpenseManager.User.ALL"))
+                        .requestMatchers(HttpMethod.POST, "/api/family")
+                        .access(hasAnyScope("ExpenseManager.Family.CREATE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.POST, "/api/family/member/{memberId}/invite")
+                        .access(hasAnyScope("ExpenseManager.Family.INVITE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.GET, "/api/invitation")
+                        .access(hasAnyScope("ExpenseManager.Invitation.READ", "ExpenseManager.Invitation.ALL"))
+                        .requestMatchers(HttpMethod.POST, "/api/invitation/{id}/accept")
+                        .access(hasAnyScope("ExpenseManager.Invitation.ACCEPT")).anyRequest().authenticated())
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 

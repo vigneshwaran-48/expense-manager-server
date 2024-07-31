@@ -126,5 +126,40 @@
         }
       ]
     }
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}/invite",
+    "params": [
+      {
+        "name": "role",
+        "type": "REGEX",
+        "regex": "^(LEADER|MAINTAINER|MEMBER)$",
+        "mandatory": "true"
+      }
+    ],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ]
+  },
+  {
+    "path": "/api/invitation",
+    "params": [],
+    "method": "GET"
+  },
+  {
+    "path": "/api/invitation/{id}/accept",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
   }
 ]
