@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,13 +99,14 @@ public class InvitationServiceImpl implements InvitationService {
 
     private void handleFamilyInvitationAccept(InvitationDTO invitation) throws AppException {
         String familyId = (String) invitation.getProperties().get(InvitationDTO.InvitationProps.FAMILY_ID);
-        FamilyMemberDTO.Role role =
-                (FamilyMemberDTO.Role) invitation.getProperties().get(InvitationDTO.InvitationProps.ROLE);
+        String roleStr = (String) invitation.getProperties().get(InvitationDTO.InvitationProps.ROLE);
+        if (Arrays.stream(FamilyMemberDTO.Role.values()).filter(role -> role.name().equals(roleStr)).findFirst()
+                .isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Role is missing or invalid!");
+        }
+        FamilyMemberDTO.Role role = FamilyMemberDTO.Role.valueOf(roleStr);
         if (familyId == null) {
             throw new AppException("Family id missing in the invitation!");
-        }
-        if (role == null) {
-            throw new AppException("Role is missing in the invitation!");
         }
         familyService.addMember(invitation.getFrom().getId(), familyId, invitation.getRecipient().getId(), role);
     }

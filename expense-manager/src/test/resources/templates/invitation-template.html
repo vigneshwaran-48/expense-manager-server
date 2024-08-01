@@ -1,156 +1,35 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Family Invitation</title>
-
-    <style>
-
-        * {
-          margin: 0px;
-          padding: 0px;
-          box-sizing: border-box;
-        }
-
-        html, body {
-          width: 100%;
-        }
-          body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
-
-          main {
-            display: flex;
-            flex-direction: column;
-            background-color: #3FA2F6;
-            color: white;
-            border-radius: 7px;
-          }
-
-          .app-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 7px;
-          }
-
-          .container {
-            max-width: 600px;
-            width: 100%;
-            height: 100%;
-            box-shadow: 1px 1px 7px rgb(0, 0, 0, 0.14);
-            margin: 5px;
-            border-radius: 7px;
-            padding: 10px;
-          }
-
-          .top-image-container {
-            width: 100%;
-            padding: 10px;
-          }
-
-          .invitation-text-container {
-            padding: 10px;
-            bord
-          }
-
-          .invitation-text-container > * {
-            padding: 7px 0px;
-            margin: 5px 0px;
-           }
-
-          .button {
-            border: none;
-            padding: 10px;
-            border-radius: 7px;
-            font-size: 18px;
-            transition: 0.5s;
-            cursor: pointer;
-            color: white;
-          }
-
-          .button:active {
-            transform: scale(0.9);
-          }
-
-          .button.accept {
-            background-color: #06D001;
-          }
-
-          .button.reject {
-            background-color: red;
-          }
-
-          .family-image {
-            width: 100px;
-            height: 80px;
-            border-radius: 7px;
-          }
-
-          .family-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            justify-content: center;
-            align-items: center;
-            background-color: white;
-            color: black;
-            padding: 20px 10px;
-          }
-
-          .family-container > p {
-            font-size: 18px;
-            font-weight: 400;
-          }
-
-          footer {
-            widthL: 100%;
-            background-color: black;
-            color: white;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-          }
-
-          footer > p {
-            text-align: center;
-            width: 80%;
-            padding: 10px;
-          }
-
-
-    </style>
 </head>
-<body>
-<div class="container">
+<body style="margin: 0; padding: 0; box-sizing: border-box; width: 100%; display: flex; justify-content: center; align-items: center;">
+<div style="max-width: 600px; width: 100%; height: 100%; box-shadow: 1px 1px 7px rgba(0, 0, 0, 0.14); margin: 5px; border-radius: 7px; padding: 10px; background-color: #3FA2F6; color: white; display: flex; flex-direction: column;">
     <main>
-        <div class="top-image-container">
-            <img th:src="@{images/app-icon.png}" alt="App icon" class="app-icon" />
+        <div style="width: 100%; padding: 10px;">
+            <img src="images/app-icon.png" alt="App icon" style="width: 40px; height: 40px; border-radius: 7px;" />
         </div>
-        <div class="invitation-text-container">
-            <h1 th:text="${title}">Family Invitation</h1>
-            <p th:text="${content}">A Family invites you to join them</p>
+        <div style="padding: 10px;">
+            <h1 th:text="${title}" style="padding: 7px 0; margin: 5px 0;">Family Invitation</h1>
+            <p th:text="${content}" style="padding: 7px 0; margin: 5px 0;">A Family invites you to join them</p>
             <div>
-                <button class="button accept">Accept</button>
-                <button class="button reject">Reject</button>
+                <button style="border: none; padding: 10px; border-radius: 7px; font-size: 18px; transition: 0.5s; cursor: pointer; color: white; background-color: #06D001;">Accept</button>
+                <button style="border: none; padding: 10px; border-radius: 7px; font-size: 18px; transition: 0.5s; cursor: pointer; color: white; background-color: red;">Reject</button>
             </div>
         </div>
-        <div class="family-container">
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; align-items: center; background-color: white; color: black; padding: 20px 10px;">
             <div>
-                <img th:src="@{images/family-icon.png}" alt="Family image" class="family-image" />
+                <img th:src="@{images/family-icon.png}"  alt="Family image" style="width: 100px; height: 80px; border-radius: 7px;" />
             </div>
-            <h2 th:text="${familyName}">Family Name<h2>
-                <div>
-                    <p th:text="${familyDescription}">Family Description</p>
-                </div>
+            <h2 th:text="${familyName}" style="font-size: 24px; font-weight: 400;">Family Name</h2>
+            <div>
+                <p th:text="${familyDescription}" style="font-size: 18px; font-weight: 400;">Family Description</p>
+            </div>
         </div>
     </main>
-    <footer>
-        <img th:src="@{images/app-icon.png}" alt="App icon" class="app-icon" />
-        <p>Family expense Manager app comes under the vapps projects</p>
+    <footer style="width: 100%; background-color: black; color: white; padding: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <img th:src="@{images/app-icon.png}" alt="App icon" style="width: 40px; height: 40px; border-radius: 7px;" />
+        <p style="text-align: center; width: 80%; padding: 10px;">Family expense Manager app comes under the vapps projects</p>
     </footer>
 </div>
 </body>

@@ -133,17 +133,18 @@
       {
         "name": "role",
         "type": "REGEX",
-        "regex": "^(LEADER|MAINTAINER|MEMBER)$",
-        "mandatory": "true"
+        "regex": "^(LEADER|MAINTAINER|MEMBER)$"
       }
     ],
     "method": "POST",
     "pathVariables": [
       {
-        "name": "familyId"
+        "name": "familyId",
+        "mandatory": "true"
       },
       {
-        "name": "memberId"
+        "name": "memberId",
+        "mandatory": "true"
       }
     ]
   },
@@ -158,8 +159,19 @@
     "method": "POST",
     "pathVariables": [
       {
-        "name": "id"
+        "name": "id",
+        "mandatory": "true"
       }
     ]
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [],
+    "method": "DELETE"
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "GET"
   }
 ]

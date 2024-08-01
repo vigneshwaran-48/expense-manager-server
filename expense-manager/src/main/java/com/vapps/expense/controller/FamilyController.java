@@ -2,7 +2,6 @@ package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.InvitationDTO;
 import com.vapps.expense.common.dto.response.FamilyResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
@@ -44,5 +43,15 @@ public class FamilyController {
 
         return ResponseEntity.ok(
                 new Response(HttpStatus.OK.value(), "Invited member!", LocalDateTime.now(), request.getServletPath()));
+    }
+
+    @DeleteMapping("/{familyId}/member/{memberId}")
+    public ResponseEntity<Response> removeMember(@PathVariable String familyId, @PathVariable String memberId,
+            Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+
+        familyService.removeMember(userId, familyId, memberId);
+        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Removed member from family!", LocalDateTime.now(),
+                request.getServletPath()));
     }
 }

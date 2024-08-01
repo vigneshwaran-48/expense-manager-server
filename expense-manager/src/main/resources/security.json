@@ -163,5 +163,15 @@
         "mandatory": "true"
       }
     ]
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [],
+    "method": "DELETE"
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "GET"
   }
 ]

@@ -33,8 +33,7 @@ import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static com.vapps.expense.util.TestUtil.logTestCasePassed;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { FamilyController.class, InvitationController.class })
@@ -141,18 +140,35 @@ public class FamilyControllerTest {
 
     @Test
     @Order(2)
+    public void shouldGetFamily() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/api/family/" + familyId).with(
+                        oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+        FamilyResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        FamilyDTO familyDTO = response.getFamily();
+        assertThat(familyDTO.getName()).isEqualTo("Testing");
+        assertThat(familyDTO.getDescription()).isEqualTo("Testing family");
+        assertThat(familyDTO.getVisibility()).isEqualTo(FamilyDTO.Visibility.PRIVATE);
+        assertThat(familyDTO.getCreatedTime()).isNotNull();
+        assertThat(familyDTO.getCreatedBy().getId()).isEqualTo(USER_ID);
+    }
+
+    @Test
+    @Order(3)
     public void shouldInviteMember() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(
                         post("/api/family/" + familyId + "/member/" + MEMBER_ID + "/invite").param("role",
                                 FamilyMemberDTO.Role.MEMBER.name()).with(oidcLogin().oidcUser(
-                                getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.INVITE")))))
+                                getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member.INVITE")))))
                 .andExpect(status().isOk()).andReturn();
         Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         mvcResult = mockMvc.perform(get("/api/invitation").with(
-                        oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Invitation.READ")))))
+                        oidcLogin().oidcUser(getOidcUser(MEMBER_ID, List.of("SCOPE_ExpenseManager.Invitation.READ")))))
                 .andExpect(status().isOk()).andReturn();
 
         InvitationsResponse invitationsResponse =
@@ -162,7 +178,8 @@ public class FamilyControllerTest {
 
         InvitationDTO invitation = invitationsResponse.getInvitations().get(0);
         mvcResult = mockMvc.perform(post("/api/invitation/" + invitation.getId() + "/accept").with(
-                        oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Invitation.ACCEPT")))))
+                        oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
+                                List.of("SCOPE_ExpenseManager.Invitation.ACCEPT")))))
                 .andExpect(status().isOk()).andReturn();
 
         response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
@@ -172,9 +189,38 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(3)
-    public void shouldAddMemberToFamily() throws Exception {
+    @Order(4)
+    public void shouldRemoveMemberFromFamily() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(delete("/api/family/" + familyId + "/member/" + MEMBER_ID).with(
+                        oidcLogin().oidcUser(getOidcUser(USER_ID,
+                                List.of("SCOPE_ExpenseManager.Family.Member.REMOVE")))))
+                .andExpect(status().isOk()).andReturn();
+        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+        logTestCasePassed("Remove Family Member", "Removing member from family test passed!");
+    }
+
+    @Test
+    @Order(5)
+    public void shouldUpdateFamily() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/api/family/" + familyId).with(
+                        oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+        FamilyResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        FamilyDTO familyDTO = response.getFamily();
+
+        String updatedName = familyDTO.getName() + "_updated";
+        String updatedDescription = familyDTO.getDescription() + "_updated";
+        FamilyDTO.Visibility updatedVisibility = FamilyDTO.Visibility.PUBLIC;
+        String updateImage = familyDTO.getImage() + "_updated";
+
+        familyDTO.setName(updatedName);
+        familyDTO.setDescription(updatedDescription);
+        familyDTO.setImage(updateImage);
+        // TODO Need to complete this!
     }
 
     @Data
