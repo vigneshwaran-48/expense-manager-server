@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.Family.READ", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_FAMILY)
                         .access(hasAnyScope("ExpenseManager.Family.UPDATE", "ExpenseManager.Family.ALL"))
-                        .requestMatchers(HttpMethod.PATCH, Endpoints.DELETE_FAMILY)
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_FAMILY)
                         .access(hasAnyScope("ExpenseManager.Family.DELETE", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.INVITE_MEMBER)
                         .access(hasAnyScope("ExpenseManager.Family.Member.INVITE", "ExpenseManager.Family.ALL"))

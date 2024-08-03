@@ -267,18 +267,7 @@ public class FamilyControllerTest {
         FamilyResponse response =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        FamilyDTO familyDTO = response.getFamily();
-
-        String updatedName = familyDTO.getName() + "_updated";
-        String updatedDescription = familyDTO.getDescription() + "_updated";
-        FamilyDTO.Visibility updatedVisibility = FamilyDTO.Visibility.PUBLIC;
-        String updateImage = familyDTO.getImage() + "_updated";
-
-        FamilyCreationPayload payload = new FamilyCreationPayload();
-        payload.setName(updatedName);
-        payload.setDescription(updatedDescription);
-        payload.setImage(updateImage);
-        payload.setVisibility(updatedVisibility);
+        FamilyCreationPayload payload = getFamilyCreationPayload(response);
 
         mvcResult = mockMvc.perform(
                         patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY).buildAndExpand(familyId)
@@ -340,14 +329,24 @@ public class FamilyControllerTest {
         logTestCasePassed("Delete family", "Delete family test passed!");
     }
 
-    @Data
-    private class UserWithIdAndEmail {
-        private String id;
-        private String email;
+    private FamilyCreationPayload getFamilyCreationPayload(FamilyResponse response) {
+        FamilyDTO familyDTO = response.getFamily();
+
+        String updatedName = familyDTO.getName();
+        String updatedDescription = familyDTO.getDescription();
+        FamilyDTO.Visibility updatedVisibility = FamilyDTO.Visibility.PUBLIC;
+        String updateImage = familyDTO.getImage();
+
+        FamilyCreationPayload payload = new FamilyCreationPayload();
+        payload.setName(updatedName);
+        payload.setDescription(updatedDescription);
+        payload.setImage(updateImage);
+        payload.setVisibility(updatedVisibility);
+        return payload;
     }
 
     @Data
-    private class FamilyCreationPayload {
+    private static class FamilyCreationPayload {
         private String name;
         private String description;
         private FamilyDTO.Visibility visibility;

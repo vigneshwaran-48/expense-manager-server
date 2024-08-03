@@ -24,6 +24,7 @@ import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,7 +79,7 @@ public class FamilyServiceImpl implements FamilyService {
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
         if (userMember.isEmpty() || (userMember.get().getRole() != FamilyMemberDTO.Role.LEADER && userMember.get()
                 .getRole() != FamilyMemberDTO.Role.MAINTAINER)) {
-            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed update this family!");
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to update this family!");
         }
         Family existingFamily = familyRepository.findById(familyId).get();
         familyDTO.setCreatedBy(existingFamily.getCreatedBy().toDTO());
@@ -125,7 +126,14 @@ public class FamilyServiceImpl implements FamilyService {
     @UserIdValidator(positions = 0)
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void deleteFamilyById(String userId, String id) throws AppException {
-
+        Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(id, userId);
+        if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete this family!");
+        }
+        familyMemberRepository.deleteByFamilyId(id);
+        LOGGER.info("Deleted all members relation in the family {}", id);
+        familyRepository.deleteById(id);
+        LOGGER.info("Deleted family {}", id);
     }
 
     @Override

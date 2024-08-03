@@ -6,6 +6,7 @@ import com.vapps.expense.repository.mongo.FamilyMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -34,13 +35,13 @@ public class FamilyCacheRepository implements FamilyRepository {
     }
 
     @Override
-    @CacheEvict(value = "family", key = "'family' + #id")
+    @Caching(evict = { @CacheEvict(value = "familyCreatedBy"), @CacheEvict(value = "family", key = "'family' + #id") })
     public void deleteById(String id) {
         familyRepository.deleteById(id);
     }
 
     @Override
-    @Cacheable(value = "family", key = "'created_by_' + #createdById")
+    @Cacheable(value = "familyCreatedBy", key = "'created_by_' + #createdById")
     public Optional<Family> findByCreatedById(String createdById) {
         return familyRepository.findByCreatedById(createdById);
     }

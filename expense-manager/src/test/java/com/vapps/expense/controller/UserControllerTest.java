@@ -146,9 +146,52 @@ public class UserControllerTest {
                         .content(userStr)).andExpect(status().isOk()).andReturn();
         UserResponse userResponse =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
+
         assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(userResponse.getUser()).isEqualTo(userDTO);
+        assertThat(userResponse.getUser().getId()).isEqualTo(userDTO.getId());
+        assertThat(userResponse.getUser().getName()).isEqualTo(userDTO.getName());
+        assertThat(userResponse.getUser().getFirstName()).isEqualTo(userDTO.getFirstName());
+        assertThat(userResponse.getUser().getLastName()).isEqualTo(userDTO.getLastName());
+        assertThat(userResponse.getUser().getAge()).isEqualTo(userDTO.getAge());
+        assertThat(userResponse.getUser().getEmail()).isEqualTo(userDTO.getEmail());
+        assertThat(userResponse.getUser().getImage()).isEqualTo(userDTO.getImage());
+
         logTestCasePassed("Create user", "Tests whether user is created");
+    }
+
+    @Test
+    @Order(5)
+    void shouldCreateAnotherUser() throws Exception {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId("different_user_id");
+        userDTO.setAge(19);
+        userDTO.setEmail("different@test.com");
+        userDTO.setImage("https://vapps.images.com/vicky/profile");
+        userDTO.setName("Different");
+        userDTO.setFirstName("Different");
+        userDTO.setLastName("M");
+
+        String userStr = objectMapper.writeValueAsString(userDTO);
+
+        OidcUser oidcUser = new DefaultOidcUser(AuthorityUtils.createAuthorityList("SCOPE_ExpenseManager.User.CREATE"),
+                OidcIdToken.withTokenValue("id-token").claim("sub", "different_user_id").build(), "sub");
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(Endpoints.CREATE_USER).with(oidcLogin().oidcUser(oidcUser)).contentType(MediaType.APPLICATION_JSON)
+                        .content(userStr)).andExpect(status().isOk()).andReturn();
+        UserResponse userResponse =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
+
+        assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(userResponse.getUser().getId()).isEqualTo(userDTO.getId());
+        assertThat(userResponse.getUser().getName()).isEqualTo(userDTO.getName());
+        assertThat(userResponse.getUser().getFirstName()).isEqualTo(userDTO.getFirstName());
+        assertThat(userResponse.getUser().getLastName()).isEqualTo(userDTO.getLastName());
+        assertThat(userResponse.getUser().getAge()).isEqualTo(userDTO.getAge());
+        assertThat(userResponse.getUser().getEmail()).isEqualTo(userDTO.getEmail());
+        assertThat(userResponse.getUser().getImage()).isEqualTo(userDTO.getImage());
+
+        logTestCasePassed("Create another user", "Tests whether user another is also created");
     }
 
     @Test
