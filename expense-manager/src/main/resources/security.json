@@ -123,8 +123,96 @@
           "type": "REGEX",
           "mandatory": "true",
           "regex": "^(PRIVATE|PUBLIC)$"
+        },
+        {
+          "key": "image"
         }
       ]
     }
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}/invite",
+    "params": [
+      {
+        "name": "role",
+        "type": "REGEX",
+        "regex": "^(LEADER|MAINTAINER|MEMBER)$"
+      }
+    ],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ]
+  },
+  {
+    "path": "/api/invitation",
+    "params": [],
+    "method": "GET"
+  },
+  {
+    "path": "/api/invitation/{id}/accept",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [],
+    "method": "DELETE"
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "PATCH",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "type": "STRING",
+          "mandatory": "true",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "description",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25
+        },
+        {
+          "key": "visibility",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^(PRIVATE|PUBLIC)$"
+        },
+        {
+          "key": "image"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "DELETE"
   }
 ]

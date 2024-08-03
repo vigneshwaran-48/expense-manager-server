@@ -73,4 +73,13 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
         familyMemberRepository.deleteByFamilyIdAndMemberId(familyId, memberId);
     }
 
+    /**
+     * Need to find a better way to evict the cache related to the family.
+     */
+    @Override
+    @CacheEvict(value = "familyMember")
+    public void deleteByFamilyId(String familyId) {
+        familyMemberRepository.deleteByFamilyId(familyId);
+    }
+
 }

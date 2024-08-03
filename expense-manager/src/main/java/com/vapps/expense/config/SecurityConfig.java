@@ -1,5 +1,6 @@
 package com.vapps.expense.config;
 
+import com.vapps.expense.common.util.Endpoints;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,13 +25,29 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
-                .disable().authorizeHttpRequests(http -> http.requestMatchers(HttpMethod.GET, "/api/user/**")
+                .disable().authorizeHttpRequests(http -> http.requestMatchers(HttpMethod.GET, Endpoints.GET_USER)
                         .access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
-                        .requestMatchers(HttpMethod.POST, "/api/user")
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_USER)
                         .access(hasAnyScope("ExpenseManager.User.CREATE", "ExpenseManager.User.ALL"))
-                        .requestMatchers(HttpMethod.PATCH, "/api/user/**")
-                        .access(hasAnyScope("ExpenseManager.User.UPDATE", "ExpenseManager.User.ALL")).anyRequest()
-                        .authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+                        .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_USER)
+                        .access(hasAnyScope("ExpenseManager.User.UPDATE", "ExpenseManager.User.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_FAMILY)
+                        .access(hasAnyScope("ExpenseManager.Family.CREATE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_FAMILY)
+                        .access(hasAnyScope("ExpenseManager.Family.READ", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_FAMILY)
+                        .access(hasAnyScope("ExpenseManager.Family.UPDATE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_FAMILY)
+                        .access(hasAnyScope("ExpenseManager.Family.DELETE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.INVITE_MEMBER)
+                        .access(hasAnyScope("ExpenseManager.Family.Member.INVITE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.REMOVE_MEMBER_FROM_FAMILY)
+                        .access(hasAnyScope("ExpenseManager.Family.Member.REMOVE", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_ALL_INVITATIONS)
+                        .access(hasAnyScope("ExpenseManager.Invitation.READ", "ExpenseManager.Invitation.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.ACCEPT_INVITATION)
+                        .access(hasAnyScope("ExpenseManager.Invitation.ACCEPT")).anyRequest().authenticated())
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 

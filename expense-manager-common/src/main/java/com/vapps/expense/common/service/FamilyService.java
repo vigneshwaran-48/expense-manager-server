@@ -10,7 +10,7 @@ public interface FamilyService {
 
     FamilyDTO createFamily(String userId, FamilyDTO family) throws AppException;
 
-    FamilyDTO updateFamily(String userId, FamilyDTO family) throws AppException;
+    FamilyDTO updateFamily(String userId, String familyId, FamilyDTO family) throws AppException;
 
     Optional<FamilyDTO> getFamilyById(String userId, String id) throws AppException;
 

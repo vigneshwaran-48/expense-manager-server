@@ -21,4 +21,7 @@ public interface FamilyMemberMongoRepository extends MongoRepository<FamilyMembe
     void deleteByFamilyIdAndMemberId(String familyId, String memberId);
 
     Optional<FamilyMember> findByMemberId(String memberId);
+
+    @Transactional
+    void deleteByFamilyId(String familyId);
 }

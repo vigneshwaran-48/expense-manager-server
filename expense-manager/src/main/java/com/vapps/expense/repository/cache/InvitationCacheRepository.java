@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -39,5 +40,11 @@ public class InvitationCacheRepository implements InvitationRepository {
     public Optional<Invitation> findByRecipientIdAndFromIdAndType(String recipientId, String fromId,
             InvitationDTO.Type type) {
         return invitationRepository.findByRecipientIdAndFromIdAndType(recipientId, fromId, type);
+    }
+
+    @Override
+    @Cacheable(value = "invitation", key = "'user_all_invitation_' + #recipientId")
+    public List<Invitation> findByRecipientId(String recipientId) {
+        return invitationRepository.findByRecipientId(recipientId);
     }
 }

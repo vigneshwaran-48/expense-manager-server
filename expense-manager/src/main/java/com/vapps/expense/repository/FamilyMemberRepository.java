@@ -28,4 +28,7 @@ public interface FamilyMemberRepository {
     @Transactional
     void deleteByFamilyIdAndMemberId(String familyId, String memberId);
 
+    @Transactional
+    void deleteByFamilyId(String familyId);
+
 }
