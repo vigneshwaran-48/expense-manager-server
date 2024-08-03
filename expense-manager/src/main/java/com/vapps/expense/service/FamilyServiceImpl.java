@@ -73,8 +73,37 @@ public class FamilyServiceImpl implements FamilyService {
 
     @Override
     @UserIdValidator(positions = 0)
-    public FamilyDTO updateFamily(String userId, FamilyDTO family) throws AppException {
-        return null;
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public FamilyDTO updateFamily(String userId, String familyId, FamilyDTO familyDTO) throws AppException {
+        Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
+        if (userMember.isEmpty() || (userMember.get().getRole() != FamilyMemberDTO.Role.LEADER && userMember.get()
+                .getRole() != FamilyMemberDTO.Role.MAINTAINER)) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed update this family!");
+        }
+        Family existingFamily = familyRepository.findById(familyId).get();
+        familyDTO.setCreatedBy(existingFamily.getCreatedBy().toDTO());
+
+        Family familyToUpdate = Family.build(familyDTO);
+        familyToUpdate.setId(familyId);
+        familyToUpdate.setCreatedTime(existingFamily.getCreatedTime());
+
+        if (familyToUpdate.getName() == null) {
+            familyToUpdate.setName(existingFamily.getName());
+        }
+        if (familyToUpdate.getDescription() == null) {
+            familyToUpdate.setDescription(existingFamily.getDescription());
+        }
+        if (familyToUpdate.getImage() == null) {
+            familyToUpdate.setImage(existingFamily.getImage());
+        }
+        if (familyToUpdate.getVisibility() == null) {
+            familyToUpdate.setVisibility(existingFamily.getVisibility());
+        }
+        Family updatedFamily = familyRepository.update(familyToUpdate);
+        if (updatedFamily == null) {
+            throw new AppException("Error while updating the family!");
+        }
+        return updatedFamily.toDTO();
     }
 
     @Override
@@ -94,6 +123,7 @@ public class FamilyServiceImpl implements FamilyService {
 
     @Override
     @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void deleteFamilyById(String userId, String id) throws AppException {
 
     }

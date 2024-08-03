@@ -123,6 +123,9 @@
           "type": "REGEX",
           "mandatory": "true",
           "regex": "^(PRIVATE|PUBLIC)$"
+        },
+        {
+          "key": "image"
         }
       ]
     }
@@ -139,12 +142,10 @@
     "method": "POST",
     "pathVariables": [
       {
-        "name": "familyId",
-        "mandatory": "true"
+        "name": "familyId"
       },
       {
-        "name": "memberId",
-        "mandatory": "true"
+        "name": "memberId"
       }
     ]
   },
@@ -159,8 +160,7 @@
     "method": "POST",
     "pathVariables": [
       {
-        "name": "id",
-        "mandatory": "true"
+        "name": "id"
       }
     ]
   },
@@ -173,5 +173,46 @@
     "path": "/api/family/{familyId}",
     "params": [],
     "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "PATCH",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "type": "STRING",
+          "mandatory": "true",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        {
+          "key": "description",
+          "type": "STRING",
+          "minLength": 1,
+          "maxLength": 25
+        },
+        {
+          "key": "visibility",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^(PRIVATE|PUBLIC)$"
+        },
+        {
+          "key": "image"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/family/{familyId}",
+    "params": [],
+    "method": "DELETE"
   }
 ]

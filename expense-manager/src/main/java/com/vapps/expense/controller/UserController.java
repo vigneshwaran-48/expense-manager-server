@@ -4,6 +4,7 @@ import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.dto.response.UserResponse;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.UserService;
+import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping(Endpoints.USER_API)
 public class UserController {
 
     @Autowired
@@ -29,7 +30,7 @@ public class UserController {
                         userDTO));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping(Endpoints.GET_USER_PATH)
     public ResponseEntity<UserResponse> getUser(@PathVariable String userId, HttpServletRequest request)
             throws AppException {
         UserDTO userDTO = userService.getUser(userId)
@@ -39,7 +40,7 @@ public class UserController {
                         userDTO));
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping(Endpoints.UPDATE_USER_PATH)
     public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserDTO user,
             HttpServletRequest request, Principal principal) throws AppException {
 
@@ -50,7 +51,7 @@ public class UserController {
                         updatedUser));
     }
 
-    @GetMapping("/profile")
+    @GetMapping(Endpoints.GET_PROFILE_PATH)
     public ResponseEntity<UserResponse> getProfile(HttpServletRequest request, Principal principal)
             throws AppException {
 

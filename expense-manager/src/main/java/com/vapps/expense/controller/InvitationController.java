@@ -5,6 +5,7 @@ import com.vapps.expense.common.dto.response.InvitationsResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.InvitationService;
+import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/invitation")
+@RequestMapping(Endpoints.INVITATION_API)
 public class InvitationController {
 
     @Autowired
     private InvitationService invitationService;
 
-    @PostMapping("/{id}/accept")
+    @PostMapping(Endpoints.ACCEPT_INVITATION_PATH)
     public ResponseEntity<Response> acceptInvitation(@PathVariable String id, Principal principal,
             HttpServletRequest request) throws AppException {
         String userId = principal.getName();
