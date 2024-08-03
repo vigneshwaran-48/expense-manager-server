@@ -56,8 +56,8 @@ public class UserController {
             throws AppException {
 
         String userId = principal.getName();
-        UserDTO userDTO =
-                userService.getUser(userId).orElseThrow(() -> new AppException(401, "Current user not " + "exists!"));
+        UserDTO userDTO = userService.getUser(userId)
+                .orElseThrow(() -> new AppException(401, "Current user not " + userId + " exists!"));
         return ResponseEntity.ok(
                 new UserResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         userDTO));
