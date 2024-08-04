@@ -1,0 +1,87 @@
+[
+  {
+    "id": "f1",
+    "name": "The Smiths",
+    "description": "Smith family description",
+    "visibility": "PUBLIC",
+    "createdTime": "2024-07-09T10:00:00",
+    "image": "smithfamily.jpg",
+    "createdBy": {
+      "id": "1",
+      "name": "johnsmith",
+      "firstName": "John",
+      "lastName": "Smith",
+      "age": 28,
+      "email": "john.smith@example.com",
+      "image": "johnsmith.jpg"
+    }
+  },
+  {
+    "id": "f2",
+    "name": "Johnson Clan",
+    "description": "Johnson family description",
+    "visibility": "PUBLIC",
+    "createdTime": "2024-07-09T11:00:00",
+    "image": "johnsonclan.jpg",
+    "createdBy": {
+      "id": "2",
+      "name": "emmajones",
+      "firstName": "Emma",
+      "lastName": "Jones",
+      "age": 32,
+      "email": "emma.jones@example.com",
+      "image": "emmajones.jpg"
+    }
+  },
+  {
+    "id": "f3",
+    "name": "The Martinez Family",
+    "description": "Martinez family description",
+    "visibility": "PUBLIC",
+    "createdTime": "2024-07-09T12:00:00",
+    "image": "martinezfamily.jpg",
+    "createdBy": {
+      "id": "3",
+      "name": "robertbrown",
+      "firstName": "Robert",
+      "lastName": "Brown",
+      "age": 24,
+      "email": "robert.brown@example.com",
+      "image": "robertbrown.jpg"
+    }
+  },
+  {
+    "id": "f4",
+    "name": "Williams Crew",
+    "description": "Williams family description",
+    "visibility": "PUBLIC",
+    "createdTime": "2024-07-09T13:00:00",
+    "image": "williamscrew.jpg",
+    "createdBy": {
+      "id": "4",
+      "name": "oliviawilliams",
+      "firstName": "Olivia",
+      "lastName": "Williams",
+      "age": 29,
+      "email": "olivia.williams@example.com",
+      "image": "oliviawilliams.jpg"
+    }
+  },
+  {
+    "id": "f5",
+    "name": "Garcia Tribe",
+    "description": "Garcia family description",
+    "visibility": "PUBLIC",
+    "createdTime": "2024-07-09T14:00:00",
+    "image": "garciatribe.jpg",
+    "createdBy": {
+      "id": "5",
+      "name": "michaelgarcia",
+      "firstName": "Michael",
+      "lastName": "Garcia",
+      "age": 35,
+      "email": "michael.garcia@example.com",
+      "image": "michaelgarcia.jpg"
+    }
+  }
+]

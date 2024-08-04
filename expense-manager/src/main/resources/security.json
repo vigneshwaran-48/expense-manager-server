@@ -214,5 +214,20 @@
     "path": "/api/family/{familyId}",
     "params": [],
     "method": "DELETE"
+  },
+  {
+    "path": "/api/family/search",
+    "params": [
+      {
+        "name": "query",
+        "mandatory": "true"
+      },
+      {
+        "name": "page",
+        "mandatory": "true",
+        "type": "INTEGER"
+      }
+    ],
+    "method": "GET"
   }
 ]

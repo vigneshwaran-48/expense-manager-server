@@ -2,10 +2,7 @@ package com.vapps.expense.service;
 
 import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.InvitationDTO;
-import com.vapps.expense.common.dto.UserDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.InvitationService;
@@ -18,15 +15,14 @@ import com.vapps.expense.repository.FamilyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class FamilyServiceImpl implements FamilyService {
@@ -44,6 +40,7 @@ public class FamilyServiceImpl implements FamilyService {
     private InvitationService invitationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
+    private static final int PAGE_SIZE = 10;
 
     @Override
     @UserIdValidator(positions = 0)
@@ -243,5 +240,40 @@ public class FamilyServiceImpl implements FamilyService {
         context.setVariable("familyName", familyDTO.getName());
 
         invitationService.sendInvitation(userId, invitationDTO, context);
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public Optional<FamilyDTO> getUserFamily(String userId) {
+        Optional<FamilyMember> familyMember = familyMemberRepository.findByMemberId(userId);
+        if (familyMember.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(familyMember.get().getFamily().toDTO());
+    }
+
+    @Override
+    public SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException {
+
+        int queryPage = page - 1;
+
+        SearchDTO<FamilyDTO> familyResults = new SearchDTO<>();
+        familyResults.setResults(new ArrayList<>());
+        familyResults.setCurrentPage(page);
+        familyResults.setNextPage(-1);
+
+        familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query, FamilyDTO.Visibility.PUBLIC,
+                        PageRequest.of(queryPage, PAGE_SIZE + 1)).stream()
+                .filter(family -> !familyMemberRepository.existsByFamilyIdAndMemberId(family.getId(), userId))
+                .forEach(family -> familyResults.getResults().add(family.toDTO()));
+
+        if (familyResults.getResults().size() > PAGE_SIZE) {
+            familyResults.getResults().remove(familyResults.getResults().size() - 1);
+            familyResults.setNextPage(page + 1);
+        }
+        int resultSize = familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query,
+                FamilyDTO.Visibility.PUBLIC).size();
+        familyResults.setTotalPages(resultSize >= PAGE_SIZE ? resultSize % PAGE_SIZE : 1);
+        return familyResults;
     }
 }
