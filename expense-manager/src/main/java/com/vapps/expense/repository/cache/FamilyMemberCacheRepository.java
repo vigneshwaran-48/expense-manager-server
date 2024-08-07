@@ -20,6 +20,7 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
     private FamilyMemberMongoRepository familyMemberRepository;
 
     @Override
+    @CacheEvict(value = "familyMember", key = "'family_member_' + #familyMember.getMember().getId()")
     public FamilyMember save(FamilyMember familyMember) {
         return familyMemberRepository.save(familyMember);
     }

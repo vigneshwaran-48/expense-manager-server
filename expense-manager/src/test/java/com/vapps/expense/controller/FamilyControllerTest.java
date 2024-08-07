@@ -172,12 +172,14 @@ public class FamilyControllerTest {
         String updatedDescription = familyDTO.getDescription() + "_updated";
         FamilyDTO.Visibility updatedVisibility = FamilyDTO.Visibility.PUBLIC;
         String updateImage = familyDTO.getImage() + "_updated";
+        FamilyDTO.JoinType updatedJoinTye = FamilyDTO.JoinType.INVITE_ONLY;
 
         FamilyCreationPayload payload = new FamilyCreationPayload();
         payload.setName(updatedName);
         payload.setDescription(updatedDescription);
         payload.setImage(updateImage);
         payload.setVisibility(updatedVisibility);
+        payload.setJoinType(updatedJoinTye);
 
         mvcResult = mockMvc.perform(
                         patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY).buildAndExpand(familyId)
@@ -197,6 +199,7 @@ public class FamilyControllerTest {
         assertThat(updatedFamily.getDescription()).isEqualTo(updatedDescription);
         assertThat(updatedFamily.getImage()).isEqualTo(updateImage);
         assertThat(updatedFamily.getVisibility()).isEqualTo(updatedVisibility);
+        assertThat(updatedFamily.getJoinType()).isEqualTo(updatedJoinTye);
 
         logTestCasePassed("Update Family", "Update family test case passed!");
     }
@@ -348,6 +351,7 @@ public class FamilyControllerTest {
         familyDTO.setVisibility(visibility);
         familyDTO.setName(familyName);
         familyDTO.setImage("/testing.png");
+        familyDTO.setJoinType(FamilyDTO.JoinType.ANYONE);
 
         MvcResult mvcResult = mockMvc.perform(post(Endpoints.CREATE_FAMILY).with(
                                 oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.Family" +
@@ -364,6 +368,7 @@ public class FamilyControllerTest {
         assertThat(family.getName()).isEqualTo(familyName);
         assertThat(family.getVisibility()).isEqualTo(visibility);
         assertThat(family.getDescription()).isEqualTo(description);
+        assertThat(family.getJoinType()).isEqualTo(FamilyDTO.JoinType.ANYONE);
 
         return family.getId();
     }
@@ -381,6 +386,7 @@ public class FamilyControllerTest {
         payload.setDescription(updatedDescription);
         payload.setImage(updateImage);
         payload.setVisibility(updatedVisibility);
+        payload.setJoinType(FamilyDTO.JoinType.ANYONE);
         return payload;
     }
 
@@ -423,5 +429,6 @@ public class FamilyControllerTest {
         private String description;
         private FamilyDTO.Visibility visibility;
         private String image;
+        private FamilyDTO.JoinType joinType;
     }
 }

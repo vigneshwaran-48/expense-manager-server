@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -96,6 +95,9 @@ public class FamilyServiceImpl implements FamilyService {
         }
         if (familyToUpdate.getVisibility() == null) {
             familyToUpdate.setVisibility(existingFamily.getVisibility());
+        }
+        if (familyToUpdate.getJoinType() == null) {
+            familyToUpdate.setJoinType(existingFamily.getJoinType());
         }
         Family updatedFamily = familyRepository.update(familyToUpdate);
         if (updatedFamily == null) {
