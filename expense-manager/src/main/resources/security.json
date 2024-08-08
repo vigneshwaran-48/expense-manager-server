@@ -116,7 +116,7 @@
           "key": "description",
           "type": "STRING",
           "minLength": 1,
-          "maxLength": 25
+          "maxLength": 100
         },
         {
           "key": "visibility",
@@ -126,6 +126,12 @@
         },
         {
           "key": "image"
+        },
+        {
+          "key": "joinType",
+          "type": "REGEX",
+          "mandatory": "true",
+          "regex": "^(ANYONE|INVITE_ONLY)$"
         }
       ]
     }
@@ -188,7 +194,6 @@
         {
           "key": "name",
           "type": "STRING",
-          "mandatory": "true",
           "minLength": 1,
           "maxLength": 20
         },
@@ -201,11 +206,15 @@
         {
           "key": "visibility",
           "type": "REGEX",
-          "mandatory": "true",
           "regex": "^(PRIVATE|PUBLIC)$"
         },
         {
           "key": "image"
+        },
+        {
+          "key": "joinType",
+          "type": "REGEX",
+          "regex": "^(ANYONE|INVITE_ONLY)$"
         }
       ]
     }
@@ -214,5 +223,20 @@
     "path": "/api/family/{familyId}",
     "params": [],
     "method": "DELETE"
+  },
+  {
+    "path": "/api/family/search",
+    "params": [
+      {
+        "name": "query",
+        "mandatory": "true"
+      },
+      {
+        "name": "page",
+        "mandatory": "true",
+        "type": "INTEGER"
+      }
+    ],
+    "method": "GET"
   }
 ]

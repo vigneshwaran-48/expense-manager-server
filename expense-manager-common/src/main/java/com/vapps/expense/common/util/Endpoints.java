@@ -23,6 +23,8 @@ public class Endpoints {
     public static final String DELETE_FAMILY_PATH = "/{familyId}";
     public static final String INVITE_MEMBER_PATH = "/{familyId}/member/{memberId}/invite";
     public static final String REMOVE_MEMBER_FROM_FAMILY_PATH = "/{familyId}/member/{memberId}";
+    public static final String GET_USER_FAMILY_PATH = "/user";
+    public static final String SEARCH_FAMILY_PATH = "/search";
 
     public static final String CREATE_FAMILY = FAMILY_API;
     public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -30,6 +32,8 @@ public class Endpoints {
     public static final String DELETE_FAMILY = FAMILY_API + DELETE_FAMILY_PATH;
     public static final String INVITE_MEMBER = FAMILY_API + INVITE_MEMBER_PATH;
     public static final String REMOVE_MEMBER_FROM_FAMILY = FAMILY_API + REMOVE_MEMBER_FROM_FAMILY_PATH;
+    public static final String GET_USER_FAMILY = FAMILY_API + GET_USER_FAMILY_PATH;
+    public static final String SEARCH_FAMILY = FAMILY_API + SEARCH_FAMILY_PATH;
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";

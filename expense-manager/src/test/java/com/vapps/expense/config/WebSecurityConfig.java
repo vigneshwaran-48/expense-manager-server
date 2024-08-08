@@ -19,13 +19,11 @@ public class WebSecurityConfig {
     @Bean
     public WebSecurityConfiguration webSecurityConfiguration() throws IOException {
 
-        System.out.println("Hi -------------------------------");
         ObjectMapper mapper = new ObjectMapper();
         InputStream inputStream = getClass().getResourceAsStream("/security.json");
         List<URLConfig> urlConfigs = null;
         try {
             urlConfigs = Arrays.asList(mapper.readValue(inputStream, URLConfig[].class));
-            System.out.println(urlConfigs);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
             throw e;

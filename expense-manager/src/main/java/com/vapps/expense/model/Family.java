@@ -21,6 +21,7 @@ public class Family {
     private Visibility visibility;
     private LocalDateTime createdTime;
     private String image;
+    private FamilyDTO.JoinType joinType;
 
     @DocumentReference
     private User createdBy;
@@ -34,6 +35,7 @@ public class Family {
         familyDTO.setCreatedBy(createdBy.toDTO());
         familyDTO.setCreatedTime(createdTime);
         familyDTO.setImage(image);
+        familyDTO.setJoinType(joinType);
         return familyDTO;
     }
 
@@ -46,6 +48,7 @@ public class Family {
         family.setCreatedBy(User.build(familyDTO.getCreatedBy()));
         family.setCreatedTime(familyDTO.getCreatedTime());
         family.setImage(familyDTO.getImage());
+        family.setJoinType(familyDTO.getJoinType());
         return family;
     }
 }

@@ -2,8 +2,10 @@ package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
+import com.vapps.expense.common.dto.SearchDTO;
 import com.vapps.expense.common.dto.response.FamilyResponse;
 import com.vapps.expense.common.dto.response.Response;
+import com.vapps.expense.common.dto.response.SearchResponse;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.util.Endpoints;
@@ -90,5 +92,28 @@ public class FamilyController {
         familyService.deleteFamilyById(userId, familyId);
         return ResponseEntity.ok(
                 new Response(HttpStatus.OK.value(), "Deleted family!", LocalDateTime.now(), request.getServletPath()));
+    }
+
+    @GetMapping(Endpoints.GET_USER_FAMILY_PATH)
+    public ResponseEntity<FamilyResponse> getUserFamily(Principal principal, HttpServletRequest request)
+            throws AppException {
+
+        String userId = principal.getName();
+        Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+        return ResponseEntity.ok(
+                new FamilyResponse(family.isPresent() ? HttpStatus.OK.value() : HttpStatus.NO_CONTENT.value(),
+                        "success", LocalDateTime.now(), request.getServletPath(),
+                        family.isPresent() ? family.get() : null));
+    }
+
+    @GetMapping(Endpoints.SEARCH_FAMILY_PATH)
+    public ResponseEntity<SearchResponse<FamilyDTO>> searchFamily(@RequestParam String query, @RequestParam int page,
+            Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = principal.getName();
+        SearchDTO<FamilyDTO> results = familyService.searchFamily(userId, query, page);
+        return ResponseEntity.ok(
+                new SearchResponse<>(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        results));
     }
 }

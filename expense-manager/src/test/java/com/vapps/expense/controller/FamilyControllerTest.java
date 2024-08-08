@@ -1,14 +1,8 @@
 package com.vapps.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.InvitationDTO;
-import com.vapps.expense.common.dto.UserDTO;
-import com.vapps.expense.common.dto.response.FamilyResponse;
-import com.vapps.expense.common.dto.response.InvitationsResponse;
-import com.vapps.expense.common.dto.response.Response;
-import com.vapps.expense.common.dto.response.UserResponse;
+import com.vapps.expense.common.dto.*;
+import com.vapps.expense.common.dto.response.*;
 import com.vapps.expense.common.util.Endpoints;
 import com.vapps.expense.config.EnableMongoTestServer;
 import lombok.Data;
@@ -35,6 +29,7 @@ import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static com.vapps.expense.util.TestUtil.logTestCasePassed;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,50 +54,28 @@ public class FamilyControllerTest {
 
     @BeforeEach
     public void setup() throws Exception {
-
-        OidcUser oidcUser = new DefaultOidcUser(AuthorityUtils.createAuthorityList("SCOPE_ExpenseManager.User.READ"),
-                OidcIdToken.withTokenValue("id-token").claim("sub", USER_ID).build(), "sub");
-
-        MvcResult getUserResult = mockMvc.perform(
-                get(UriComponentsBuilder.fromPath(Endpoints.GET_USER).buildAndExpand("testing_user_id")
-                        .toUriString()).with(oidcLogin().oidcUser(oidcUser))).andReturn();
-        UserResponse userResponse =
-                objectMapper.readValue(getUserResult.getResponse().getContentAsString(), UserResponse.class);
-
-        if (userResponse.getStatus() == HttpStatus.OK.value()) {
-            return;
-        }
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(USER_ID);
-        userDTO.setAge(19);
-        userDTO.setEmail("vigneshwaran4817@gmail.com");
-        userDTO.setImage("https://vapps.images.com/vicky/profile");
-        userDTO.setName("Vicky");
-        userDTO.setFirstName("Vigneshwaran");
-        userDTO.setLastName("M");
-
-        String userStr = objectMapper.writeValueAsString(userDTO);
-
-        oidcUser = new DefaultOidcUser(AuthorityUtils.createAuthorityList("SCOPE_ExpenseManager.User.CREATE"),
-                OidcIdToken.withTokenValue("id-token").claim("sub", "testing_user_id").build(), "sub");
-
-        MvcResult mvcResult = mockMvc.perform(
-                post(Endpoints.CREATE_USER).with(oidcLogin().oidcUser(oidcUser)).contentType(MediaType.APPLICATION_JSON)
-                        .content(userStr)).andExpect(status().isOk()).andReturn();
-        userResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
-        assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(userResponse.getUser()).isEqualTo(userDTO);
-
-        userDTO.setId(MEMBER_ID);
-        userDTO.setEmail("p3487260@gmail.com");
-        userStr = objectMapper.writeValueAsString(userDTO);
-
-        mvcResult = mockMvc.perform(
-                post(Endpoints.CREATE_USER).with(oidcLogin().oidcUser(oidcUser)).contentType(MediaType.APPLICATION_JSON)
-                        .content(userStr)).andExpect(status().isOk()).andReturn();
-        userResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
-        assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(userResponse.getUser()).isEqualTo(userDTO);
+        createUser(USER_ID, "Vigneshwaran");
+        createUser(MEMBER_ID, "Member");
+        createUser("smith_id", "smith");
+        createUser("john_id", "john");
+        createUser("martinez_id", "martinez");
+        createUser("brown_id", "brown");
+        createUser("williams_id", "williams");
+        createUser("garcia_id", "garcia");
+        createUser("rodriguez_id", "rodriguez");
+        createUser("lee_id", "lee");
+        createUser("young_id", "young");
+        createUser("nguyen_id", "nguyen");
+        createUser("patel_id", "patel");
+        createUser("wilson_id", "wilson");
+        createUser("walker_id", "walker");
+        createUser("harris_id", "harris");
+        createUser("hernandez_id", "hernandez");
+        createUser("white_id", "white");
+        createUser("thompson_id", "thompson");
+        createUser("ramirez_id", "ramirez");
+        createUser("jones_id", "jones");
+        createUser("greene_id", "greene");
 
         logTestCasePassed("Users for family", "Tests whether users is created");
     }
@@ -110,35 +83,7 @@ public class FamilyControllerTest {
     @Test
     @Order(1)
     public void shouldCreateFamily() throws Exception {
-
-        String description = "Testing family";
-        FamilyDTO.Visibility visibility = FamilyDTO.Visibility.PRIVATE;
-        String familyName = "Testing";
-
-        FamilyCreationPayload familyDTO = new FamilyCreationPayload();
-        familyDTO.setDescription(description);
-        familyDTO.setVisibility(visibility);
-        familyDTO.setName(familyName);
-        familyDTO.setImage("/testing.png");
-
-        MvcResult mvcResult = mockMvc.perform(post(Endpoints.CREATE_FAMILY).with(
-                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
-                                        ".CREATE"))))
-                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(familyDTO)))
-                .andExpect(status().isOk()).andReturn();
-
-        FamilyResponse familyResponse =
-                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
-        assertThat(familyResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
-        FamilyDTO family = familyResponse.getFamily();
-        assertThat(family.getId()).isNotNull().isNotBlank();
-        assertThat(family.getCreatedTime()).isNotNull();
-        assertThat(family.getName()).isEqualTo(familyName);
-        assertThat(family.getVisibility()).isEqualTo(visibility);
-        assertThat(family.getDescription()).isEqualTo(description);
-
-        familyId = family.getId();
-
+        familyId = createFamily(USER_ID, "Testing", FamilyDTO.Visibility.PRIVATE);
         logTestCasePassed("Create Family", "Tests family creation");
     }
 
@@ -227,12 +172,14 @@ public class FamilyControllerTest {
         String updatedDescription = familyDTO.getDescription() + "_updated";
         FamilyDTO.Visibility updatedVisibility = FamilyDTO.Visibility.PUBLIC;
         String updateImage = familyDTO.getImage() + "_updated";
+        FamilyDTO.JoinType updatedJoinTye = FamilyDTO.JoinType.INVITE_ONLY;
 
         FamilyCreationPayload payload = new FamilyCreationPayload();
         payload.setName(updatedName);
         payload.setDescription(updatedDescription);
         payload.setImage(updateImage);
         payload.setVisibility(updatedVisibility);
+        payload.setJoinType(updatedJoinTye);
 
         mvcResult = mockMvc.perform(
                         patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY).buildAndExpand(familyId)
@@ -252,6 +199,7 @@ public class FamilyControllerTest {
         assertThat(updatedFamily.getDescription()).isEqualTo(updatedDescription);
         assertThat(updatedFamily.getImage()).isEqualTo(updateImage);
         assertThat(updatedFamily.getVisibility()).isEqualTo(updatedVisibility);
+        assertThat(updatedFamily.getJoinType()).isEqualTo(updatedJoinTye);
 
         logTestCasePassed("Update Family", "Update family test case passed!");
     }
@@ -286,6 +234,22 @@ public class FamilyControllerTest {
 
     @Test
     @Order(7)
+    public void shouldGetUserFamily() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(
+                        get(UriComponentsBuilder.fromPath(Endpoints.GET_USER_FAMILY).toUriString()).with(
+                                oidcLogin().oidcUser(getOidcUser(USER_ID,
+                                        List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+        FamilyResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getFamily()).isNotNull();
+
+        logTestCasePassed("Get user's family", "Getting user's family test passed!");
+    }
+
+    @Test
+    @Order(8)
     public void shouldRemoveMemberFromFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete(UriComponentsBuilder.fromPath(Endpoints.REMOVE_MEMBER_FROM_FAMILY)
                         .buildAndExpand(familyId, MEMBER_ID).toUriString()).with(
@@ -299,7 +263,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void shouldDeleteUnknownFamilyFail() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
@@ -315,7 +279,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void shouldDeleteFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
@@ -327,6 +291,86 @@ public class FamilyControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
         logTestCasePassed("Delete family", "Delete family test passed!");
+    }
+
+    @Test
+    @Order(11)
+    public void shouldSearchFamily() throws Exception {
+        createFamily("smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
+        createFamily("john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);
+        createFamily("martinez_id", "The Martinez Family", FamilyDTO.Visibility.PUBLIC);
+        createFamily("brown_id", "Brown Household", FamilyDTO.Visibility.PUBLIC);
+        createFamily("williams_id", "Williams Crew", FamilyDTO.Visibility.PUBLIC);
+        createFamily("garcia_id", "Garcia Tribe", FamilyDTO.Visibility.PUBLIC);
+        createFamily("rodriguez_id", "Rodriguez Kin", FamilyDTO.Visibility.PUBLIC);
+        createFamily("lee_id", "Lee Dynasty", FamilyDTO.Visibility.PUBLIC);
+        createFamily("young_id", "The Youngs", FamilyDTO.Visibility.PUBLIC);
+        createFamily("nguyen_id", "Nguyen Household", FamilyDTO.Visibility.PUBLIC);
+        createFamily("patel_id", "Patel Family", FamilyDTO.Visibility.PUBLIC);
+        createFamily("wilson_id", "The Wilsons", FamilyDTO.Visibility.PUBLIC);
+        createFamily("walker_id", "The Walkers", FamilyDTO.Visibility.PUBLIC);
+        createFamily("harris_id", "Harris Household", FamilyDTO.Visibility.PUBLIC);
+        createFamily("hernandez_id", "The Hernandez Family", FamilyDTO.Visibility.PUBLIC);
+        createFamily("white_id", "White Clan", FamilyDTO.Visibility.PUBLIC);
+        createFamily("thompson_id", "The Thompson Tribe", FamilyDTO.Visibility.PUBLIC);
+        createFamily("ramirez_id", "The Ramirezes", FamilyDTO.Visibility.PUBLIC);
+        createFamily("jones_id", "Jones Unit", FamilyDTO.Visibility.PUBLIC);
+        createFamily("greene_id", "The Greenes", FamilyDTO.Visibility.PUBLIC);
+
+        // Searching for more results
+        MvcResult result = mockMvc.perform(get(Endpoints.SEARCH_FAMILY).param("query", "e").param("page", "1")
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+
+        SearchResponse<SearchDTO> searchResponse =
+                objectMapper.readValue(result.getResponse().getContentAsString(), SearchResponse.class);
+
+        assertThat(searchResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(searchResponse.getResult().getResults().size()).isEqualTo(10);
+        assertThat(searchResponse.getResult().getCurrentPage()).isEqualTo(1);
+        assertThat(searchResponse.getResult().getNextPage()).isEqualTo(2);
+
+        // Searching for next results
+        result = mockMvc.perform(get(Endpoints.SEARCH_FAMILY).param("query", "e").param("page", "2")
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+
+        searchResponse = objectMapper.readValue(result.getResponse().getContentAsString(), SearchResponse.class);
+
+        assertThat(searchResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(searchResponse.getResult().getCurrentPage()).isEqualTo(2);
+
+        logTestCasePassed("Search family", "Search family test passed!");
+    }
+
+    private String createFamily(String userId, String familyName, FamilyDTO.Visibility visibility) throws Exception {
+        String description = "Testing family";
+
+        FamilyCreationPayload familyDTO = new FamilyCreationPayload();
+        familyDTO.setDescription(description);
+        familyDTO.setVisibility(visibility);
+        familyDTO.setName(familyName);
+        familyDTO.setImage("/testing.png");
+        familyDTO.setJoinType(FamilyDTO.JoinType.ANYONE);
+
+        MvcResult mvcResult = mockMvc.perform(post(Endpoints.CREATE_FAMILY).with(
+                                oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.Family" +
+                                        ".CREATE"))))
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(familyDTO)))
+                .andExpect(status().isOk()).andReturn();
+
+        FamilyResponse familyResponse =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyResponse.class);
+        assertThat(familyResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        FamilyDTO family = familyResponse.getFamily();
+        assertThat(family.getId()).isNotNull().isNotBlank();
+        assertThat(family.getCreatedTime()).isNotNull();
+        assertThat(family.getName()).isEqualTo(familyName);
+        assertThat(family.getVisibility()).isEqualTo(visibility);
+        assertThat(family.getDescription()).isEqualTo(description);
+        assertThat(family.getJoinType()).isEqualTo(FamilyDTO.JoinType.ANYONE);
+
+        return family.getId();
     }
 
     private FamilyCreationPayload getFamilyCreationPayload(FamilyResponse response) {
@@ -342,7 +386,41 @@ public class FamilyControllerTest {
         payload.setDescription(updatedDescription);
         payload.setImage(updateImage);
         payload.setVisibility(updatedVisibility);
+        payload.setJoinType(FamilyDTO.JoinType.ANYONE);
         return payload;
+    }
+
+    private String createUser(String userId, String userName) throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(
+                        get(UriComponentsBuilder.fromPath(Endpoints.GET_USER).buildAndExpand(userId).toUriString()).with(
+                                oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.User.READ")))))
+                .andReturn();
+
+        UserResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
+        if (response.getUser() != null) {
+            return response.getUser().getId();
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userId);
+        userDTO.setAge(19);
+        userDTO.setEmail(userName + "@gmail.com");
+        userDTO.setImage("https://vapps.images.com/vicky/profile");
+        userDTO.setName(userName);
+        userDTO.setFirstName(userName);
+        userDTO.setLastName("M");
+
+        mvcResult = mockMvc.perform(post(Endpoints.CREATE_USER).with(
+                                oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.User.CREATE"))))
+                        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isOk()).andReturn();
+        UserResponse userResponse =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UserResponse.class);
+        assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(userResponse.getUser()).isEqualTo(userDTO);
+        return userResponse.getUser().getId();
     }
 
     @Data
@@ -351,5 +429,6 @@ public class FamilyControllerTest {
         private String description;
         private FamilyDTO.Visibility visibility;
         private String image;
+        private FamilyDTO.JoinType joinType;
     }
 }

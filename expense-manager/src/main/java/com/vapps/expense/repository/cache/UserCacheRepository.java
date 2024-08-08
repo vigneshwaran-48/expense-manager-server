@@ -21,6 +21,7 @@ public class UserCacheRepository implements UserRepository {
 
     @Override
     @Cacheable(value = "users", key = "'user_' + #id")
+    @CachePut(value = "users", key = "'user_' + #return?.getEmail()")
     public Optional<User> findById(String id) {
         return userRepository.findById(id);
     }
