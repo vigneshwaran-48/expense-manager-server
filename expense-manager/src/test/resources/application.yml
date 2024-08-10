@@ -10,12 +10,22 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
-
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://authorization-server-50019167766.catalystappsail.in
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+logging:
+  level:
+    org:
+      springframework:
+        security: trace
 
 mail:
   google:
