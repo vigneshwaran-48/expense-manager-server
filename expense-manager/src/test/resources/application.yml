@@ -31,3 +31,8 @@ mail:
   google:
     appPassword: ${FAMILY_EXPENSE_MANAGER_APP_PASSWORD}
     email: ${FAMILY_EXPENSE_MANAGER_EMAIL_ID}
+
+app:
+  default:
+    user:
+      id: default
