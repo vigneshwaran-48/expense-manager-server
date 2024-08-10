@@ -4,6 +4,7 @@ import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.StaticResourceDTO;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.StaticResourceService;
+import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.model.StaticResource;
 import com.vapps.expense.repository.StaticResourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,17 @@ public class StaticResourceServiceImpl implements StaticResourceService {
     @Autowired
     private StaticResourceRepository staticResourceRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     @UserIdValidator(positions = 0)
     public Optional<StaticResourceDTO> getResource(String userId, String resourceId) throws AppException {
         Optional<StaticResource> staticResource = staticResourceRepository.findByOwnerIdAndId(userId, resourceId);
+        if (staticResource.isEmpty()) {
+            staticResource =
+                    staticResourceRepository.findByIdAndVisibility(resourceId, StaticResourceDTO.Visibility.PUBLIC);
+        }
         if (staticResource.isPresent()) {
             return Optional.of(staticResource.get().toDTO());
         }
@@ -37,13 +45,18 @@ public class StaticResourceServiceImpl implements StaticResourceService {
         if (staticResourceDTO.getType() == null) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Provide the content type of the resource!");
         }
+        staticResourceDTO.setOwner(userService.getUser(userId).get());
         StaticResource staticResource = StaticResource.build(staticResourceDTO);
-        // TODO Need to finish this
-        return null;
+        StaticResource savedStaticResource = staticResourceRepository.save(staticResource);
+        if (savedStaticResource == null) {
+            throw new AppException("Error while adding static resource!");
+        }
+        return savedStaticResource.toDTO();
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public void deleteResource(String userId, String resourceId) throws AppException {
-
+        staticResourceRepository.deleteByIdAndOwnerId(resourceId, userId);
     }
 }

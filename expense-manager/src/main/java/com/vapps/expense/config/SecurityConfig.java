@@ -47,9 +47,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_ALL_INVITATIONS)
                         .access(hasAnyScope("ExpenseManager.Invitation.READ", "ExpenseManager.Invitation.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.ACCEPT_INVITATION)
-                        .access(hasAnyScope("ExpenseManager.Invitation.ACCEPT")).anyRequest().authenticated())
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
+                        .access(hasAnyScope("ExpenseManager.Invitation.ACCEPT"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_STATIC_RESOURCE)
+                        .access(hasAnyScope("ExpenseManager.StaticResource.CREATE",
+                                "ExpenseManager.StaticResource.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_STATIC_RESOURCE)
+                        .access(hasAnyScope("ExpenseManager.StaticResource.READ", "ExpenseManager.StaticResource.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_STATIC_RESOURCE)
+                        .access(hasAnyScope("ExpenseManager.StaticResource.DELETE",
+                                "ExpenseManager.StaticResource.ALL")).anyRequest().authenticated()).exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler()).and().oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 
     @Bean

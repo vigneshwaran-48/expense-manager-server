@@ -24,6 +24,8 @@ public class StaticResource {
 
     private Visibility visibility;
 
+    private String name;
+
     public StaticResourceDTO toDTO() {
         StaticResourceDTO staticResourceDTO = new StaticResourceDTO();
         staticResourceDTO.setData(data);
@@ -31,6 +33,7 @@ public class StaticResource {
         staticResourceDTO.setType(type);
         staticResourceDTO.setOwner(owner.toDTO());
         staticResourceDTO.setVisibility(visibility);
+        staticResourceDTO.setName(name);
         return staticResourceDTO;
     }
 
@@ -41,6 +44,7 @@ public class StaticResource {
         staticResource.setOwner(User.build(staticResourceDTO.getOwner()));
         staticResource.setType(staticResourceDTO.getType());
         staticResource.setVisibility(staticResourceDTO.getVisibility());
+        staticResource.setName(staticResourceDTO.getName());
         return staticResource;
     }
 }
