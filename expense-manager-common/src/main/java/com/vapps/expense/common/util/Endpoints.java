@@ -6,6 +6,7 @@ public class Endpoints {
     public static final String USER_API = "/api/user";
     public static final String FAMILY_API = "/api/family";
     public static final String INVITATION_API = "/api/invitation";
+    public static final String STATIC_RESOURCE_API = "/api/static";
 
     // User APIs
     public static final String GET_USER_PATH = "/{userId}";
@@ -40,5 +41,13 @@ public class Endpoints {
 
     public static final String ACCEPT_INVITATION = INVITATION_API + ACCEPT_INVITATION_PATH;
     public static final String GET_ALL_INVITATIONS = INVITATION_API;
+
+    // Static Resource APIs
+    public static final String GET_STATIC_RESOURCE_PATH = "/{resourceId}";
+    public static final String DELETE_STATIC_RESOURCE_PATH = "/{resourceId}";
+
+    public static final String CREATE_STATIC_RESOURCE = STATIC_RESOURCE_API;
+    public static final String GET_STATIC_RESOURCE = STATIC_RESOURCE_API + GET_STATIC_RESOURCE_PATH;
+    public static final String DELETE_STATIC_RESOURCE = STATIC_RESOURCE_API + DELETE_STATIC_RESOURCE_PATH;
 
 }

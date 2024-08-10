@@ -10,7 +10,8 @@ public class StaticResourceDTO {
         IMAGE_JPEG("image/jpeg"),
         IMAGE_PNG("image/png"),
         TEXT_HTML("text/html"),
-        TEXT_PLAIN("text/plain");
+        TEXT_PLAIN("text/plain"),
+        APPLICATION_PDF("application/pdf");
 
         private String type;
 
@@ -42,5 +43,6 @@ public class StaticResourceDTO {
     private byte[] data;
     private ContentType type;
     private Visibility visibility;
+    private String name;
 
 }

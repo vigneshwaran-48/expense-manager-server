@@ -238,5 +238,35 @@
       }
     ],
     "method": "GET"
+  },
+  {
+    "path": "/api/static",
+    "params": [
+      {
+        "name": "private",
+        "type": "BOOLEAN"
+      }
+    ],
+    "method": "POST"
+  },
+  {
+    "path": "/api/static/{resourceId}",
+    "params": [],
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "resourceId"
+      }
+    ]
+  },
+  {
+    "path": "/api/static/{resourceId}",
+    "params": [],
+    "method": "DELETE",
+    "pathVariables": [
+      {
+        "name": "resourceId"
+      }
+    ]
   }
 ]
