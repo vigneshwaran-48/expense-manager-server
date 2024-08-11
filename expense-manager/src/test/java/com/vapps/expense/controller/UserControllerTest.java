@@ -72,8 +72,6 @@ public class UserControllerTest {
         ErrorResponse userResponse =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ErrorResponse.class);
         assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-
-        logTestCasePassed("Create user with invalid email", "Tests email validation while creating user");
     }
 
     @Test
@@ -99,9 +97,6 @@ public class UserControllerTest {
         ErrorResponse userResponse =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ErrorResponse.class);
         assertThat(userResponse.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-        logTestCasePassed("Create user without required scope",
-                "Tests whether creating user without required scopes " + "failing");
     }
 
     @Test
@@ -120,8 +115,6 @@ public class UserControllerTest {
 
         mockMvc.perform(post(Endpoints.CREATE_USER).contentType(MediaType.APPLICATION_JSON).content(userStr))
                 .andExpect(status().isUnauthorized());
-        logTestCasePassed("Create User without authentication",
-                "Tests whether creating user without authentication " + "fails");
     }
 
     @Test
@@ -155,8 +148,6 @@ public class UserControllerTest {
         assertThat(userResponse.getUser().getAge()).isEqualTo(userDTO.getAge());
         assertThat(userResponse.getUser().getEmail()).isEqualTo(userDTO.getEmail());
         assertThat(userResponse.getUser().getImage()).isEqualTo(userDTO.getImage());
-
-        logTestCasePassed("Create user", "Tests whether user is created");
     }
 
     @Test
@@ -190,8 +181,6 @@ public class UserControllerTest {
         assertThat(userResponse.getUser().getAge()).isEqualTo(userDTO.getAge());
         assertThat(userResponse.getUser().getEmail()).isEqualTo(userDTO.getEmail());
         assertThat(userResponse.getUser().getImage()).isEqualTo(userDTO.getImage());
-
-        logTestCasePassed("Create another user", "Tests whether user another is also created");
     }
 
     @Test
@@ -234,8 +223,6 @@ public class UserControllerTest {
         ErrorResponse errorResponse =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ErrorResponse.class);
         assertThat(errorResponse.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
-
-        logTestCasePassed("Update other user", "Tests whether updating other user's info is restricted");
     }
 
     @Test
@@ -282,8 +269,6 @@ public class UserControllerTest {
         assertThat(userResponse.getUser().getName()).isEqualTo(updatedName);
         assertThat(userResponse.getUser().getFirstName()).isEqualTo(updatedFirstName);
         assertThat(userResponse.getUser().getLastName()).isEqualTo(updatedLastName);
-
-        logTestCasePassed("Update User", "Updating already existing user");
     }
 
     @Data

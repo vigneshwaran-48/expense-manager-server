@@ -3,6 +3,8 @@ package com.vapps.expense.common.service;
 import com.vapps.expense.common.dto.CategoryDTO;
 import com.vapps.expense.common.exception.AppException;
 
+import java.util.Optional;
+
 public interface CategoryService {
 
     CategoryDTO addCategory(String userId, CategoryDTO category) throws AppException;
@@ -10,4 +12,6 @@ public interface CategoryService {
     CategoryDTO updatedCategory(String userId, String categoryId, CategoryDTO category) throws AppException;
 
     void deleteCategory(String userId, String categoryId) throws AppException;
+
+    Optional<CategoryDTO> getCategory(String userId, String categoryId);
 }

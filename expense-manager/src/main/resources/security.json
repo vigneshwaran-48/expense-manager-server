@@ -201,7 +201,7 @@
           "key": "description",
           "type": "STRING",
           "minLength": 1,
-          "maxLength": 25
+          "maxLength": 100
         },
         {
           "key": "visibility",
@@ -266,6 +266,75 @@
     "pathVariables": [
       {
         "name": "resourceId"
+      }
+    ]
+  },
+  {
+    "path": "/api/category",
+    "params": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 20,
+          "mandatory": "true"
+        },
+        {
+          "key": "description",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        {
+          "key": "type",
+          "type": "REGEX",
+          "regex": "^(PERSONAL|FAMILY)$",
+          "mandatory": "true"
+        },
+        {
+          "key": "ownerId"
+        },
+        {
+          "key": "image"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/category/{id}",
+    "params": [],
+    "method": "PATCH",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 20
+        },
+        {
+          "key": "description",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        {
+          "key": "image"
+        }
+      ]
+    },
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/category/{id}",
+    "params": [],
+    "method": "DELETE",
+    "pathVariables": [
+      {
+        "name": "id"
       }
     ]
   }

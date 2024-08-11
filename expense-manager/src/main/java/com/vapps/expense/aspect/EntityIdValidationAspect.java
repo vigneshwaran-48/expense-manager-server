@@ -1,12 +1,15 @@
 package com.vapps.expense.aspect;
 
+import com.vapps.expense.annotation.CategoryIdValidator;
 import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.InvitationIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
+import com.vapps.expense.common.dto.CategoryDTO;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.InvitationDTO;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.CategoryService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.common.service.UserService;
@@ -33,6 +36,9 @@ public class EntityIdValidationAspect {
 
     @Autowired
     private InvitationService invitationService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityIdValidationAspect.class);
 
@@ -101,6 +107,28 @@ public class EntityIdValidationAspect {
             if (invitation.isEmpty()) {
                 LOGGER.error("Invitation {} not exists", id);
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invitation " + id + " not exists!");
+            }
+        }
+    }
+
+    @Before("@annotation(categoryIdValidator)")
+    public void checkCategoryExists(JoinPoint joinPoint, CategoryIdValidator categoryIdValidator) throws AppException {
+        int[] positionsToCheck = categoryIdValidator.positions();
+        String userId = (String) joinPoint.getArgs()[categoryIdValidator.userIdPosition()];
+
+        if (userId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "User Id is required!");
+        }
+        Object[] args = joinPoint.getArgs();
+        for (int position : positionsToCheck) {
+            String id = (String) args[position];
+            if (id == null) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category Id is required!");
+            }
+            Optional<CategoryDTO> category = categoryService.getCategory(userId, id);
+            if (category.isEmpty()) {
+                LOGGER.error("Category {} not exists", id);
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category " + id + " not exists!");
             }
         }
     }

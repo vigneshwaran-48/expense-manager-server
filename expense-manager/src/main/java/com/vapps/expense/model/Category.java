@@ -28,7 +28,19 @@ public class Category {
         categoryDTO.setType(type);
         categoryDTO.setName(name);
         categoryDTO.setOwnerId(ownerId);
+        categoryDTO.setCreatedBy(createdBy.toDTO());
         return categoryDTO;
     }
 
+    public static Category build(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setId(categoryDTO.getId());
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
+        category.setImage(categoryDTO.getImage());
+        category.setType(categoryDTO.getType());
+        category.setCreatedBy(User.build(categoryDTO.getCreatedBy()));
+        category.setOwnerId(categoryDTO.getOwnerId());
+        return category;
+    }
 }

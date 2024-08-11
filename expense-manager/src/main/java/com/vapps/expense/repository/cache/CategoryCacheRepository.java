@@ -1,12 +1,14 @@
 package com.vapps.expense.repository.cache;
 
 import com.vapps.expense.common.dto.CategoryDTO;
+import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.model.Category;
 import com.vapps.expense.repository.CategoryRepository;
 import com.vapps.expense.repository.mongo.CategoryMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,20 +21,55 @@ public class CategoryCacheRepository implements CategoryRepository {
     private CategoryMongoRepository categoryRepository;
 
     @Override
-    @Cacheable(value = "category_createdBy", key = "'category_created_by_' + #createdById + '_' + #type")
-    public List<Category> findByCreatedByIdAndType(String createdById, CategoryDTO.CategoryType type) {
-        return categoryRepository.findByCreatedByIdAndType(createdById, type);
+    @Cacheable(value = "category", key = "'category_' + #id")
+    public Optional<Category> findById(String id) {
+        return categoryRepository.findById(id);
     }
 
     @Override
-    @CacheEvict(value = "category_createdBy")
+    @Cacheable(value = "category_owner_id", key = "'category_owner_id_by_' + #ownerId + '_' + #type")
+    public List<Category> findByOwnerIdAndType(String ownerId, CategoryDTO.CategoryType type) {
+        return categoryRepository.findByOwnerIdAndType(ownerId, type);
+    }
+
+    @Override
+    @Cacheable(value = "category_id_owner_id", key = "'category_id_' + #id + '_owner_' + #ownerId")
+    public Optional<Category> findByIdAndOwnerId(String id, String ownerId) {
+        return categoryRepository.findByIdAndOwnerId(id, ownerId);
+    }
+
+    @Override
+    @Cacheable(value = "category_owner_id_name", key = "'category_owner_id_by_' + #ownerId + '_' + #type + '_' + #name")
+    public Optional<Category> findByOwnerIdAndTypeAndName(String ownerId, CategoryDTO.CategoryType type, String name)
+            throws AppException {
+        return categoryRepository.findByOwnerIdAndTypeAndName(ownerId, type, name);
+    }
+
+    /**
+     *
+     * When a error occurs in the DB level the return value would be null. Because of this we are not using
+     * @CachePut with the return value in save() and update() method. It will end up in a NullPointerException
+     *
+     */
+
+    @Override
+    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
+            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
     public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
-    @CacheEvict(value = "category_createdBy")
+    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
+            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
     public Category update(Category category) {
         return categoryRepository.save(category);
+    }
+
+    @Override
+    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
+            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
+    public void deleteById(String id) {
+        categoryRepository.deleteById(id);
     }
 }

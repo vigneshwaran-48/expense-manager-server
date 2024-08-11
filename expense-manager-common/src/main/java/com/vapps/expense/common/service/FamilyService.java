@@ -28,4 +28,6 @@ public interface FamilyService {
     Optional<FamilyDTO> getUserFamily(String userId);
 
     SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException;
+
+    FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException;
 }
