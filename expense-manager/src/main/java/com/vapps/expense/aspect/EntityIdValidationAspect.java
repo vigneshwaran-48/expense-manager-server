@@ -1,18 +1,9 @@
 package com.vapps.expense.aspect;
 
-import com.vapps.expense.annotation.CategoryIdValidator;
-import com.vapps.expense.annotation.FamilyIdValidator;
-import com.vapps.expense.annotation.InvitationIdValidator;
-import com.vapps.expense.annotation.UserIdValidator;
-import com.vapps.expense.common.dto.CategoryDTO;
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.InvitationDTO;
-import com.vapps.expense.common.dto.UserDTO;
+import com.vapps.expense.annotation.*;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
-import com.vapps.expense.common.service.CategoryService;
-import com.vapps.expense.common.service.FamilyService;
-import com.vapps.expense.common.service.InvitationService;
-import com.vapps.expense.common.service.UserService;
+import com.vapps.expense.common.service.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -39,6 +30,9 @@ public class EntityIdValidationAspect {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ExpenseService expenseService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityIdValidationAspect.class);
 
@@ -129,6 +123,28 @@ public class EntityIdValidationAspect {
             if (category.isEmpty()) {
                 LOGGER.error("Category {} not exists", id);
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category " + id + " not exists!");
+            }
+        }
+    }
+
+    @Before("@annotation(expenseIdValidator)")
+    public void checkExpenseExists(JoinPoint joinPoint, ExpenseIdValidator expenseIdValidator) throws AppException {
+        int[] positionsToCheck = expenseIdValidator.positions();
+        String userId = (String) joinPoint.getArgs()[expenseIdValidator.userIdPosition()];
+
+        if (userId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "User Id is required!");
+        }
+        Object[] args = joinPoint.getArgs();
+        for (int position : positionsToCheck) {
+            String id = (String) args[position];
+            if (id == null) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Expense Id is required!");
+            }
+            Optional<ExpenseDTO> expense = expenseService.getExpense(userId, id);
+            if (expense.isEmpty()) {
+                LOGGER.error("Expense {} not exists", id);
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Expense " + id + " not exists!");
             }
         }
     }

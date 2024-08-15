@@ -26,14 +26,19 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "expenseByOwnerId"), @CacheEvict(value = "expenseByFamilyId") })
+    @Caching(put = { @CachePut(value = "expenseByOwnerId", key = "'expense_owner_id_' + #expense.getOwnerId()"),
+            @CachePut(value = "expenseByFamilyId", key = "'expense_family_id_' + #expense.getFamilyId()") })
+    @CacheEvict(value = "expenseByIdAndOwnerId")
     public Expense save(Expense expense) {
         return expenseRepository.save(expense);
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "expenseByOwnerId"), @CacheEvict(value = "expenseByFamilyId") })
-    @CachePut(value = "expense", key = "'expense_' + #expense.getId()")
+    @Caching(put = { @CachePut(value = "expense", key = "'expense_' + #expense.getId()"),
+            @CachePut(value = "expenseByIdAndOwnerId",
+                    key = "'expense_id_' + #expense.getId() + '_owner_' + #expense.getOwnerId()"),
+            @CachePut(value = "expenseByOwnerId", key = "'expense_owner_id_' + #expense.getOwnerId()"),
+            @CachePut(value = "expenseByFamilyId", key = "'expense_family_id_' + #expense.getFamilyId()") })
     public Expense update(Expense expense) {
         return expenseRepository.save(expense);
     }
@@ -48,5 +53,11 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     @Cacheable(value = "expenseByFamilyId", key = "'expense_family_id_' + #familyId")
     public List<Expense> findByFamilyId(String familyId) {
         return expenseRepository.findByFamilyId(familyId);
+    }
+
+    @Override
+    @Cacheable(value = "expenseByIdAndOwnerId", key = "'expense_id_' + #id + '_owner_' + #ownerId")
+    public Optional<Expense> findByIdAndOwnerId(String id, String ownerId) {
+        return expenseRepository.findByIdAndOwnerId(id, ownerId);
     }
 }

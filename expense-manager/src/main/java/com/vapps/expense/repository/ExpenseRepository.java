@@ -17,4 +17,6 @@ public interface ExpenseRepository {
 
     List<Expense> findByFamilyId(String familyId);
 
+    Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
+
 }

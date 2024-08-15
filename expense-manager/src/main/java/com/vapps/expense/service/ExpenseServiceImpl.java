@@ -1,10 +1,8 @@
 package com.vapps.expense.service;
 
+import com.vapps.expense.annotation.ExpenseIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
-import com.vapps.expense.common.dto.ExpenseCreationPayload;
-import com.vapps.expense.common.dto.ExpenseDTO;
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.FamilyService;
@@ -36,7 +34,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     @UserIdValidator(positions = 0)
     public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload) throws AppException {
-        validateExpenseData(payload);
+        checkCurrency(payload.getCurrency());
         checkExpenseAccess(userId, payload);
 
         Expense expense = new Expense();
@@ -65,9 +63,54 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expense.toDTO();
     }
 
-    private void validateExpenseData(ExpenseCreationPayload expense) throws AppException {
-        if (!Currency.getAvailableCurrencies().contains(expense.getCurrency())) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + expense.getCurrency());
+    @Override
+    @UserIdValidator(positions = 0)
+    @ExpenseIdValidator(userIdPosition = 0, positions = 1)
+    public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload) throws AppException {
+        if (payload.getCurrency() != null) {
+            checkCurrency(payload.getCurrency());
+        }
+        Expense expense = Expense.build(getExpense(userId, expenseId).get());
+
+        if (payload.getName() != null) {
+            expense.setName(payload.getName());
+        }
+        if (payload.getDescription() != null) {
+            expense.setDescription(payload.getDescription());
+        }
+        if (payload.getTime() != null) {
+            expense.setTime(payload.getTime());
+        }
+        if (payload.getCurrency() != null) {
+            expense.setCurrency(payload.getCurrency());
+        }
+        if (payload.getAmount() > 0) {
+            expense.setAmount(payload.getAmount());
+        }
+        expense = expenseRepository.update(expense);
+        if (expense == null) {
+            throw new AppException("Error while updating expense!");
+        }
+        return expense.toDTO();
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public Optional<ExpenseDTO> getExpense(String userId, String expenseId) {
+        Optional<Expense> expense = expenseRepository.findByIdAndOwnerId(expenseId, userId);
+        if (expense.isEmpty()) {
+            Optional<FamilyDTO> familyDTO = familyService.getUserFamily(userId);
+            if (familyDTO.isEmpty()) {
+                return Optional.empty();
+            }
+            expense = expenseRepository.findByIdAndOwnerId(expenseId, familyDTO.get().getId());
+        }
+        return expense.isPresent() ? Optional.of(expense.get().toDTO()) : Optional.empty();
+    }
+
+    private void checkCurrency(String currency) throws AppException {
+        if (!Currency.getAvailableCurrencies().contains(currency)) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
         }
     }
 

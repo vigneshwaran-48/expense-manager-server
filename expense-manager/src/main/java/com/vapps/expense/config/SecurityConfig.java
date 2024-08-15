@@ -64,8 +64,12 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.Category.UPDATE", "ExpenseManager.Category.ALL"))
                         .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_CATEGORY)
                         .access(hasAnyScope("ExpenseManager.Category.DELETE", "ExpenseManager.Category.ALL"))
-                        .anyRequest().authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler())
-                .and().oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.CREATE", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_EXPENSE)
+                        .access(hasAnyScope("ExpenseManger.Expense.READ", "ExpenseManager.Expense.ALL")).anyRequest()
+                        .authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 
     @Bean
