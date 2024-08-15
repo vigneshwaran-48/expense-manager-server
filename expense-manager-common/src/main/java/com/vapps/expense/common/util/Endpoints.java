@@ -7,6 +7,8 @@ public class Endpoints {
     public static final String FAMILY_API = "/api/family";
     public static final String INVITATION_API = "/api/invitation";
     public static final String STATIC_RESOURCE_API = "/api/static";
+    public static final String CATEGORY_API = "/api/category";
+    public static final String EXPENSE_API = "/api/expense";
 
     // User APIs
     public static final String GET_USER_PATH = "/{userId}";
@@ -49,5 +51,25 @@ public class Endpoints {
     public static final String CREATE_STATIC_RESOURCE = STATIC_RESOURCE_API;
     public static final String GET_STATIC_RESOURCE = STATIC_RESOURCE_API + GET_STATIC_RESOURCE_PATH;
     public static final String DELETE_STATIC_RESOURCE = STATIC_RESOURCE_API + DELETE_STATIC_RESOURCE_PATH;
+
+    // Category APIs
+    public static final String UPDATE_CATEGORY_PATH = "/{id}";
+    public static final String DELETE_CATEGORY_PATH = "/{id}";
+    public static final String GET_CATEGORY_PATH = "/{id}";
+
+    public static final String CREATE_CATEGORY = CATEGORY_API;
+    public static final String UPDATE_CATEGORY = CATEGORY_API + UPDATE_CATEGORY_PATH;
+    public static final String DELETE_CATEGORY = CATEGORY_API + DELETE_CATEGORY_PATH;
+    public static final String GET_CATEGORY = CATEGORY_API + GET_CATEGORY_PATH;
+
+    // Expense APIs
+    public static final String GET_EXPENSE_PATH = "/{id}";
+    public static final String UPDATE_EXPENSE_PATH = "/{id}";
+    public static final String DELETE_EXPENSE_PATH = "/{id}";
+
+    public static final String CREATE_EXPENSE = EXPENSE_API;
+    public static final String UPDATE_EXPENSE = EXPENSE_API + UPDATE_EXPENSE_PATH;
+    public static final String GET_EXPENSE = EXPENSE_API + GET_EXPENSE_PATH;
+    public static final String DELETE_EXPENSE = EXPENSE_API + DELETE_EXPENSE_PATH;
 
 }

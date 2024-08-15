@@ -55,8 +55,25 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.StaticResource.READ", "ExpenseManager.StaticResource.ALL"))
                         .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_STATIC_RESOURCE)
                         .access(hasAnyScope("ExpenseManager.StaticResource.DELETE",
-                                "ExpenseManager.StaticResource.ALL")).anyRequest().authenticated()).exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler()).and().oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
+                                "ExpenseManager.StaticResource.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_CATEGORY)
+                        .access(hasAnyScope("ExpenseManager.Category.CREATE", "ExpenseManager.Category.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_CATEGORY)
+                        .access(hasAnyScope("ExpenseManager.Category.READ", "ExpenseManager.Category.ALL"))
+                        .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_CATEGORY)
+                        .access(hasAnyScope("ExpenseManager.Category.UPDATE", "ExpenseManager.Category.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_CATEGORY)
+                        .access(hasAnyScope("ExpenseManager.Category.DELETE", "ExpenseManager.Category.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.CREATE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.CREATE", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_EXPENSE)
+                        .access(hasAnyScope("ExpenseManger.Expense.READ", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.UPDATE", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.DELETE", "ExpenseManager.Expense.ALL")).anyRequest()
+                        .authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }
 
     @Bean

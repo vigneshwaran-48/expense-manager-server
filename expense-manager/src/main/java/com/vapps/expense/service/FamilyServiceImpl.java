@@ -278,4 +278,11 @@ public class FamilyServiceImpl implements FamilyService {
         familyResults.setTotalPages(resultSize >= PAGE_SIZE ? resultSize % PAGE_SIZE : 1);
         return familyResults;
     }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException {
+        return familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId).get().getRole();
+    }
 }

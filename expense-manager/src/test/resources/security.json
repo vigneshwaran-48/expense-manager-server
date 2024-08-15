@@ -201,7 +201,7 @@
           "key": "description",
           "type": "STRING",
           "minLength": 1,
-          "maxLength": 25
+          "maxLength": 100
         },
         {
           "key": "visibility",
@@ -268,5 +268,119 @@
         "name": "resourceId"
       }
     ]
+  },
+  {
+    "path": "/api/category",
+    "params": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 20,
+          "mandatory": "true"
+        },
+        {
+          "key": "description",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        {
+          "key": "type",
+          "type": "REGEX",
+          "regex": "^(PERSONAL|FAMILY)$",
+          "mandatory": "true"
+        },
+        {
+          "key": "ownerId"
+        },
+        {
+          "key": "image"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/category/{id}",
+    "params": [],
+    "method": "PATCH",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 20
+        },
+        {
+          "key": "description",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        {
+          "key": "image"
+        }
+      ]
+    },
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/category/{id}",
+    "params": [],
+    "method": "DELETE",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/expense",
+    "params": [],
+    "method": "POST",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 25,
+          "mandatory": "true"
+        },
+        {
+          "key": "description",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        {
+          "key": "type",
+          "type": "REGEX",
+          "regex": "^(PERSONAL|FAMILY)$",
+          "mandatory": "true"
+        },
+        {
+          "key": "familyId"
+        },
+        {
+          "key": "time",
+          "type": "REGEX",
+          "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,9})?$"
+        },
+        {
+          "key": "amount",
+          "type": "LONG",
+          "mandatory": "true"
+        },
+        {
+          "key": "currency",
+          "type": "REGEX",
+          "regex": "^[A-Z]{3}$",
+          "mandatory": "true"
+        }
+      ]
+    }
   }
 ]
