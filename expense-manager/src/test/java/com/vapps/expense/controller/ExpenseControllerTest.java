@@ -63,10 +63,29 @@ public class ExpenseControllerTest {
         String familyId = null;
         String currency = "USD";
         long amount = 70;
-        createExpense(name, description, type, time, amount, currency, familyId);
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        assertThat(expense.getFamily()).isNull();
+        assertThat(expense.getOwnerId()).isEqualTo("user");
     }
 
-    private void createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
+    @Test
+    @Order(2)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.CREATE")
+    public void testAddFamilyExpense() throws Exception {
+        String name = "Family expense";
+        String description = "Testing Family expense description";
+        ExpenseDTO.ExpenseType type = ExpenseDTO.ExpenseType.FAMILY;
+        LocalDateTime time = LocalDateTime.now();
+        String familyId = "this_will_be_ignored_for_family";
+        String currency = "USD";
+        long amount = 70;
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        assertThat(expense.getFamily().getId()).isNotEqualTo(familyId);
+        assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
+        assertThat(expense.getOwnerId()).isEqualTo(ExpenseControllerTest.familyId);
+    }
+
+    private ExpenseDTO createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
             long amount, String currency, String familyId) throws Exception {
         ExpenseCreationPayload payload = new ExpenseCreationPayload();
 
@@ -88,12 +107,12 @@ public class ExpenseControllerTest {
         ExpenseDTO expense = response.getExpense();
         assertThat(expense.getType()).isEqualTo(type);
         assertThat(expense.getTime()).isEqualTo(time);
-        assertThat(expense.getFamily()).isNull();
         assertThat(expense.getId()).isNotNull();
         assertThat(expense.getAmount()).isEqualTo(amount);
         assertThat(expense.getCurrency()).isEqualTo(currency);
-        assertThat(expense.getOwnerId()).isEqualTo("user");
         assertThat(expense.getDescription()).isEqualTo(description);
         assertThat(expense.getName()).isEqualTo(name);
+
+        return expense;
     }
 }
