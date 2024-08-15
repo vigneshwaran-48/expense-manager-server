@@ -14,4 +14,6 @@ public interface ExpenseService {
     ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload) throws AppException;
 
     Optional<ExpenseDTO> getExpense(String userId, String expenseId);
+
+    void deleteExpense(String userId, String expenseId) throws AppException;
 }

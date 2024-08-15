@@ -19,4 +19,5 @@ public interface ExpenseRepository {
 
     Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
 
+    void deleteById(String id);
 }

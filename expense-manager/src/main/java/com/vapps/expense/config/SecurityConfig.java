@@ -67,7 +67,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, Endpoints.CREATE_EXPENSE)
                         .access(hasAnyScope("ExpenseManager.Expense.CREATE", "ExpenseManager.Expense.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_EXPENSE)
-                        .access(hasAnyScope("ExpenseManger.Expense.READ", "ExpenseManager.Expense.ALL")).anyRequest()
+                        .access(hasAnyScope("ExpenseManger.Expense.READ", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.UPDATE", "ExpenseManager.Expense.ALL"))
+                        .requestMatchers(HttpMethod.DELETE, Endpoints.DELETE_EXPENSE)
+                        .access(hasAnyScope("ExpenseManager.Expense.DELETE", "ExpenseManager.Expense.ALL")).anyRequest()
                         .authenticated()).exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt()).build();
     }

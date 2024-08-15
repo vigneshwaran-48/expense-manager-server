@@ -26,19 +26,16 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     }
 
     @Override
-    @Caching(put = { @CachePut(value = "expenseByOwnerId", key = "'expense_owner_id_' + #expense.getOwnerId()"),
-            @CachePut(value = "expenseByFamilyId", key = "'expense_family_id_' + #expense.getFamilyId()") })
-    @CacheEvict(value = "expenseByIdAndOwnerId")
+    @Caching(evict = { @CacheEvict(value = "expenseByFamilyId"), @CacheEvict(value = "expenseByOwnerId"),
+            @CacheEvict(value = "expenseByIdAndOwnerId") })
     public Expense save(Expense expense) {
         return expenseRepository.save(expense);
     }
 
     @Override
-    @Caching(put = { @CachePut(value = "expense", key = "'expense_' + #expense.getId()"),
-            @CachePut(value = "expenseByIdAndOwnerId",
-                    key = "'expense_id_' + #expense.getId() + '_owner_' + #expense.getOwnerId()"),
-            @CachePut(value = "expenseByOwnerId", key = "'expense_owner_id_' + #expense.getOwnerId()"),
-            @CachePut(value = "expenseByFamilyId", key = "'expense_family_id_' + #expense.getFamilyId()") })
+    @Caching(put = { @CachePut(value = "expense", key = "'expense_' + #expense.getId()") },
+            evict = { @CacheEvict(value = "expenseByFamilyId"), @CacheEvict(value = "expenseByOwnerId"),
+                    @CacheEvict(value = "expenseByIdAndOwnerId") })
     public Expense update(Expense expense) {
         return expenseRepository.save(expense);
     }
@@ -59,5 +56,12 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     @Cacheable(value = "expenseByIdAndOwnerId", key = "'expense_id_' + #id + '_owner_' + #ownerId")
     public Optional<Expense> findByIdAndOwnerId(String id, String ownerId) {
         return expenseRepository.findByIdAndOwnerId(id, ownerId);
+    }
+
+    @Override
+    @Caching(evict = { @CacheEvict(value = "expenseByIdAndOwnerId"), @CacheEvict(value = "expenseByFamilyId"),
+            @CacheEvict(value = "expenseByOwnerId"), @CacheEvict(value = "expense") })
+    public void deleteById(String id) {
+        expenseRepository.deleteById(id);
     }
 }

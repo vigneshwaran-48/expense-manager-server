@@ -35,7 +35,9 @@ public class Expense {
     public static Expense build(ExpenseDTO expenseDTO) {
         Expense expense = new Expense();
         expense.setId(expenseDTO.getId());
-        expense.setFamily(Family.build(expenseDTO.getFamily()));
+        if (expenseDTO.getFamily() != null) {
+            expense.setFamily(Family.build(expenseDTO.getFamily()));
+        }
         expense.setCreatedBy(User.build(expenseDTO.getCreatedBy()));
         expense.setOwnerId(expenseDTO.getOwnerId());
         expense.setName(expenseDTO.getName());
@@ -50,17 +52,19 @@ public class Expense {
 
     public ExpenseDTO toDTO() {
         ExpenseDTO expenseDTO = new ExpenseDTO();
-        expenseDTO.setId(expenseDTO.getId());
-        expenseDTO.setFamily(family.toDTO());
+        expenseDTO.setId(id);
+        if (family != null) {
+            expenseDTO.setFamily(family.toDTO());
+        }
         expenseDTO.setCreatedBy(createdBy.toDTO());
-        expenseDTO.setOwnerId(expenseDTO.getOwnerId());
-        expenseDTO.setName(expenseDTO.getName());
-        expenseDTO.setDescription(expenseDTO.getDescription());
-        expenseDTO.setInvoices(expenseDTO.getInvoices());
-        expenseDTO.setAmount(expenseDTO.getAmount());
-        expenseDTO.setType(expenseDTO.getType());
-        expenseDTO.setCurrency(expenseDTO.getCurrency());
-        expenseDTO.setTime(expenseDTO.getTime());
+        expenseDTO.setOwnerId(ownerId);
+        expenseDTO.setName(name);
+        expenseDTO.setDescription(description);
+        expenseDTO.setInvoices(invoices);
+        expenseDTO.setAmount(amount);
+        expenseDTO.setType(type);
+        expenseDTO.setCurrency(currency);
+        expenseDTO.setTime(time);
         return expenseDTO;
     }
 

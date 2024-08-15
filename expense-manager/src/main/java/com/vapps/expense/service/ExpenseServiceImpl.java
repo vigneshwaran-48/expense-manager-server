@@ -46,13 +46,15 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setType(payload.getType());
         expense.setOwnerId(userId);
         if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
-            expense.setOwnerId(familyService.getUserFamily(userId).get().getId());
+            FamilyDTO family = familyService.getUserFamily(userId).get();
+            expense.setOwnerId(family.getId());
+            expense.setFamily(Family.build(family));
         }
         expense.setTime(payload.getTime());
         if (expense.getTime() == null) {
             expense.setTime(LocalDateTime.now());
         }
-        if (payload.getFamilyId() != null) {
+        if (payload.getType() == ExpenseDTO.ExpenseType.PERSONAL && payload.getFamilyId() != null) {
             expense.setFamily(Family.build(familyService.getFamilyById(userId, payload.getFamilyId()).get()));
         }
 
@@ -108,8 +110,20 @@ public class ExpenseServiceImpl implements ExpenseService {
         return expense.isPresent() ? Optional.of(expense.get().toDTO()) : Optional.empty();
     }
 
+    @Override
+    @UserIdValidator(positions = 0)
+    @ExpenseIdValidator(userIdPosition = 0, positions = 1)
+    public void deleteExpense(String userId, String expenseId) throws AppException {
+        ExpenseDTO expense = getExpense(userId, expenseId).get();
+        if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && familyService.getUserRoleInFamily(userId,
+                expense.getOwnerId()) == FamilyMemberDTO.Role.MEMBER) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
+        }
+        expenseRepository.deleteById(expenseId);
+    }
+
     private void checkCurrency(String currency) throws AppException {
-        if (!Currency.getAvailableCurrencies().contains(currency)) {
+        if (!Currency.getAvailableCurrencies().stream().anyMatch(curr -> curr.getCurrencyCode().equals(currency))) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
         }
     }
@@ -125,8 +139,8 @@ public class ExpenseServiceImpl implements ExpenseService {
                 throw new AppException(HttpStatus.FORBIDDEN.value(),
                         "You are not allowed to add expense in behalf of your family!");
             }
-        }
-        if (expense.getFamilyId() != null && familyService.getFamilyById(userId, expense.getFamilyId()).isEmpty()) {
+        } else if (expense.getFamilyId() != null && familyService.getFamilyById(userId, expense.getFamilyId())
+                .isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid family id " + expense.getFamilyId());
         }
     }

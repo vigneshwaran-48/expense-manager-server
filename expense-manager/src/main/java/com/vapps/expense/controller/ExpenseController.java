@@ -4,6 +4,7 @@ import com.vapps.expense.common.dto.ExpenseCreationPayload;
 import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseUpdatePayload;
 import com.vapps.expense.common.dto.response.ExpenseResponse;
+import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.util.Endpoints;
@@ -51,7 +52,17 @@ public class ExpenseController {
         if (expense.isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Expense " + id + " not found!");
         }
-        return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
-                request.getServletPath(), expense.get()));
+        return ResponseEntity.ok(
+                new ExpenseResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        expense.get()));
+    }
+
+    @DeleteMapping(Endpoints.DELETE_EXPENSE_PATH)
+    public ResponseEntity<Response> deleteExpense(@PathVariable String id, Principal principal,
+            HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        expenseService.deleteExpense(userId, id);
+        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Delete the expense!", LocalDateTime.now(),
+                request.getServletPath()));
     }
 }
