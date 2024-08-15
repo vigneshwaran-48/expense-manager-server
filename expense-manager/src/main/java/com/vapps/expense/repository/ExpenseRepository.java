@@ -16,4 +16,5 @@ public interface ExpenseRepository {
     List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId);
 
     List<Expense> findByFamilyId(String familyId);
+
 }
