@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = { ExpenseController.class })
+@WebMvcTest(controllers = {ExpenseController.class})
 @AutoConfigureMockMvc
 @EnableMongoTestServer
 @EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
@@ -85,8 +85,23 @@ public class ExpenseControllerTest {
         assertThat(expense.getOwnerId()).isEqualTo(ExpenseControllerTest.familyId);
     }
 
+    @Test
+    @Order(3)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.CREATE")
+    public void testAddPersonalExpenseInFamily() throws Exception {
+        String name = "Personal expense F";
+        String description = "Personal Expense in a family!";
+        ExpenseDTO.ExpenseType type = ExpenseDTO.ExpenseType.PERSONAL;
+        LocalDateTime time = LocalDateTime.now();
+        String currency = "USD";
+        long amount = 70;
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
+        assertThat(expense.getOwnerId()).isEqualTo("user");
+    }
+
     private ExpenseDTO createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
-            long amount, String currency, String familyId) throws Exception {
+                                     long amount, String currency, String familyId) throws Exception {
         ExpenseCreationPayload payload = new ExpenseCreationPayload();
 
         payload.setDescription(description);
