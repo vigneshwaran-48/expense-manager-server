@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = { StaticResourceController.class })
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StaticResourceControllerTest {
 

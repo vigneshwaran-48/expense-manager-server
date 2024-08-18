@@ -30,7 +30,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-import static com.vapps.expense.util.TestUtil.logTestCasePassed;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,7 +38,6 @@ import static org.assertj.core.api.Assertions.*;
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserControllerTest {
 

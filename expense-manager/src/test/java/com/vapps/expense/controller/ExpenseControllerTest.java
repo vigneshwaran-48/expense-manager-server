@@ -3,6 +3,7 @@ package com.vapps.expense.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vapps.expense.common.dto.ExpenseCreationPayload;
 import com.vapps.expense.common.dto.ExpenseDTO;
+import com.vapps.expense.common.dto.ExpenseUpdatePayload;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.response.ExpenseResponse;
 import com.vapps.expense.common.util.Endpoints;
@@ -18,20 +19,23 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
 import static com.vapps.expense.controller.ControllerTestUtil.createFamily;
 import static com.vapps.expense.controller.ControllerTestUtil.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { ExpenseController.class })
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ExpenseControllerTest {
 
@@ -42,6 +46,10 @@ public class ExpenseControllerTest {
     private MockMvc mockMvc;
 
     private static String familyId;
+
+    private static String personalExpenseId;
+
+    private static String familyExpenseId;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -66,6 +74,8 @@ public class ExpenseControllerTest {
         ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
         assertThat(expense.getFamily()).isNull();
         assertThat(expense.getOwnerId()).isEqualTo("user");
+
+        personalExpenseId = expense.getId();
     }
 
     @Test
@@ -83,6 +93,118 @@ public class ExpenseControllerTest {
         assertThat(expense.getFamily().getId()).isNotEqualTo(familyId);
         assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
         assertThat(expense.getOwnerId()).isEqualTo(ExpenseControllerTest.familyId);
+
+        familyExpenseId = expense.getId();
+    }
+
+    @Test
+    @Order(3)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.CREATE")
+    public void testAddPersonalExpenseInFamily() throws Exception {
+        String name = "Personal expense F";
+        String description = "Personal Expense in a family!";
+        ExpenseDTO.ExpenseType type = ExpenseDTO.ExpenseType.PERSONAL;
+        LocalDateTime time = LocalDateTime.now();
+        String currency = "USD";
+        long amount = 70;
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
+        assertThat(expense.getOwnerId()).isEqualTo("user");
+    }
+
+    @Test
+    @Order(4)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.UPDATE")
+    public void testUpdatePersonalExpense() throws Exception {
+        updateExpense(personalExpenseId, "Updated Personal", "Updated personal expense Description",
+                LocalDateTime.now(), 7890, "INR");
+    }
+
+    @Test
+    @Order(5)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.UPDATE")
+    public void testUpdateFamilyExpense() throws Exception {
+        updateExpense(familyExpenseId, "Updated Family", "Updated family expense Description", LocalDateTime.now(),
+                8000, "USD");
+    }
+
+    @Test
+    @Order(6)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.READ")
+    public void testGetPersonalExpense() throws Exception {
+        getExpense(personalExpenseId);
+    }
+
+    @Test
+    @Order(7)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.READ")
+    public void testGetFamilyExpense() throws Exception {
+        getExpense(familyExpenseId);
+    }
+
+    @Test
+    @Order(8)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.DELETE")
+    public void testDeletePersonalExpense() throws Exception {
+        deleteExpense(personalExpenseId);
+    }
+
+    @Test
+    @Order(9)
+    @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.DELETE")
+    public void testDeleteFamilyExpense() throws Exception {
+        deleteExpense(familyExpenseId);
+    }
+
+    private ExpenseDTO getExpense(String expenseId) throws Exception {
+
+        MvcResult result = mockMvc.perform(
+                        get(UriComponentsBuilder.fromPath(Endpoints.GET_EXPENSE).buildAndExpand(expenseId).toUriString()))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
+                .andReturn();
+        ExpenseResponse response =
+                objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+        ExpenseDTO expense = response.getExpense();
+        assertThat(expense.getId()).isEqualTo(expenseId);
+        return expense;
+    }
+
+    private void deleteExpense(String expenseId) throws Exception {
+
+        MvcResult result = mockMvc.perform(
+                        delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_EXPENSE).buildAndExpand(expenseId).toUriString()))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andReturn();
+        ExpenseResponse response =
+                objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+    }
+
+    private ExpenseDTO updateExpense(String expenseId, String name, String description, LocalDateTime time, long amount,
+            String currency) throws Exception {
+        ExpenseUpdatePayload payload = new ExpenseUpdatePayload();
+        payload.setAmount(amount);
+        payload.setCurrency(currency);
+        payload.setTime(time);
+        payload.setName(name);
+        payload.setDescription(description);
+
+        MvcResult result = mockMvc.perform(
+                        patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
+                                .toUriString()).contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
+                .andReturn();
+
+        ExpenseResponse response =
+                objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+        ExpenseDTO expense = response.getExpense();
+        assertThat(expense.getId()).isEqualTo(expenseId);
+        assertThat(expense.getName()).isEqualTo(name);
+        assertThat(expense.getDescription()).isEqualTo(description);
+        assertThat(expense.getTime()).isEqualTo(time);
+        assertThat(expense.getAmount()).isEqualTo(amount);
+        assertThat(expense.getCurrency()).isEqualTo(currency);
+
+        return expense;
     }
 
     private ExpenseDTO createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,

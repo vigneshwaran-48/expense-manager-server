@@ -26,12 +26,12 @@ import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { FamilyController.class, InvitationController.class })
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FamilyControllerTest {
 
@@ -224,7 +224,7 @@ public class FamilyControllerTest {
         assertThat(errorResponse.getStatus()).isEqualTo(HttpStatus.FORBIDDEN.value());
 
         // logTestCasePassed("Update Family by non leader or maintainer",
-//                "Update family by non leader or maintainer test case passed!");
+        //                "Update family by non leader or maintainer test case passed!");
     }
 
     @Test
@@ -245,6 +245,34 @@ public class FamilyControllerTest {
 
     @Test
     @Order(8)
+    public void shouldGetMembersOfFamily() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(
+                        get(UriComponentsBuilder.fromPath(Endpoints.GET_FAMILY_MEMBERS).buildAndExpand(familyId)
+                                .toUriString()).with(oidcLogin().oidcUser(
+                                getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" + ".READ")))))
+                .andExpect(status().isOk()).andReturn();
+        FamilyMembersResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyMembersResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getMembers().size()).isGreaterThan(0);
+    }
+
+    @Test
+    @Order(9)
+    public void shouldUpdateMemberRoleInFamily() throws Exception {
+
+        mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY_MEMBER_ROLE)
+                        .buildAndExpand(familyId, MEMBER_ID).toUriString()).param("role",
+                                FamilyMemberDTO.Role.MAINTAINER.name())
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" +
+                                ".UPDATE")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
+
+    }
+
+    @Test
+    @Order(10)
     public void shouldRemoveMemberFromFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete(UriComponentsBuilder.fromPath(Endpoints.REMOVE_MEMBER_FROM_FAMILY)
                         .buildAndExpand(familyId, MEMBER_ID).toUriString()).with(
@@ -258,7 +286,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(11)
     public void shouldDeleteUnknownFamilyFail() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
@@ -274,7 +302,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     public void shouldDeleteFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
@@ -289,7 +317,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     public void shouldSearchFamily() throws Exception {
         createFamily(mockMvc, objectMapper, "smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
         createFamily(mockMvc, objectMapper, "john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);

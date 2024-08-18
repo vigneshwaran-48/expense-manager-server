@@ -221,6 +221,11 @@
   },
   {
     "path": "/api/family/{familyId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
     "params": [],
     "method": "DELETE"
   },
@@ -238,6 +243,35 @@
       }
     ],
     "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}/member",
+    "params": [],
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [
+      {
+        "name": "role",
+        "type": "REGEX",
+        "regex": "^(LEADER|MAINTAINER|MEMBER)$"
+      }
+    ],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ]
   },
   {
     "path": "/api/static",
@@ -382,5 +416,63 @@
         }
       ]
     }
+  },
+  {
+    "path": "/api/expense/{id}",
+    "params": [],
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ],
+    "method": "PATCH",
+    "requestBodyConfig": {
+      "fields": [
+        {
+          "key": "name",
+          "minLength": 3,
+          "maxLength": 25
+        },
+        {
+          "key": "description",
+          "minLength": 0,
+          "maxLength": 100
+        },
+        {
+          "key": "time",
+          "type": "REGEX",
+          "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,9})?$"
+        },
+        {
+          "key": "amount",
+          "type": "LONG"
+        },
+        {
+          "key": "currency",
+          "type": "REGEX",
+          "regex": "^[A-Z]{3}$"
+        }
+      ]
+    }
+  },
+  {
+    "path": "/api/expense/{id}",
+    "params": [],
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/expense/{id}",
+    "params": [],
+    "method": "DELETE",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
   }
 ]

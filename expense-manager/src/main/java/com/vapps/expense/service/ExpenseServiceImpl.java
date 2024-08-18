@@ -107,7 +107,7 @@ public class ExpenseServiceImpl implements ExpenseService {
             }
             expense = expenseRepository.findByIdAndOwnerId(expenseId, familyDTO.get().getId());
         }
-        return expense.isPresent() ? Optional.of(expense.get().toDTO()) : Optional.empty();
+        return expense.map(Expense::toDTO);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private void checkCurrency(String currency) throws AppException {
-        if (!Currency.getAvailableCurrencies().stream().anyMatch(curr -> curr.getCurrencyCode().equals(currency))) {
+        if (Currency.getAvailableCurrencies().stream().noneMatch(curr -> curr.getCurrencyCode().equals(currency))) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
         }
     }

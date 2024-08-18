@@ -32,9 +32,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private UserService userService;
 
-    @Value("${app.default.user.id}")
-    private String defaultUserId;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     @Override

@@ -3,6 +3,7 @@ package com.vapps.expense.controller;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
 import com.vapps.expense.common.dto.SearchDTO;
+import com.vapps.expense.common.dto.response.FamilyMembersResponse;
 import com.vapps.expense.common.dto.response.FamilyResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.dto.response.SearchResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -115,5 +117,25 @@ public class FamilyController {
         return ResponseEntity.ok(
                 new SearchResponse<>(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         results));
+    }
+
+    @GetMapping(Endpoints.GET_FAMILY_MEMBERS_PATH)
+    public ResponseEntity<FamilyMembersResponse> getFamilyMembers(@PathVariable String familyId, Principal principal,
+            HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        List<FamilyMemberDTO> members = familyService.getFamilyMembers(userId, familyId);
+        return ResponseEntity.ok(new FamilyMembersResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+                request.getServletPath(), members));
+    }
+
+    @PostMapping(Endpoints.UPDATE_FAMILY_MEMBER_ROLE_PATH)
+    public ResponseEntity<Response> updateFamilyMemberRole(@PathVariable String familyId, @PathVariable String memberId,
+            @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
+            throws AppException {
+        String userId = principal.getName();
+        familyService.updateRole(userId, familyId, memberId, role);
+
+        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Updated Member Role!", LocalDateTime.now(),
+                request.getServletPath()));
     }
 }

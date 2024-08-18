@@ -39,7 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WebMvcTest(controllers = { CategoryController.class })
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CategoryControllerTest {
 
