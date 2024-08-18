@@ -127,4 +127,15 @@ public class FamilyController {
         return ResponseEntity.ok(new FamilyMembersResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
                 request.getServletPath(), members));
     }
+
+    @PostMapping(Endpoints.UPDATE_FAMILY_MEMBER_ROLE_PATH)
+    public ResponseEntity<Response> updateFamilyMemberRole(@PathVariable String familyId, @PathVariable String memberId,
+            @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
+            throws AppException {
+        String userId = principal.getName();
+        familyService.updateRole(userId, familyId, memberId, role);
+
+        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Updated Member Role!", LocalDateTime.now(),
+                request.getServletPath()));
+    }
 }

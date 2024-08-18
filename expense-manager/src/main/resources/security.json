@@ -255,6 +255,25 @@
     ]
   },
   {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [
+      {
+        "name": "role",
+        "type": "REGEX",
+        "regex": "^(LEADER|MAINTAINER|MEMBER)$"
+      }
+    ],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ]
+  },
+  {
     "path": "/api/static",
     "params": [
       {

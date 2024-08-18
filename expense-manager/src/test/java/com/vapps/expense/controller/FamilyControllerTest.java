@@ -26,6 +26,7 @@ import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = { FamilyController.class, InvitationController.class })
@@ -259,6 +260,19 @@ public class FamilyControllerTest {
 
     @Test
     @Order(9)
+    public void shouldUpdateMemberRoleInFamily() throws Exception {
+
+        mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY_MEMBER_ROLE)
+                        .buildAndExpand(familyId, MEMBER_ID).toUriString()).param("role",
+                                FamilyMemberDTO.Role.MAINTAINER.name())
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" +
+                                ".UPDATE")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
+
+    }
+
+    @Test
+    @Order(10)
     public void shouldRemoveMemberFromFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete(UriComponentsBuilder.fromPath(Endpoints.REMOVE_MEMBER_FROM_FAMILY)
                         .buildAndExpand(familyId, MEMBER_ID).toUriString()).with(
@@ -272,7 +286,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void shouldDeleteUnknownFamilyFail() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
@@ -288,7 +302,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void shouldDeleteFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
@@ -303,7 +317,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void shouldSearchFamily() throws Exception {
         createFamily(mockMvc, objectMapper, "smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
         createFamily(mockMvc, objectMapper, "john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);
