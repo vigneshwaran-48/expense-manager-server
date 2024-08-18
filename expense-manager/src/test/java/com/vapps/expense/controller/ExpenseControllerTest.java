@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = { ExpenseController.class })
 @AutoConfigureMockMvc
 @EnableMongoTestServer
-@EnableMongoRepositories(basePackages = "com.vapps.expense.repository.mongo")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ExpenseControllerTest {
 

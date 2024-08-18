@@ -5,6 +5,7 @@ import com.vapps.expense.common.dto.FamilyMemberDTO;
 import com.vapps.expense.common.dto.SearchDTO;
 import com.vapps.expense.common.exception.AppException;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface FamilyService {
@@ -30,4 +31,6 @@ public interface FamilyService {
     SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException;
 
     FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException;
+
+    List<FamilyMemberDTO> getFamilyMembers(String userId, String familyId) throws AppException;
 }

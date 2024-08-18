@@ -22,4 +22,12 @@ public class FamilyMember {
 
     private Role role;
 
+    public FamilyMemberDTO toDTO() {
+        FamilyMemberDTO familyMemberDTO = new FamilyMemberDTO();
+        familyMemberDTO.setId(id);
+        familyMemberDTO.setFamily(family.toDTO());
+        familyMemberDTO.setMember(member.toDTO());
+        familyMemberDTO.setRole(role);
+        return familyMemberDTO;
+    }
 }

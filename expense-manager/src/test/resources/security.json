@@ -221,6 +221,11 @@
   },
   {
     "path": "/api/family/{familyId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
     "params": [],
     "method": "DELETE"
   },
@@ -238,6 +243,16 @@
       }
     ],
     "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}/member",
+    "params": [],
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
   },
   {
     "path": "/api/static",

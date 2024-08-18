@@ -285,4 +285,14 @@ public class FamilyServiceImpl implements FamilyService {
     public FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException {
         return familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId).get().getRole();
     }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public List<FamilyMemberDTO> getFamilyMembers(String userId, String familyId) throws AppException {
+        if (!familyMemberRepository.existsByFamilyIdAndMemberId(familyId, userId)) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "Only family members can view the members of family!");
+        }
+        return familyMemberRepository.findByFamilyId(familyId).stream().map(FamilyMember::toDTO).toList();
+    }
 }
