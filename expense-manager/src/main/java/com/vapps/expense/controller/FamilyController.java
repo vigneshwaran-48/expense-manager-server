@@ -3,10 +3,7 @@ package com.vapps.expense.controller;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
 import com.vapps.expense.common.dto.SearchDTO;
-import com.vapps.expense.common.dto.response.FamilyMembersResponse;
-import com.vapps.expense.common.dto.response.FamilyResponse;
-import com.vapps.expense.common.dto.response.Response;
-import com.vapps.expense.common.dto.response.SearchResponse;
+import com.vapps.expense.common.dto.response.*;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.util.Endpoints;
@@ -137,5 +134,17 @@ public class FamilyController {
 
         return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Updated Member Role!", LocalDateTime.now(),
                 request.getServletPath()));
+    }
+
+    @GetMapping(Endpoints.GET_FAMILY_MEMBER_PATH)
+    public ResponseEntity<FamilyMemberResponse> getFamilyMember(@PathVariable String familyId,
+            @PathVariable String memberId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        Optional<FamilyMemberDTO> member = familyService.getFamilyMember(userId, familyId, memberId);
+        if (member.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Member not present in family!");
+        }
+        return ResponseEntity.ok(new FamilyMemberResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+                request.getServletPath(), member.get()));
     }
 }

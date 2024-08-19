@@ -30,6 +30,7 @@ public class Endpoints {
     public static final String SEARCH_FAMILY_PATH = "/search";
     public static final String GET_FAMILY_MEMBERS_PATH = "/{familyId}/member";
     public static final String UPDATE_FAMILY_MEMBER_ROLE_PATH = "/{familyId}/member/{memberId}";
+    public static final String GET_FAMILY_MEMBER_PATH = "/{familyId}/member/{memberId}";
 
     public static final String CREATE_FAMILY = FAMILY_API;
     public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -41,6 +42,7 @@ public class Endpoints {
     public static final String SEARCH_FAMILY = FAMILY_API + SEARCH_FAMILY_PATH;
     public static final String GET_FAMILY_MEMBERS = FAMILY_API + GET_FAMILY_MEMBERS_PATH;
     public static final String UPDATE_FAMILY_MEMBER_ROLE = FAMILY_API + UPDATE_FAMILY_MEMBER_ROLE_PATH;
+    public static final String GET_FAMILY_MEMBER = FAMILY_API + GET_FAMILY_MEMBER_PATH;
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";

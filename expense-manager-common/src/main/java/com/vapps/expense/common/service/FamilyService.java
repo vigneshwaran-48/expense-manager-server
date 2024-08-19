@@ -33,4 +33,6 @@ public interface FamilyService {
     FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException;
 
     List<FamilyMemberDTO> getFamilyMembers(String userId, String familyId) throws AppException;
+
+    Optional<FamilyMemberDTO> getFamilyMember(String userId, String familyId, String memberId) throws AppException;
 }

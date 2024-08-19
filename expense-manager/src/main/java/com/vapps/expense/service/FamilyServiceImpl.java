@@ -188,13 +188,16 @@ public class FamilyServiceImpl implements FamilyService {
     public void updateRole(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
             throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByMemberId(userId);
-
         if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed add member to this family");
         }
         if (role == FamilyMemberDTO.Role.LEADER) {
             userMember.get().setRole(FamilyMemberDTO.Role.MAINTAINER);
             familyMemberRepository.updateRole(userMember.get());
+        } else if (userId.equals(memberId)) {
+            // Leader can only update roles of user. If the new role is not Leader and it has been going to
+            // change to the leader itself then restricting it.
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "You can't demote yourself. Try promoting others!");
         }
 
         Optional<FamilyMember> memberToUpdate = familyMemberRepository.findByFamilyIdAndMemberId(familyId, memberId);
@@ -294,5 +297,17 @@ public class FamilyServiceImpl implements FamilyService {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "Only family members can view the members of family!");
         }
         return familyMemberRepository.findByFamilyId(familyId).stream().map(FamilyMember::toDTO).toList();
+    }
+
+    @Override
+    @UserIdValidator(positions = { 0, 2 })
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public Optional<FamilyMemberDTO> getFamilyMember(String userId, String familyId, String memberId)
+            throws AppException {
+        Optional<FamilyMember> familyMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, memberId);
+        if (familyMember.isPresent()) {
+            return Optional.of(familyMember.get().toDTO());
+        }
+        return Optional.empty();
     }
 }
