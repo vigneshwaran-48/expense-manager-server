@@ -9,9 +9,11 @@ import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.model.Family;
 import com.vapps.expense.model.FamilyMember;
+import com.vapps.expense.model.JoinRequest;
 import com.vapps.expense.model.User;
 import com.vapps.expense.repository.FamilyMemberRepository;
 import com.vapps.expense.repository.FamilyRepository;
+import com.vapps.expense.repository.JoinRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,9 @@ public class FamilyServiceImpl implements FamilyService {
 
     @Autowired
     private InvitationService invitationService;
+
+    @Autowired
+    private JoinRequestRepository joinRequestRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
     private static final int PAGE_SIZE = 10;
@@ -136,7 +141,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @UserIdValidator(positions = { 0, 2 })
+    @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void addMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
             throws AppException {
@@ -168,7 +173,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @UserIdValidator(positions = { 0, 2 })
+    @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void removeMember(String userId, String familyId, String memberId) throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
@@ -183,7 +188,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @UserIdValidator(positions = { 0, 2 })
+    @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void updateRole(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
             throws AppException {
@@ -214,7 +219,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @UserIdValidator(positions = { 0, 2 })
+    @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
             throws AppException {
@@ -300,7 +305,7 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    @UserIdValidator(positions = { 0, 2 })
+    @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public Optional<FamilyMemberDTO> getFamilyMember(String userId, String familyId, String memberId)
             throws AppException {
@@ -309,5 +314,40 @@ public class FamilyServiceImpl implements FamilyService {
             return Optional.of(familyMember.get().toDTO());
         }
         return Optional.empty();
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public JoinRequestDTO joinRequestFamily(String userId, String familyId) throws AppException {
+        FamilyDTO familyDTO = getFamilyById(userId, familyId).get();
+        if (familyDTO.getJoinType() != FamilyDTO.JoinType.ANYONE) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "This is an invite only family!");
+        }
+        JoinRequest request = new JoinRequest();
+        request.setRequestUser(User.build(userService.getUser(userId).get()));
+        request.setFamily(Family.build(familyDTO));
+        request.setRequestedTime(LocalDateTime.now());
+
+        request = joinRequestRepository.save(request);
+        if (request == null) {
+            throw new AppException("Error while adding join request!");
+        }
+        return request.toDTO();
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public void acceptJoinRequest(String userId, String requestId) throws AppException {
+        Optional<JoinRequest> joinRequest = joinRequestRepository.findById(requestId);
+        if (joinRequest.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Join request not exists!");
+        }
+        // TODO Need to finsh this
+    }
+
+    @Override
+    public void rejectJoinRequest(String userId, String requestId) throws AppException {
+
     }
 }
