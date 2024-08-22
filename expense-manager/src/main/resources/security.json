@@ -279,6 +279,39 @@
     ]
   },
   {
+    "path": "/api/family/{familyId}/request",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request/{requestId}/accept",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "requestId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request/{requestId}/reject",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "requestId"
+      }
+    ]
+  },
+  {
     "path": "/api/static",
     "params": [
       {

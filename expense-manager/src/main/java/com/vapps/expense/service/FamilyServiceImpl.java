@@ -4,6 +4,7 @@ import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.EmailService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.common.service.UserService;
@@ -42,6 +43,9 @@ public class FamilyServiceImpl implements FamilyService {
 
     @Autowired
     private JoinRequestRepository joinRequestRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
     private static final int PAGE_SIZE = 10;
@@ -170,6 +174,7 @@ public class FamilyServiceImpl implements FamilyService {
         if (addedFamilyMember == null) {
             throw new AppException("Error while adding member to the family!");
         }
+        deleteAllJoinRequestsOfUser(memberId);
     }
 
     @Override
@@ -320,6 +325,12 @@ public class FamilyServiceImpl implements FamilyService {
     @UserIdValidator(positions = 0)
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public JoinRequestDTO joinRequestFamily(String userId, String familyId) throws AppException {
+        if (familyMemberRepository.existsByFamilyIdAndMemberId(familyId, userId)) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "You're already a part of this family!");
+        }
+        if (familyMemberRepository.findByMemberId(userId).isPresent()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Leave your current family before requesting!");
+        }
         FamilyDTO familyDTO = getFamilyById(userId, familyId).get();
         if (familyDTO.getJoinType() != FamilyDTO.JoinType.ANYONE) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "This is an invite only family!");
@@ -343,11 +354,43 @@ public class FamilyServiceImpl implements FamilyService {
         if (joinRequest.isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Join request not exists!");
         }
-        // TODO Need to finsh this
+        Family family = joinRequest.get().getFamily();
+        Optional<FamilyMember> familyMember = familyMemberRepository.findByFamilyIdAndMemberId(family.getId(), userId);
+        if (familyMember.isEmpty()) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You can't accept other family request!");
+        }
+        if (familyMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You aren't allowed to accept this request!");
+        }
+        if (familyMemberRepository.findByMemberId(joinRequest.get().getRequestUser().getId()).isPresent()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Requested user has already a join a family!");
+        }
+        addMember(userId, family.getId(), joinRequest.get().getRequestUser().getId(), FamilyMemberDTO.Role.MEMBER);
+        deleteAllJoinRequestsOfUser(userId);
     }
 
     @Override
+    @UserIdValidator(positions = 0)
     public void rejectJoinRequest(String userId, String requestId) throws AppException {
+        Optional<JoinRequest> joinRequest = joinRequestRepository.findById(requestId);
+        if (joinRequest.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Join request not exists!");
+        }
+        Family family = joinRequest.get().getFamily();
+        Optional<FamilyMember> familyMember = familyMemberRepository.findByFamilyIdAndMemberId(family.getId(), userId);
+        if (familyMember.isEmpty()) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You can't reject other family request!");
+        }
+        if (familyMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You aren't allowed to reject this request!");
+        }
+        joinRequestRepository.deleteById(requestId);
+        // Need to make a html template for this!
+        emailService.sendEmail(joinRequest.get().getRequestUser().getEmail(), "Request rejected!",
+                "<h1>Your request to join the family " + family.getName() + " has been rejected by its leader!</h1>");
+    }
 
+    private void deleteAllJoinRequestsOfUser(String userId) throws AppException {
+        joinRequestRepository.findByRequestUserId(userId).forEach(request -> joinRequestRepository.deleteById(request.getId()));
     }
 }

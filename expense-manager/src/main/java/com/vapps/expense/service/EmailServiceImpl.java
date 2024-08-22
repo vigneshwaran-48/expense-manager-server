@@ -47,4 +47,22 @@ public class EmailServiceImpl implements EmailService {
             throw new AppException("Error while sending email!");
         }
     }
+
+    @Override
+    public void sendEmail(String to, String subject, String content) throws AppException {
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+
+        try {
+            helper.setFrom(email);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new AppException("Error while sending email!");
+        }
+    }
 }

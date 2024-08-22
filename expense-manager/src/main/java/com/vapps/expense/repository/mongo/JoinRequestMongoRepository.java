@@ -8,4 +8,6 @@ import java.util.List;
 public interface JoinRequestMongoRepository extends MongoRepository<JoinRequest, String> {
 
     List<JoinRequest> findByFamilyId(String familyId);
+
+    List<JoinRequest> findByRequestUserId(String requestUserId);
 }
