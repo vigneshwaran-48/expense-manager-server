@@ -3,6 +3,7 @@ package com.vapps.expense.repository.cache;
 import com.vapps.expense.model.JoinRequest;
 import com.vapps.expense.repository.JoinRequestRepository;
 import com.vapps.expense.repository.mongo.JoinRequestMongoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Repository
 public class JoinRequestRepositoryImpl implements JoinRequestRepository {
 
+    @Autowired
     private JoinRequestMongoRepository joinRequestRepository;
 
     @Override

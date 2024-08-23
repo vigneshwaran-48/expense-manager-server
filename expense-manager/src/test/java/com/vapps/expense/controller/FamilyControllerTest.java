@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = { FamilyController.class, InvitationController.class })
+@WebMvcTest(controllers = {FamilyController.class, InvitationController.class})
 @AutoConfigureMockMvc
 @EnableMongoTestServer
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -42,6 +42,8 @@ public class FamilyControllerTest {
     private ObjectMapper objectMapper;
 
     private static String familyId;
+
+    private static String requestId;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyControllerTest.class);
     private static final String USER_ID = "testing_user_id";
@@ -303,10 +305,54 @@ public class FamilyControllerTest {
 
     @Test
     @Order(12)
+    public void shouldRejectJoinRequest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.CREATE"))))).andExpect(status().isOk())
+                .andReturn();
+        JoinRequestResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestResponse.class);
+        assertThat(response.getRequest().getId()).isNotNull();
+        assertThat(response.getRequest().getFamily().getId()).isEqualTo(familyId);
+        assertThat(response.getRequest().getRequestUser().getId()).isEqualTo(MEMBER_ID);
+
+        mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_REJECT_JOIN_REQUEST)
+                        .buildAndExpand(familyId, response.getRequest().getId()).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.REJECT"))))).andExpect(status().isOk())
+                .andReturn();
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+    }
+
+    @Test
+    @Order(13)
+    public void shouldMakeJoinRequest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.CREATE"))))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.request").exists()).andReturn();
+        JoinRequestResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestResponse.class);
+        assertThat(response.getRequest().getId()).isNotNull();
+        assertThat(response.getRequest().getFamily().getId()).isEqualTo(familyId);
+        assertThat(response.getRequest().getRequestUser().getId()).isEqualTo(MEMBER_ID);
+
+        requestId = response.getRequest().getId();
+    }
+
+    @Test
+    @Order(14)
+    public void shouldAcceptJoinRequest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_ACCEPT_JOIN_REQUEST)
+                        .buildAndExpand(familyId, requestId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.ACCEPT"))))).andExpect(status().isOk())
+                .andReturn();
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+    }
+
+    @Test
+    @Order(15)
     public void shouldDeleteUnknownFamilyFail() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
-                                "SOME_FAKE_FAMILY_ID")
+                                        "SOME_FAKE_FAMILY_ID")
                                 .toUriString()).with(
                                 oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
                                         ".DELETE")))))
@@ -318,7 +364,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(16)
     public void shouldDeleteFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
@@ -333,7 +379,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(17)
     public void shouldSearchFamily() throws Exception {
         createFamily(mockMvc, objectMapper, "smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
         createFamily(mockMvc, objectMapper, "john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);
