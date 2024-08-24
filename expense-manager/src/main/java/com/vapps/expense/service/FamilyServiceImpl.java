@@ -200,7 +200,7 @@ public class FamilyServiceImpl implements FamilyService {
             throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByMemberId(userId);
         if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
-            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed add member to this family");
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to change members role of this family");
         }
         if (role == FamilyMemberDTO.Role.LEADER) {
             userMember.get().setRole(FamilyMemberDTO.Role.MAINTAINER);
@@ -269,11 +269,11 @@ public class FamilyServiceImpl implements FamilyService {
     }
 
     @Override
-    public SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException {
+    public SearchDTO<FamilySearchDTO> searchFamily(String userId, String query, int page) throws AppException {
 
         int queryPage = page - 1;
 
-        SearchDTO<FamilyDTO> familyResults = new SearchDTO<>();
+        SearchDTO<FamilySearchDTO> familyResults = new SearchDTO<>();
         familyResults.setResults(new ArrayList<>());
         familyResults.setCurrentPage(page);
         familyResults.setNextPage(-1);
@@ -293,7 +293,7 @@ public class FamilyServiceImpl implements FamilyService {
         } else {
             families = families.subList(startIndex, families.size());
         }
-        familyResults.setResults(families.stream().map(Family::toDTO).toList());
+        familyResults.setResults(families.stream().map(family -> family.toSearchDTO(joinRequestRepository.findByFamilyIdAndRequestUserId(family.getId(), userId).isPresent())).toList());
         return familyResults;
     }
 

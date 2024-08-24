@@ -1,9 +1,6 @@
 package com.vapps.expense.controller;
 
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.JoinRequestDTO;
-import com.vapps.expense.common.dto.SearchDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.dto.response.*;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.FamilyService;
@@ -107,11 +104,11 @@ public class FamilyController {
     }
 
     @GetMapping(Endpoints.SEARCH_FAMILY_PATH)
-    public ResponseEntity<SearchResponse<FamilyDTO>> searchFamily(@RequestParam String query, @RequestParam int page,
-                                                                  Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<SearchResponse<FamilySearchDTO>> searchFamily(@RequestParam String query, @RequestParam int page,
+                                                                        Principal principal, HttpServletRequest request) throws AppException {
 
         String userId = principal.getName();
-        SearchDTO<FamilyDTO> results = familyService.searchFamily(userId, query, page);
+        SearchDTO<FamilySearchDTO> results = familyService.searchFamily(userId, query, page);
         return ResponseEntity.ok(
                 new SearchResponse<>(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         results));

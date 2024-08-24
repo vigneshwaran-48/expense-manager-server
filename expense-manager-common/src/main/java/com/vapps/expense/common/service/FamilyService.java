@@ -1,9 +1,6 @@
 package com.vapps.expense.common.service;
 
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.JoinRequestDTO;
-import com.vapps.expense.common.dto.SearchDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
 
 import java.util.List;
@@ -29,7 +26,7 @@ public interface FamilyService {
 
     Optional<FamilyDTO> getUserFamily(String userId);
 
-    SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException;
+    SearchDTO<FamilySearchDTO> searchFamily(String userId, String query, int page) throws AppException;
 
     FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException;
 

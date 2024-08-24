@@ -26,16 +26,16 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "expenseByFamilyId"), @CacheEvict(value = "expenseByOwnerId"),
-            @CacheEvict(value = "expenseByIdAndOwnerId") })
+    @Caching(evict = {@CacheEvict(value = "expenseByFamilyId", allEntries = true), @CacheEvict(value = "expenseByOwnerId", allEntries = true),
+            @CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true)})
     public Expense save(Expense expense) {
         return expenseRepository.save(expense);
     }
 
     @Override
-    @Caching(put = { @CachePut(value = "expense", key = "'expense_' + #expense.getId()") },
-            evict = { @CacheEvict(value = "expenseByFamilyId"), @CacheEvict(value = "expenseByOwnerId"),
-                    @CacheEvict(value = "expenseByIdAndOwnerId") })
+    @Caching(put = {@CachePut(value = "expense", key = "'expense_' + #expense.getId()")},
+            evict = {@CacheEvict(value = "expenseByFamilyId", allEntries = true), @CacheEvict(value = "expenseByOwnerId", allEntries = true),
+                    @CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true)})
     public Expense update(Expense expense) {
         return expenseRepository.save(expense);
     }
@@ -59,8 +59,8 @@ public class ExpenseCacheRepository implements ExpenseRepository {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "expenseByIdAndOwnerId"), @CacheEvict(value = "expenseByFamilyId"),
-            @CacheEvict(value = "expenseByOwnerId"), @CacheEvict(value = "expense") })
+    @Caching(evict = {@CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true), @CacheEvict(value = "expenseByFamilyId", allEntries = true),
+            @CacheEvict(value = "expenseByOwnerId", allEntries = true), @CacheEvict(value = "expense", allEntries = true)})
     public void deleteById(String id) {
         expenseRepository.deleteById(id);
     }

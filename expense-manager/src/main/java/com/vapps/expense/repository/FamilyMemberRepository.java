@@ -11,8 +11,6 @@ public interface FamilyMemberRepository {
 
     FamilyMember save(FamilyMember familyMember);
 
-    FamilyMember update(FamilyMember familyMember);
-
     List<FamilyMember> findByFamilyId(String familyId);
 
     Optional<FamilyMember> findByMemberId(String memberId);
@@ -25,10 +23,8 @@ public interface FamilyMemberRepository {
 
     List<FamilyMember> findByFamilyIdAndRole(String familyId, FamilyMemberDTO.Role role);
 
-    @Transactional
     void deleteByFamilyIdAndMemberId(String familyId, String memberId);
 
-    @Transactional
     void deleteByFamilyId(String familyId);
 
 }

@@ -16,4 +16,6 @@ public interface JoinRequestRepository {
     void deleteById(String id);
 
     List<JoinRequest> findByRequestUserId(String requestUserId);
+
+    Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId);
 }

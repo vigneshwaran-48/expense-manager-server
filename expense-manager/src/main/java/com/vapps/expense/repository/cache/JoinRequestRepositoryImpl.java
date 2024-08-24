@@ -21,7 +21,9 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepository {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "join_request_family_id", key = "'join_request_family_id_' + #request.getFamily().getId()"),
-            @CacheEvict(value = "join_request_user_id", key = "'join_request_user_id_' + #request.getRequestUser().getId()")
+            @CacheEvict(value = "join_request_user_id", key = "'join_request_user_id_' + #request.getRequestUser().getId()"),
+            @CacheEvict(value = "join_family_id_request_user_id",
+                    key = "'join_family_id_' + #request.getFamily().getId() + '_request_user_id_' + #request.getRequestUser().getId()")
     })
     public JoinRequest save(JoinRequest request) {
         return joinRequestRepository.save(request);
@@ -42,8 +44,9 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepository {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "join_request", key = "'join_request_' + #id"),
-            @CacheEvict(value = "join_request_family_id"),
-            @CacheEvict(value = "join_request_user_id")
+            @CacheEvict(value = "join_request_family_id", allEntries = true),
+            @CacheEvict(value = "join_request_user_id", allEntries = true),
+            @CacheEvict(value = "join_family_id_request_user_id", allEntries = true)
     })
     public void deleteById(String id) {
         joinRequestRepository.deleteById(id);
@@ -53,5 +56,11 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepository {
     @Cacheable(value = "join_request_user_id", key = "'join_request_user_id_' + #requestUserId")
     public List<JoinRequest> findByRequestUserId(String requestUserId) {
         return joinRequestRepository.findByRequestUserId(requestUserId);
+    }
+
+    @Override
+    @Cacheable(value = "join_family_id_request_user_id", key = "'join_family_id_' + #familyId + '_request_user_id_' + #requestUserId")
+    public Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId) {
+        return joinRequestRepository.findByFamilyIdAndRequestUserId(familyId, requestUserId);
     }
 }
