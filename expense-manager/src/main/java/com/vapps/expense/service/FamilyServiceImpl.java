@@ -271,6 +271,8 @@ public class FamilyServiceImpl implements FamilyService {
     @Override
     public SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException {
 
+        int queryPage = page - 1;
+
         SearchDTO<FamilyDTO> familyResults = new SearchDTO<>();
         familyResults.setResults(new ArrayList<>());
         familyResults.setCurrentPage(page);
@@ -282,14 +284,14 @@ public class FamilyServiceImpl implements FamilyService {
         familyResults.setTotalPages(families.size() == 0 ? 0 : families.size() <= PAGE_SIZE ? 1
                 : (int) Math.ceil((float) families.size() / PAGE_SIZE));
 
-        int startIndex = page * PAGE_SIZE;
+        int startIndex = queryPage * PAGE_SIZE;
         if (families.size() <= startIndex) {
             families = List.of();
         } else if (startIndex + PAGE_SIZE + 1 < families.size()) {
             familyResults.setNextPage(page + 1);
             families = families.subList(startIndex, startIndex + PAGE_SIZE);
         } else {
-            families = families.subList(startIndex, families.size() - 1);
+            families = families.subList(startIndex, families.size());
         }
         familyResults.setResults(families.stream().map(Family::toDTO).toList());
         return familyResults;

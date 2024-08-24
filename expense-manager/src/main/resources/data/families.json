@@ -4,6 +4,7 @@
     "name": "The Smiths",
     "description": "Smith family description",
     "visibility": "PUBLIC",
+    "joinType": "ANYONE",
     "createdTime": "2024-07-09T10:00:00",
     "image": "smithfamily.jpg",
     "createdBy": {
@@ -21,6 +22,7 @@
     "name": "Johnson Clan",
     "description": "Johnson family description",
     "visibility": "PUBLIC",
+    "joinType": "ANYONE",
     "createdTime": "2024-07-09T11:00:00",
     "image": "johnsonclan.jpg",
     "createdBy": {
@@ -38,6 +40,7 @@
     "name": "The Martinez Family",
     "description": "Martinez family description",
     "visibility": "PUBLIC",
+    "joinType": "ANYONE",
     "createdTime": "2024-07-09T12:00:00",
     "image": "martinezfamily.jpg",
     "createdBy": {
@@ -55,6 +58,7 @@
     "name": "Williams Crew",
     "description": "Williams family description",
     "visibility": "PUBLIC",
+    "joinType": "ANYONE",
     "createdTime": "2024-07-09T13:00:00",
     "image": "williamscrew.jpg",
     "createdBy": {
@@ -72,6 +76,7 @@
     "name": "Garcia Tribe",
     "description": "Garcia family description",
     "visibility": "PUBLIC",
+    "joinType": "ANYONE",
     "createdTime": "2024-07-09T14:00:00",
     "image": "garciatribe.jpg",
     "createdBy": {
