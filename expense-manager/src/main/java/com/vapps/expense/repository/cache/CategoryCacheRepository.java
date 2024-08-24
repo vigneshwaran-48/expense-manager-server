@@ -46,29 +46,28 @@ public class CategoryCacheRepository implements CategoryRepository {
     }
 
     /**
-     *
      * When a error occurs in the DB level the return value would be null. Because of this we are not using
-     * @CachePut with the return value in save() and update() method. It will end up in a NullPointerException
      *
+     * @CachePut with the return value in save() and update() method. It will end up in a NullPointerException
      */
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
-            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
+    @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
     public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
-            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
+    @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
     public Category update(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "category_owner_id"), @CacheEvict(value = "category_owner_id_name"),
-            @CacheEvict(value = "category_id_owner_id"), @CacheEvict(value = "category") })
+    @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
     public void deleteById(String id) {
         categoryRepository.deleteById(id);
     }

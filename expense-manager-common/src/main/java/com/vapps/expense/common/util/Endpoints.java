@@ -30,6 +30,10 @@ public class Endpoints {
     public static final String SEARCH_FAMILY_PATH = "/search";
     public static final String GET_FAMILY_MEMBERS_PATH = "/{familyId}/member";
     public static final String UPDATE_FAMILY_MEMBER_ROLE_PATH = "/{familyId}/member/{memberId}";
+    public static final String GET_FAMILY_MEMBER_PATH = "/{familyId}/member/{memberId}";
+    public static final String FAMILY_JOIN_REQUEST_PATH = "/{familyId}/request";
+    public static final String FAMILY_ACCEPT_JOIN_REQUEST_PATH = "/{familyId}/request/{requestId}/accept";
+    public static final String FAMILY_REJECT_JOIN_REQUEST_PATH = "/{familyId}/request/{requestId}/reject";
 
     public static final String CREATE_FAMILY = FAMILY_API;
     public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -41,6 +45,11 @@ public class Endpoints {
     public static final String SEARCH_FAMILY = FAMILY_API + SEARCH_FAMILY_PATH;
     public static final String GET_FAMILY_MEMBERS = FAMILY_API + GET_FAMILY_MEMBERS_PATH;
     public static final String UPDATE_FAMILY_MEMBER_ROLE = FAMILY_API + UPDATE_FAMILY_MEMBER_ROLE_PATH;
+    public static final String GET_FAMILY_MEMBER = FAMILY_API + GET_FAMILY_MEMBER_PATH;
+    public static final String FAMILY_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
+    public static final String FAMILY_ACCEPT_JOIN_REQUEST = FAMILY_API + FAMILY_ACCEPT_JOIN_REQUEST_PATH;
+    public static final String FAMILY_REJECT_JOIN_REQUEST = FAMILY_API + FAMILY_REJECT_JOIN_REQUEST_PATH;
+    public static final String FAMILY_LIST_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";

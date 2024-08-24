@@ -2,6 +2,7 @@ package com.vapps.expense.model;
 
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyDTO.Visibility;
+import com.vapps.expense.common.dto.FamilySearchDTO;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,6 +37,20 @@ public class Family {
         familyDTO.setCreatedTime(createdTime);
         familyDTO.setImage(image);
         familyDTO.setJoinType(joinType);
+        return familyDTO;
+    }
+
+    public FamilySearchDTO toSearchDTO(boolean isJoinRequestExists) {
+        FamilySearchDTO familyDTO = new FamilySearchDTO();
+        familyDTO.setId(id);
+        familyDTO.setName(name);
+        familyDTO.setDescription(description);
+        familyDTO.setVisibility(visibility);
+        familyDTO.setCreatedBy(createdBy.toDTO());
+        familyDTO.setCreatedTime(createdTime);
+        familyDTO.setImage(image);
+        familyDTO.setJoinType(joinType);
+        familyDTO.setJoinRequestExists(isJoinRequestExists);
         return familyDTO;
     }
 

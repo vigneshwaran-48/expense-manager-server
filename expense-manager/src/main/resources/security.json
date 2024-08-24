@@ -176,6 +176,11 @@
     "method": "DELETE"
   },
   {
+    "path": "/api/family/{familyId}/member/{memberId}",
+    "params": [],
+    "method": "GET"
+  },
+  {
     "path": "/api/family/{familyId}",
     "params": [],
     "method": "GET"
@@ -270,6 +275,48 @@
       },
       {
         "name": "memberId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request",
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request/{requestId}/accept",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "requestId"
+      }
+    ]
+  },
+  {
+    "path": "/api/family/{familyId}/request/{requestId}/reject",
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "requestId"
       }
     ]
   },

@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = { FamilyController.class, InvitationController.class })
+@WebMvcTest(controllers = {FamilyController.class, InvitationController.class})
 @AutoConfigureMockMvc
 @EnableMongoTestServer
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -42,6 +42,8 @@ public class FamilyControllerTest {
     private ObjectMapper objectMapper;
 
     private static String familyId;
+
+    private static String requestId;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyControllerTest.class);
     private static final String USER_ID = "testing_user_id";
@@ -260,19 +262,35 @@ public class FamilyControllerTest {
 
     @Test
     @Order(9)
+    public void shouldGetMemberOfFamily() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(
+                        get(UriComponentsBuilder.fromPath(Endpoints.GET_FAMILY_MEMBER).buildAndExpand(familyId,
+                                        MEMBER_ID)
+                                .toUriString()).with(oidcLogin().oidcUser(
+                                getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" + ".READ")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.member").exists()).andReturn();
+        FamilyMemberResponse response =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), FamilyMemberResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getMember().getMember().getId()).isEqualTo(MEMBER_ID);
+        assertThat(response.getMember().getFamily().getId()).isEqualTo(familyId);
+    }
+
+    @Test
+    @Order(10)
     public void shouldUpdateMemberRoleInFamily() throws Exception {
 
         mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.UPDATE_FAMILY_MEMBER_ROLE)
                         .buildAndExpand(familyId, MEMBER_ID).toUriString()).param("role",
-                                FamilyMemberDTO.Role.MAINTAINER.name())
-                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" +
-                                ".UPDATE")))))
+                        FamilyMemberDTO.Role.MAINTAINER.name()).with(oidcLogin().oidcUser(
+                        getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" + ".UPDATE")))))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value(HttpStatus.OK.value()));
 
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void shouldRemoveMemberFromFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete(UriComponentsBuilder.fromPath(Endpoints.REMOVE_MEMBER_FROM_FAMILY)
                         .buildAndExpand(familyId, MEMBER_ID).toUriString()).with(
@@ -286,11 +304,11 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     public void shouldDeleteUnknownFamilyFail() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
-                                "SOME_FAKE_FAMILY_ID")
+                                        "SOME_FAKE_FAMILY_ID")
                                 .toUriString()).with(
                                 oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
                                         ".DELETE")))))
@@ -302,7 +320,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     public void shouldDeleteFamily() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
                         delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
@@ -317,7 +335,64 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
+    public void shouldRejectJoinRequest() throws Exception {
+        familyId = createFamily(mockMvc, objectMapper, USER_ID, "The Smiths Test", FamilyDTO.Visibility.PUBLIC);
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.CREATE"))))).andExpect(status().isOk())
+                .andReturn();
+        JoinRequestResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestResponse.class);
+        assertThat(response.getRequest().getId()).isNotNull();
+        assertThat(response.getRequest().getFamily().getId()).isEqualTo(familyId);
+        assertThat(response.getRequest().getRequestUser().getId()).isEqualTo(MEMBER_ID);
+
+        mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_REJECT_JOIN_REQUEST)
+                        .buildAndExpand(familyId, response.getRequest().getId()).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.REJECT"))))).andExpect(status().isOk())
+                .andReturn();
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+    }
+
+    @Test
+    @Order(15)
+    public void shouldMakeJoinRequest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.CREATE"))))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.request").exists()).andReturn();
+        JoinRequestResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestResponse.class);
+        assertThat(response.getRequest().getId()).isNotNull();
+        assertThat(response.getRequest().getFamily().getId()).isEqualTo(familyId);
+        assertThat(response.getRequest().getRequestUser().getId()).isEqualTo(MEMBER_ID);
+
+        requestId = response.getRequest().getId();
+    }
+
+    @Test
+    @Order(16)
+    public void shouldListJoinRequests() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(UriComponentsBuilder.fromPath(Endpoints.FAMILY_LIST_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.READ"))))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.requests").exists())
+                .andReturn();
+        JoinRequestsResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestsResponse.class);
+        assertThat(response.getRequests().get(0).getRequestUser().getId()).isEqualTo(MEMBER_ID);
+    }
+
+    @Test
+    @Order(17)
+    public void shouldAcceptJoinRequest() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_ACCEPT_JOIN_REQUEST)
+                        .buildAndExpand(familyId, requestId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.ACCEPT"))))).andExpect(status().isOk())
+                .andReturn();
+        objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+    }
+
+    @Test
+    @Order(18)
     public void shouldSearchFamily() throws Exception {
         createFamily(mockMvc, objectMapper, "smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
         createFamily(mockMvc, objectMapper, "john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);
@@ -348,6 +423,7 @@ public class FamilyControllerTest {
         SearchResponse<SearchDTO> searchResponse =
                 objectMapper.readValue(result.getResponse().getContentAsString(), SearchResponse.class);
 
+        LOGGER.info("Search Response => {}", searchResponse.toString());
         assertThat(searchResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(searchResponse.getResult().getResults().size()).isEqualTo(10);
         assertThat(searchResponse.getResult().getCurrentPage()).isEqualTo(1);

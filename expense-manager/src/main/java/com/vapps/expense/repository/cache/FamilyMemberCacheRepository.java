@@ -20,14 +20,8 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
     private FamilyMemberMongoRepository familyMemberRepository;
 
     @Override
-    @CacheEvict(value = "familyMember", key = "'family_member_' + #familyMember.getMember().getId()")
+    @CacheEvict(value = "familyMember", allEntries = true)
     public FamilyMember save(FamilyMember familyMember) {
-        return familyMemberRepository.save(familyMember);
-    }
-
-    @Override
-    @CacheEvict(value = "familyMember", key = "'familyMembers_' + #id")
-    public FamilyMember update(FamilyMember familyMember) {
         return familyMemberRepository.save(familyMember);
     }
 
@@ -44,7 +38,7 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
     }
 
     @Override
-    @Cacheable(value = "familyMember", key = "'family_member_' + #memberId")
+    @Cacheable(value = "familyMember", key = "'family_id_' + #familyId + '_member_' + #memberId")
     public Optional<FamilyMember> findByFamilyIdAndMemberId(String familyId, String memberId) {
         return familyMemberRepository.findByFamilyIdAndMemberId(familyId, memberId);
     }
@@ -56,7 +50,7 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
     }
 
     @Override
-    @CacheEvict(value = "familyMember", key = "'family_' + #familyMember.getFamily().getId() + '_role'")
+    @CacheEvict(value = "familyMember", allEntries = true)
     public FamilyMember updateRole(FamilyMember familyMember) {
         return familyMemberRepository.save(familyMember);
     }
@@ -68,8 +62,7 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "familyMember", key = "'family_member_' + #memberId"),
-            @CacheEvict(value = "familyMember", key = "'member_exists_' + #familyId + '_' + #memberId") })
+    @CacheEvict(value = "familyMember", allEntries = true)
     public void deleteByFamilyIdAndMemberId(String familyId, String memberId) {
         familyMemberRepository.deleteByFamilyIdAndMemberId(familyId, memberId);
     }
@@ -78,7 +71,7 @@ public class FamilyMemberCacheRepository implements FamilyMemberRepository {
      * Need to find a better way to evict the cache related to the family.
      */
     @Override
-    @CacheEvict(value = "familyMember")
+    @CacheEvict(value = "familyMember", allEntries = true)
     public void deleteByFamilyId(String familyId) {
         familyMemberRepository.deleteByFamilyId(familyId);
     }

@@ -37,7 +37,7 @@ public class StaticResourceCacheRepository implements StaticResourceRepository {
 
     @Override
     @Caching(evict = { @CacheEvict(value = "staticResource", key = "'resource_' + #id"),
-            @CacheEvict(value = "staticResourceVisibility") })
+            @CacheEvict(value = "staticResourceVisibility", allEntries = true) })
     public void deleteByIdAndOwnerId(String id, String ownerId) {
         staticResourceRepository.deleteByIdAndOwnerId(id, ownerId);
     }

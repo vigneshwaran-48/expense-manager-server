@@ -22,7 +22,7 @@ public class FamilyCacheRepository implements FamilyRepository {
 
     @Override
     @Cacheable(value = "family", key = "'family' + #id")
-    @CacheEvict(value = "familySearch")
+    @CacheEvict(value = "familySearch", allEntries = true)
     public Optional<Family> findById(String id) {
         return familyRepository.findById(id);
     }
@@ -34,14 +34,14 @@ public class FamilyCacheRepository implements FamilyRepository {
 
     @Override
     @Cacheable(value = "family", key = "'family' + #family.getId()")
-    @CacheEvict(value = "familySearch")
+    @CacheEvict(value = "familySearch", allEntries = true)
     public Family update(Family family) {
         return familyRepository.save(family);
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = "familyCreatedBy"), @CacheEvict(value = "family", key = "'family' + #id"),
-            @CacheEvict(value = "familySearch") })
+    @Caching(evict = { @CacheEvict(value = "familyCreatedBy", allEntries = true), @CacheEvict(value = "family", key = "'family' + #id"),
+            @CacheEvict(value = "familySearch", allEntries = true) })
     public void deleteById(String id) {
         familyRepository.deleteById(id);
     }

@@ -1,8 +1,6 @@
 package com.vapps.expense.common.service;
 
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.FamilyMemberDTO;
-import com.vapps.expense.common.dto.SearchDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
 
 import java.util.List;
@@ -28,9 +26,19 @@ public interface FamilyService {
 
     Optional<FamilyDTO> getUserFamily(String userId);
 
-    SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException;
+    SearchDTO<FamilySearchDTO> searchFamily(String userId, String query, int page) throws AppException;
 
     FamilyMemberDTO.Role getUserRoleInFamily(String userId, String familyId) throws AppException;
 
     List<FamilyMemberDTO> getFamilyMembers(String userId, String familyId) throws AppException;
+
+    Optional<FamilyMemberDTO> getFamilyMember(String userId, String familyId, String memberId) throws AppException;
+
+    JoinRequestDTO joinRequestFamily(String userId, String familyId) throws AppException;
+
+    void acceptJoinRequest(String userId, String requestId) throws AppException;
+
+    void rejectJoinRequest(String userId, String requestId) throws AppException;
+
+    List<JoinRequestDTO> getFamilyJoinRequests(String userId, String familyId) throws AppException;
 }
