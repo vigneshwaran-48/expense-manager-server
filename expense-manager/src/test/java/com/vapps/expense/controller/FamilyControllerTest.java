@@ -305,7 +305,39 @@ public class FamilyControllerTest {
 
     @Test
     @Order(12)
+    public void shouldDeleteUnknownFamilyFail() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(
+                        delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
+                                        "SOME_FAKE_FAMILY_ID")
+                                .toUriString()).with(
+                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
+                                        ".DELETE")))))
+                .andExpect(status().isBadRequest()).andReturn();
+        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        // logTestCasePassed("Delete unknown family", "Delete unknown family test passed!");
+    }
+
+    @Test
+    @Order(13)
+    public void shouldDeleteFamily() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(
+                        delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
+                                .toUriString()).with(
+                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
+                                        ".DELETE")))))
+                .andExpect(status().isOk()).andReturn();
+        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        // logTestCasePassed("Delete family", "Delete family test passed!");
+    }
+
+    @Test
+    @Order(14)
     public void shouldRejectJoinRequest() throws Exception {
+        familyId = createFamily(mockMvc, objectMapper, USER_ID, "The Smiths Test", FamilyDTO.Visibility.PUBLIC);
         MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
                         .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
                         List.of("SCOPE_ExpenseManager.Family.Request.CREATE"))))).andExpect(status().isOk())
@@ -323,7 +355,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     public void shouldMakeJoinRequest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_JOIN_REQUEST)
                         .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(MEMBER_ID,
@@ -338,44 +370,13 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     public void shouldAcceptJoinRequest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_ACCEPT_JOIN_REQUEST)
                         .buildAndExpand(familyId, requestId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
                         List.of("SCOPE_ExpenseManager.Family.Request.ACCEPT"))))).andExpect(status().isOk())
                 .andReturn();
         objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
-    }
-
-    @Test
-    @Order(15)
-    public void shouldDeleteUnknownFamilyFail() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(
-                        delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(
-                                        "SOME_FAKE_FAMILY_ID")
-                                .toUriString()).with(
-                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
-                                        ".DELETE")))))
-                .andExpect(status().isBadRequest()).andReturn();
-        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-
-        // logTestCasePassed("Delete unknown family", "Delete unknown family test passed!");
-    }
-
-    @Test
-    @Order(16)
-    public void shouldDeleteFamily() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(
-                        delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_FAMILY).buildAndExpand(familyId)
-                                .toUriString()).with(
-                                oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family" +
-                                        ".DELETE")))))
-                .andExpect(status().isOk()).andReturn();
-        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-
-        // logTestCasePassed("Delete family", "Delete family test passed!");
     }
 
     @Test
@@ -410,6 +411,7 @@ public class FamilyControllerTest {
         SearchResponse<SearchDTO> searchResponse =
                 objectMapper.readValue(result.getResponse().getContentAsString(), SearchResponse.class);
 
+        LOGGER.info("Search Response => {}", searchResponse.toString());
         assertThat(searchResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(searchResponse.getResult().getResults().size()).isEqualTo(10);
         assertThat(searchResponse.getResult().getCurrentPage()).isEqualTo(1);

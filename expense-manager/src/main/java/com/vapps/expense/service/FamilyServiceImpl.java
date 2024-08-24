@@ -288,7 +288,7 @@ public class FamilyServiceImpl implements FamilyService {
         }
         int resultSize = familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query,
                 FamilyDTO.Visibility.PUBLIC).size();
-        familyResults.setTotalPages(resultSize >= PAGE_SIZE ? resultSize % PAGE_SIZE : 1);
+        familyResults.setTotalPages(resultSize >= PAGE_SIZE ? (int) Math.ceil((float) resultSize % PAGE_SIZE) : 1);
         return familyResults;
     }
 

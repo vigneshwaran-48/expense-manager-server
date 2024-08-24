@@ -20,7 +20,7 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepository {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "join_request_family_id", key = "'join_request_family_id_' + #request.getFamilyId()"),
+            @CacheEvict(value = "join_request_family_id", key = "'join_request_family_id_' + #request.getFamily().getId()"),
             @CacheEvict(value = "join_request_user_id", key = "'join_request_user_id_' + #request.getRequestUser().getId()")
     })
     public JoinRequest save(JoinRequest request) {
