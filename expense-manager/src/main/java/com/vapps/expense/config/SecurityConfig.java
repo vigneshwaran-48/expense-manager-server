@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.Family.Request.ACCEPT", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.FAMILY_REJECT_JOIN_REQUEST)
                         .access(hasAnyScope("ExpenseManager.Family.Request.REJECT", "ExpenseManager.Family.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.FAMILY_LIST_JOIN_REQUEST)
+                        .access(hasAnyScope("ExpenseManager.Family.Request.READ", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.INVITE_MEMBER)
                         .access(hasAnyScope("ExpenseManager.Family.Member.INVITE", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.DELETE, Endpoints.REMOVE_MEMBER_FROM_FAMILY)

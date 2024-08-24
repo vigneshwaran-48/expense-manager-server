@@ -174,4 +174,14 @@ public class FamilyController {
         return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Rejected the request!", LocalDateTime.now(),
                 request.getServletPath()));
     }
+
+    @GetMapping(Endpoints.FAMILY_JOIN_REQUEST_PATH)
+    public ResponseEntity<JoinRequestsResponse> listJoinRequests(@PathVariable String familyId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        List<JoinRequestDTO> requests = familyService.getFamilyJoinRequests(userId, familyId);
+
+        return ResponseEntity.ok(new JoinRequestsResponse(HttpStatus.OK.value(), "success",
+                LocalDateTime.now(), request.getServletPath(), requests));
+    }
+
 }

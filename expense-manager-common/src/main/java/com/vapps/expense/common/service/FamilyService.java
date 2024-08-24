@@ -42,4 +42,6 @@ public interface FamilyService {
     void acceptJoinRequest(String userId, String requestId) throws AppException;
 
     void rejectJoinRequest(String userId, String requestId) throws AppException;
+
+    List<JoinRequestDTO> getFamilyJoinRequests(String userId, String familyId) throws AppException;
 }

@@ -288,6 +288,15 @@
     ]
   },
   {
+    "path": "/api/family/{familyId}/request",
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
     "path": "/api/family/{familyId}/request/{requestId}/accept",
     "method": "POST",
     "pathVariables": [

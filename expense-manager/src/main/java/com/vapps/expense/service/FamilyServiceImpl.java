@@ -25,6 +25,7 @@ import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FamilyServiceImpl implements FamilyService {
@@ -270,25 +271,27 @@ public class FamilyServiceImpl implements FamilyService {
     @Override
     public SearchDTO<FamilyDTO> searchFamily(String userId, String query, int page) throws AppException {
 
-        int queryPage = page - 1;
-
         SearchDTO<FamilyDTO> familyResults = new SearchDTO<>();
         familyResults.setResults(new ArrayList<>());
         familyResults.setCurrentPage(page);
         familyResults.setNextPage(-1);
 
-        familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query, FamilyDTO.Visibility.PUBLIC,
-                        PageRequest.of(queryPage, PAGE_SIZE + 1)).stream()
-                .filter(family -> !familyMemberRepository.existsByFamilyIdAndMemberId(family.getId(), userId))
-                .forEach(family -> familyResults.getResults().add(family.toDTO()));
+        List<Family> families = familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query, FamilyDTO.Visibility.PUBLIC).stream()
+                .filter(family -> !familyMemberRepository.existsByFamilyIdAndMemberId(family.getId(), userId)).collect(Collectors.toList());
 
-        if (familyResults.getResults().size() > PAGE_SIZE) {
-            familyResults.getResults().remove(familyResults.getResults().size() - 1);
+        familyResults.setTotalPages(families.size() == 0 ? 0 : families.size() <= PAGE_SIZE ? 1
+                : (int) Math.ceil((float) families.size() / PAGE_SIZE));
+
+        int startIndex = page * PAGE_SIZE;
+        if (families.size() <= startIndex) {
+            families = List.of();
+        } else if (startIndex + PAGE_SIZE + 1 < families.size()) {
             familyResults.setNextPage(page + 1);
+            families = families.subList(startIndex, startIndex + PAGE_SIZE);
+        } else {
+            families = families.subList(startIndex, families.size() - 1);
         }
-        int resultSize = familyRepository.findByIdOrNameContainingIgnoreCaseAndVisibility(query, query,
-                FamilyDTO.Visibility.PUBLIC).size();
-        familyResults.setTotalPages(resultSize >= PAGE_SIZE ? (int) Math.ceil((float) resultSize % PAGE_SIZE) : 1);
+        familyResults.setResults(families.stream().map(Family::toDTO).toList());
         return familyResults;
     }
 
@@ -388,6 +391,16 @@ public class FamilyServiceImpl implements FamilyService {
         // Need to make a html template for this!
         emailService.sendEmail(joinRequest.get().getRequestUser().getEmail(), "Request rejected!",
                 "<h1>Your request to join the family " + family.getName() + " has been rejected by its leader!</h1>");
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public List<JoinRequestDTO> getFamilyJoinRequests(String userId, String familyId) throws AppException {
+        if (!familyMemberRepository.existsByFamilyIdAndMemberId(familyId, userId)) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "Only family members can view the join requests!");
+        }
+        return joinRequestRepository.findByFamilyId(familyId).stream().map(JoinRequest::toDTO).toList();
     }
 
     private void deleteAllJoinRequestsOfUser(String userId) throws AppException {

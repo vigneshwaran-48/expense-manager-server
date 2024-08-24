@@ -371,6 +371,18 @@ public class FamilyControllerTest {
 
     @Test
     @Order(16)
+    public void shouldListJoinRequests() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get(UriComponentsBuilder.fromPath(Endpoints.FAMILY_LIST_JOIN_REQUEST)
+                        .buildAndExpand(familyId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
+                        List.of("SCOPE_ExpenseManager.Family.Request.READ"))))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.requests").exists())
+                .andReturn();
+        JoinRequestsResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), JoinRequestsResponse.class);
+        assertThat(response.getRequests().get(0).getRequestUser().getId()).isEqualTo(MEMBER_ID);
+    }
+
+    @Test
+    @Order(17)
     public void shouldAcceptJoinRequest() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.FAMILY_ACCEPT_JOIN_REQUEST)
                         .buildAndExpand(familyId, requestId).toUriString()).with(oidcLogin().oidcUser(getOidcUser(USER_ID,
@@ -380,7 +392,7 @@ public class FamilyControllerTest {
     }
 
     @Test
-    @Order(17)
+    @Order(18)
     public void shouldSearchFamily() throws Exception {
         createFamily(mockMvc, objectMapper, "smith_id", "The Smiths", FamilyDTO.Visibility.PUBLIC);
         createFamily(mockMvc, objectMapper, "john_id", "Johnson Clan", FamilyDTO.Visibility.PUBLIC);

@@ -49,6 +49,7 @@ public class Endpoints {
     public static final String FAMILY_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
     public static final String FAMILY_ACCEPT_JOIN_REQUEST = FAMILY_API + FAMILY_ACCEPT_JOIN_REQUEST_PATH;
     public static final String FAMILY_REJECT_JOIN_REQUEST = FAMILY_API + FAMILY_REJECT_JOIN_REQUEST_PATH;
+    public static final String FAMILY_LIST_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";
