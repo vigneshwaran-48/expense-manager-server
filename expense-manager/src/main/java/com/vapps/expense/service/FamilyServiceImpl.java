@@ -405,6 +405,17 @@ public class FamilyServiceImpl implements FamilyService {
         return joinRequestRepository.findByFamilyId(familyId).stream().map(JoinRequest::toDTO).toList();
     }
 
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public List<InvitationDTO> getAllInvitationsOfFamily(String userId, String familyId) throws AppException {
+        if (!familyMemberRepository.existsByFamilyIdAndMemberId(familyId, userId)) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "Only members of family can view the invites!");
+        }
+        FamilyMember leader = familyMemberRepository.findByFamilyIdAndRole(familyId, FamilyMemberDTO.Role.LEADER).get(0);
+        return invitationService.getAllSentInvitations(leader.getMember().getId());
+    }
+
     private void deleteAllJoinRequestsOfUser(String userId) throws AppException {
         joinRequestRepository.findByRequestUserId(userId).forEach(request -> joinRequestRepository.deleteById(request.getId()));
     }

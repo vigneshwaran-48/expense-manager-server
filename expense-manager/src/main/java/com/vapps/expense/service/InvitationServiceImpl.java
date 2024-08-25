@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,7 @@ public class InvitationServiceImpl implements InvitationService {
     public InvitationDTO sendInvitation(String userId, InvitationDTO invitation, Context context) throws AppException {
         checkDuplicateInvitation(userId, invitation);
         Invitation invitationModel = Invitation.build(invitation);
+        invitationModel.setSentTime(LocalDateTime.now());
         Invitation savedInvitation = invitationRepository.save(invitationModel);
         if (savedInvitation == null) {
             throw new AppException("Error while saving invitation!");
@@ -88,6 +90,12 @@ public class InvitationServiceImpl implements InvitationService {
     @UserIdValidator(positions = 0)
     public List<InvitationDTO> getAllInvitations(String userId) throws AppException {
         return invitationRepository.findByRecipientId(userId).stream().map(Invitation::toDTO).toList();
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<InvitationDTO> getAllSentInvitations(String userId) throws AppException {
+        return invitationRepository.findByFromId(userId).stream().map(Invitation::toDTO).toList();
     }
 
     private void checkDuplicateInvitation(String userId, InvitationDTO invitation) throws AppException {

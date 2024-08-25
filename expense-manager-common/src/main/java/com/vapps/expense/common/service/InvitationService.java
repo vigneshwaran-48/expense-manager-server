@@ -19,4 +19,6 @@ public interface InvitationService {
 
     List<InvitationDTO> getAllInvitations(String userId) throws AppException;
 
+    List<InvitationDTO> getAllSentInvitations(String userId) throws AppException;
+
 }

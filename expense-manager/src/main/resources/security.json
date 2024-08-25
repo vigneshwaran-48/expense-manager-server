@@ -156,6 +156,15 @@
     ]
   },
   {
+    "path": "/api/family/{familyId}/invite",
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
     "path": "/api/invitation",
     "params": [],
     "method": "GET"

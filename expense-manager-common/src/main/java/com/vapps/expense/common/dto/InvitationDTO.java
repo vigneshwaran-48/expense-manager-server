@@ -2,6 +2,7 @@ package com.vapps.expense.common.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
@@ -23,5 +24,6 @@ public class InvitationDTO {
     private UserDTO recipient;
     private UserDTO from;
     private Type type;
+    private LocalDateTime sentTime;
 
 }

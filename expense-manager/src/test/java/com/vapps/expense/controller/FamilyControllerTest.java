@@ -130,11 +130,21 @@ public class FamilyControllerTest {
         Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
+        mvcResult = mockMvc.perform(get(UriComponentsBuilder.fromPath(Endpoints.GET_FAMILY_INVITATIONS)
+                        .buildAndExpand(familyId).toUriString()).with(
+                        oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+                .andExpect(status().isOk()).andReturn();
+
+        InvitationsResponse invitationsResponse =
+                objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InvitationsResponse.class);
+        assertThat(invitationsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(invitationsResponse.getInvitations().size()).isGreaterThan(0);
+
         mvcResult = mockMvc.perform(get(Endpoints.GET_ALL_INVITATIONS).with(
                         oidcLogin().oidcUser(getOidcUser(MEMBER_ID, List.of("SCOPE_ExpenseManager.Invitation.READ")))))
                 .andExpect(status().isOk()).andReturn();
 
-        InvitationsResponse invitationsResponse =
+        invitationsResponse =
                 objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InvitationsResponse.class);
         assertThat(invitationsResponse.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(invitationsResponse.getInvitations().size()).isGreaterThan(0);

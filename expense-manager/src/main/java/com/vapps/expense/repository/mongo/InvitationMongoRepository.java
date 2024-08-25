@@ -13,4 +13,5 @@ public interface InvitationMongoRepository extends MongoRepository<Invitation, S
 
     List<Invitation> findByRecipientId(String recipientId);
 
+    List<Invitation> findByFromId(String fromId);
 }

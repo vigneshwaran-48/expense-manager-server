@@ -189,4 +189,12 @@ public class FamilyController {
                 LocalDateTime.now(), request.getServletPath(), role));
     }
 
+    @GetMapping(Endpoints.GET_FAMILY_INVITATIONS_PATH)
+    public ResponseEntity<InvitationsResponse> getFamilyInvitations(@PathVariable String familyId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        List<InvitationDTO> invitations = familyService.getAllInvitationsOfFamily(userId, familyId);
+        return ResponseEntity.ok(
+                new InvitationsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        invitations));
+    }
 }
