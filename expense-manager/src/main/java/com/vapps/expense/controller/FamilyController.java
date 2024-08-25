@@ -181,4 +181,12 @@ public class FamilyController {
                 LocalDateTime.now(), request.getServletPath(), requests));
     }
 
+    @GetMapping(Endpoints.GET_USERS_FAMILY_ROLE_PATH)
+    public ResponseEntity<FamilyRoleResponse> getUsersFamilyRole(@PathVariable String familyId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        FamilyMemberDTO.Role role = familyService.getUserRoleInFamily(userId, familyId);
+        return ResponseEntity.ok(new FamilyRoleResponse(HttpStatus.OK.value(), "success",
+                LocalDateTime.now(), request.getServletPath(), role));
+    }
+
 }

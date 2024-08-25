@@ -172,16 +172,47 @@
   },
   {
     "path": "/api/family/{familyId}/member/{memberId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ],
     "params": [],
     "method": "DELETE"
   },
   {
     "path": "/api/family/{familyId}/member/{memberId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ],
     "params": [],
     "method": "GET"
   },
   {
     "path": "/api/family/{familyId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
+    "params": [],
+    "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}/role",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
     "params": [],
     "method": "GET"
   },
