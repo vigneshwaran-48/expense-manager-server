@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Document
@@ -25,7 +26,11 @@ public class Invitation {
     @DocumentReference
     private User from;
 
-    private InvitationDTO.Type type;
+    private InvitationDTO.Type type = InvitationDTO.Type.FAMILY_INVITE;
+
+    private LocalDateTime sentTime;
+
+    private InvitationDTO.InvitationStatus status = InvitationDTO.InvitationStatus.ACTIVE;
 
     public InvitationDTO toDTO() {
         InvitationDTO invitationDTO = new InvitationDTO();
@@ -36,6 +41,8 @@ public class Invitation {
         invitationDTO.setRecipient(recipient.toDTO());
         invitationDTO.setProperties(properties);
         invitationDTO.setType(type);
+        invitationDTO.setSentTime(sentTime);
+        invitationDTO.setStatus(status);
         return invitationDTO;
     }
 
@@ -48,6 +55,8 @@ public class Invitation {
         invitation.setType(invitationDTO.getType());
         invitation.setTitle(invitationDTO.getTitle());
         invitation.setProperties(invitationDTO.getProperties());
+        invitation.setSentTime(invitationDTO.getSentTime());
+        invitation.setStatus(invitationDTO.getStatus());
         return invitation;
     }
 }

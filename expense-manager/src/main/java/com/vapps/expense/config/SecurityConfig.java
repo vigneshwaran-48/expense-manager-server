@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, Endpoints.CREATE_FAMILY)
                         .access(hasAnyScope("ExpenseManager.Family.CREATE", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_FAMILY, Endpoints.GET_USER_FAMILY,
-                                Endpoints.SEARCH_FAMILY)
+                                Endpoints.SEARCH_FAMILY, Endpoints.GET_USERS_FAMILY_ROLE, Endpoints.GET_FAMILY_INVITATIONS)
                         .access(hasAnyScope("ExpenseManager.Family.READ", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_FAMILY)
                         .access(hasAnyScope("ExpenseManager.Family.UPDATE", "ExpenseManager.Family.ALL"))
@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.Family.Request.REJECT", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.FAMILY_LIST_JOIN_REQUEST)
                         .access(hasAnyScope("ExpenseManager.Family.Request.READ", "ExpenseManager.Family.ALL"))
-                        .requestMatchers(HttpMethod.POST, Endpoints.INVITE_MEMBER)
+                        .requestMatchers(HttpMethod.POST, Endpoints.INVITE_MEMBER, Endpoints.RESEND_INVITATION, Endpoints.REVOKE_INVITATION)
                         .access(hasAnyScope("ExpenseManager.Family.Member.INVITE", "ExpenseManager.Family.ALL"))
                         .requestMatchers(HttpMethod.DELETE, Endpoints.REMOVE_MEMBER_FROM_FAMILY)
                         .access(hasAnyScope("ExpenseManager.Family.Member.REMOVE", "ExpenseManager.Family.ALL"))

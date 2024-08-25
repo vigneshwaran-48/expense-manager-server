@@ -22,7 +22,7 @@ public interface FamilyService {
 
     void updateRole(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
 
-    void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
+    InvitationDTO inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
 
     Optional<FamilyDTO> getUserFamily(String userId);
 
@@ -41,4 +41,6 @@ public interface FamilyService {
     void rejectJoinRequest(String userId, String requestId) throws AppException;
 
     List<JoinRequestDTO> getFamilyJoinRequests(String userId, String familyId) throws AppException;
+
+    List<InvitationDTO> getAllInvitationsOfFamily(String userId, String familyId) throws AppException;
 }

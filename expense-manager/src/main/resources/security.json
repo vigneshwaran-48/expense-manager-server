@@ -156,6 +156,15 @@
     ]
   },
   {
+    "path": "/api/family/{familyId}/invite",
+    "method": "GET",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ]
+  },
+  {
     "path": "/api/invitation",
     "params": [],
     "method": "GET"
@@ -171,17 +180,68 @@
     ]
   },
   {
+    "path": "/api/invitation/{id}/resend",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/invitation/{id}/revoke",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
     "path": "/api/family/{familyId}/member/{memberId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ],
     "params": [],
     "method": "DELETE"
   },
   {
     "path": "/api/family/{familyId}/member/{memberId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      },
+      {
+        "name": "memberId"
+      }
+    ],
     "params": [],
     "method": "GET"
   },
   {
     "path": "/api/family/{familyId}",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
+    "params": [],
+    "method": "GET"
+  },
+  {
+    "path": "/api/family/{familyId}/role",
+    "pathVariables": [
+      {
+        "name": "familyId"
+      }
+    ],
     "params": [],
     "method": "GET"
   },

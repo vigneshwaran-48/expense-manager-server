@@ -2,6 +2,7 @@ package com.vapps.expense.common.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Data
@@ -10,6 +11,11 @@ public class InvitationDTO {
     public static class InvitationProps {
         public static final String FAMILY_ID = "FAMILY_ID";
         public static final String ROLE = "ROLE";
+    }
+
+    public enum InvitationStatus {
+        ACTIVE,
+        REVOKED
     }
 
     public enum Type {
@@ -23,5 +29,7 @@ public class InvitationDTO {
     private UserDTO recipient;
     private UserDTO from;
     private Type type;
+    private LocalDateTime sentTime;
+    private InvitationStatus status;
 
 }

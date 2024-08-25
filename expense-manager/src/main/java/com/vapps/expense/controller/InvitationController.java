@@ -1,6 +1,7 @@
 package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.InvitationDTO;
+import com.vapps.expense.common.dto.response.InvitationResponse;
 import com.vapps.expense.common.dto.response.InvitationsResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
@@ -25,7 +26,7 @@ public class InvitationController {
 
     @PostMapping(Endpoints.ACCEPT_INVITATION_PATH)
     public ResponseEntity<Response> acceptInvitation(@PathVariable String id, Principal principal,
-            HttpServletRequest request) throws AppException {
+                                                     HttpServletRequest request) throws AppException {
         String userId = principal.getName();
         invitationService.acceptInvitation(userId, id);
 
@@ -41,5 +42,21 @@ public class InvitationController {
         return ResponseEntity.ok(
                 new InvitationsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         invitations));
+    }
+
+    @PostMapping(Endpoints.RESEND_INVITATION_PATH)
+    public ResponseEntity<Response> resendInvitation(@PathVariable String id, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        invitationService.resendInvitation(userId, id);
+        return ResponseEntity.ok(
+                new Response(HttpStatus.OK.value(), "Resent invitation!", LocalDateTime.now(), request.getServletPath()));
+    }
+
+    @PostMapping(Endpoints.REVOKE_INVITATION_PATH)
+    public ResponseEntity<InvitationResponse> revokeInvitation(@PathVariable String id, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        InvitationDTO invitationDTO = invitationService.revokeInvitation(userId, id);
+        return ResponseEntity.ok(
+                new InvitationResponse(HttpStatus.OK.value(), "Resent invitation!", LocalDateTime.now(), request.getServletPath(), invitationDTO));
     }
 }

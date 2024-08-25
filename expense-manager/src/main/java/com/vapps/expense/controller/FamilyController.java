@@ -35,15 +35,13 @@ public class FamilyController {
     }
 
     @PostMapping(Endpoints.INVITE_MEMBER_PATH)
-    public ResponseEntity<Response> inviteMember(@PathVariable String familyId, @PathVariable String memberId,
-                                                 @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
+    public ResponseEntity<InvitationResponse> inviteMember(@PathVariable String familyId, @PathVariable String memberId,
+                                                           @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
             throws AppException {
         String userId = principal.getName();
-
-        familyService.inviteMember(userId, familyId, memberId, role);
-
+        InvitationDTO invitation = familyService.inviteMember(userId, familyId, memberId, role);
         return ResponseEntity.ok(
-                new Response(HttpStatus.OK.value(), "Invited member!", LocalDateTime.now(), request.getServletPath()));
+                new InvitationResponse(HttpStatus.OK.value(), "Invited member!", LocalDateTime.now(), request.getServletPath(), invitation));
     }
 
     @DeleteMapping(Endpoints.REMOVE_MEMBER_FROM_FAMILY_PATH)
@@ -181,4 +179,20 @@ public class FamilyController {
                 LocalDateTime.now(), request.getServletPath(), requests));
     }
 
+    @GetMapping(Endpoints.GET_USERS_FAMILY_ROLE_PATH)
+    public ResponseEntity<FamilyRoleResponse> getUsersFamilyRole(@PathVariable String familyId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        FamilyMemberDTO.Role role = familyService.getUserRoleInFamily(userId, familyId);
+        return ResponseEntity.ok(new FamilyRoleResponse(HttpStatus.OK.value(), "success",
+                LocalDateTime.now(), request.getServletPath(), role));
+    }
+
+    @GetMapping(Endpoints.GET_FAMILY_INVITATIONS_PATH)
+    public ResponseEntity<InvitationsResponse> getFamilyInvitations(@PathVariable String familyId, Principal principal, HttpServletRequest request) throws AppException {
+        String userId = principal.getName();
+        List<InvitationDTO> invitations = familyService.getAllInvitationsOfFamily(userId, familyId);
+        return ResponseEntity.ok(
+                new InvitationsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        invitations));
+    }
 }

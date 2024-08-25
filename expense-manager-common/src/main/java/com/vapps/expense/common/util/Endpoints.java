@@ -34,6 +34,8 @@ public class Endpoints {
     public static final String FAMILY_JOIN_REQUEST_PATH = "/{familyId}/request";
     public static final String FAMILY_ACCEPT_JOIN_REQUEST_PATH = "/{familyId}/request/{requestId}/accept";
     public static final String FAMILY_REJECT_JOIN_REQUEST_PATH = "/{familyId}/request/{requestId}/reject";
+    public static final String GET_USERS_FAMILY_ROLE_PATH = "/{familyId}/role";
+    public static final String GET_FAMILY_INVITATIONS_PATH = "/{familyId}/invite";
 
     public static final String CREATE_FAMILY = FAMILY_API;
     public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -50,12 +52,18 @@ public class Endpoints {
     public static final String FAMILY_ACCEPT_JOIN_REQUEST = FAMILY_API + FAMILY_ACCEPT_JOIN_REQUEST_PATH;
     public static final String FAMILY_REJECT_JOIN_REQUEST = FAMILY_API + FAMILY_REJECT_JOIN_REQUEST_PATH;
     public static final String FAMILY_LIST_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
+    public static final String GET_USERS_FAMILY_ROLE = FAMILY_API + GET_USERS_FAMILY_ROLE_PATH;
+    public static final String GET_FAMILY_INVITATIONS = FAMILY_API + GET_FAMILY_INVITATIONS_PATH;
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";
+    public static final String RESEND_INVITATION_PATH = "/{id}/resend";
+    public static final String REVOKE_INVITATION_PATH = "/{id}/revoke";
 
     public static final String ACCEPT_INVITATION = INVITATION_API + ACCEPT_INVITATION_PATH;
     public static final String GET_ALL_INVITATIONS = INVITATION_API;
+    public static final String RESEND_INVITATION = INVITATION_API + RESEND_INVITATION_PATH;
+    public static final String REVOKE_INVITATION = INVITATION_API + REVOKE_INVITATION_PATH;
 
     // Static Resource APIs
     public static final String GET_STATIC_RESOURCE_PATH = "/{resourceId}";
