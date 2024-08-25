@@ -180,6 +180,26 @@
     ]
   },
   {
+    "path": "/api/invitation/{id}/resend",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
+    "path": "/api/invitation/{id}/revoke",
+    "params": [],
+    "method": "POST",
+    "pathVariables": [
+      {
+        "name": "id"
+      }
+    ]
+  },
+  {
     "path": "/api/family/{familyId}/member/{memberId}",
     "pathVariables": [
       {

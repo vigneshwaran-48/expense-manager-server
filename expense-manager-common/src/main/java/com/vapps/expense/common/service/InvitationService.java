@@ -15,10 +15,13 @@ public interface InvitationService {
 
     void rejectInvitation(String userId, String id) throws AppException;
 
-    Optional<InvitationDTO> getInvitation(String id) throws AppException;
+    Optional<InvitationDTO> getInvitation(String userId, String id) throws AppException;
 
     List<InvitationDTO> getAllInvitations(String userId) throws AppException;
 
     List<InvitationDTO> getAllSentInvitations(String userId) throws AppException;
 
+    void resendInvitation(String userId, String invitationId) throws AppException;
+
+    InvitationDTO revokeInvitation(String userId, String invitationId) throws AppException;
 }

@@ -227,7 +227,7 @@ public class FamilyServiceImpl implements FamilyService {
     @Override
     @UserIdValidator(positions = {0, 2})
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
-    public void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
+    public InvitationDTO inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role)
             throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByMemberId(userId);
 
@@ -255,7 +255,7 @@ public class FamilyServiceImpl implements FamilyService {
         context.setVariable("familyDescription", familyDTO.getDescription());
         context.setVariable("familyName", familyDTO.getName());
 
-        invitationService.sendInvitation(userId, invitationDTO, context);
+        return invitationService.sendInvitation(userId, invitationDTO, context);
     }
 
     @Override
@@ -371,7 +371,6 @@ public class FamilyServiceImpl implements FamilyService {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Requested user has already a join a family!");
         }
         addMember(userId, family.getId(), joinRequest.get().getRequestUser().getId(), FamilyMemberDTO.Role.MEMBER);
-        deleteAllJoinRequestsOfUser(userId);
     }
 
     @Override

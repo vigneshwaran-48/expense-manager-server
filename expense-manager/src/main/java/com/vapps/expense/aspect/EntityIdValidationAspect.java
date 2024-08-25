@@ -88,6 +88,12 @@ public class EntityIdValidationAspect {
             throws AppException {
         int[] positionsToCheck = invitationIdValidator.positions();
 
+        String userId = (String) joinPoint.getArgs()[invitationIdValidator.userIdPosition()];
+
+        if (userId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "User Id is required!");
+        }
+
         Object[] args = joinPoint.getArgs();
 
         for (int position : positionsToCheck) {
@@ -97,7 +103,7 @@ public class EntityIdValidationAspect {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invitation Id is required!");
             }
 
-            Optional<InvitationDTO> invitation = invitationService.getInvitation(id);
+            Optional<InvitationDTO> invitation = invitationService.getInvitation(userId, id);
             if (invitation.isEmpty()) {
                 LOGGER.error("Invitation {} not exists", id);
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invitation " + id + " not exists!");

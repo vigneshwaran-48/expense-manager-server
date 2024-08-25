@@ -22,7 +22,7 @@ public interface FamilyService {
 
     void updateRole(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
 
-    void inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
+    InvitationDTO inviteMember(String userId, String familyId, String memberId, FamilyMemberDTO.Role role) throws AppException;
 
     Optional<FamilyDTO> getUserFamily(String userId);
 

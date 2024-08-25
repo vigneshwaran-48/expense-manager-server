@@ -57,9 +57,13 @@ public class Endpoints {
 
     // Invitation APIs
     public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";
+    public static final String RESEND_INVITATION_PATH = "/{id}/resend";
+    public static final String REVOKE_INVITATION_PATH = "/{id}/revoke";
 
     public static final String ACCEPT_INVITATION = INVITATION_API + ACCEPT_INVITATION_PATH;
     public static final String GET_ALL_INVITATIONS = INVITATION_API;
+    public static final String RESEND_INVITATION = INVITATION_API + RESEND_INVITATION_PATH;
+    public static final String REVOKE_INVITATION = INVITATION_API + REVOKE_INVITATION_PATH;
 
     // Static Resource APIs
     public static final String GET_STATIC_RESOURCE_PATH = "/{resourceId}";

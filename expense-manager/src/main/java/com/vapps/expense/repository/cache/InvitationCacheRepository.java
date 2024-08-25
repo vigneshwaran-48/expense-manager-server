@@ -6,6 +6,7 @@ import com.vapps.expense.repository.InvitationRepository;
 import com.vapps.expense.repository.mongo.InvitationMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
@@ -58,13 +59,33 @@ public class InvitationCacheRepository implements InvitationRepository {
 
     @Override
     @Cacheable(value = "invitationRecipient", key = "'user_all_invitation_' + #recipientId")
-    public List<Invitation> findByRecipientId(String recipientId) {
-        return invitationRepository.findByRecipientId(recipientId);
+    public List<Invitation> findByRecipientIdAndStatus(String recipientId, InvitationDTO.InvitationStatus status) {
+        return invitationRepository.findByRecipientIdAndStatus(recipientId, status);
     }
 
     @Override
     @Cacheable(value = "invitationFromId", key = "'invitation_from_id_' + #fromId")
-    public List<Invitation> findByFromId(String fromId) {
-        return invitationRepository.findByFromId(fromId);
+    public List<Invitation> findByFromIdAndStatus(String fromId, InvitationDTO.InvitationStatus status) {
+        return invitationRepository.findByFromIdAndStatus(fromId, status);
+    }
+
+    @Override
+    @Cacheable(value = "invitationIdRecipientOrFrom",
+            key = "'invitation_id_' + #id + '_recipient_' + #recipientId + '_from_id_' + #fromId")
+    public Optional<Invitation> findByIdAndRecipientIdOrFromId(String id, String recipientId, String fromId) {
+        return invitationRepository.findByIdAndRecipientIdOrFromId(id, recipientId, fromId);
+    }
+
+    @Override
+    @CachePut(value = "invitation", key = "'invitation_' + #invitation.getId()")
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "invitationFromId", allEntries = true),
+                    @CacheEvict(value = "invitationRecipient", allEntries = true),
+                    @CacheEvict(value = "invitationRecipientFromType", allEntries = true)
+            }
+    )
+    public Invitation update(Invitation invitation) {
+        return invitationRepository.save(invitation);
     }
 }

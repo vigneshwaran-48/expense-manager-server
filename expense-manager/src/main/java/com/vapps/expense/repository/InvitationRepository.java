@@ -16,7 +16,11 @@ public interface InvitationRepository {
 
     Optional<Invitation> findByRecipientIdAndFromIdAndType(String recipientId, String fromId, InvitationDTO.Type type);
 
-    List<Invitation> findByRecipientId(String recipientId);
+    List<Invitation> findByRecipientIdAndStatus(String recipientId, InvitationDTO.InvitationStatus status);
 
-    List<Invitation> findByFromId(String fromId);
+    List<Invitation> findByFromIdAndStatus(String fromId, InvitationDTO.InvitationStatus status);
+
+    Optional<Invitation> findByIdAndRecipientIdOrFromId(String id, String recipientId, String fromId);
+
+    Invitation update(Invitation invitation);
 }

@@ -35,15 +35,13 @@ public class FamilyController {
     }
 
     @PostMapping(Endpoints.INVITE_MEMBER_PATH)
-    public ResponseEntity<Response> inviteMember(@PathVariable String familyId, @PathVariable String memberId,
-                                                 @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
+    public ResponseEntity<InvitationResponse> inviteMember(@PathVariable String familyId, @PathVariable String memberId,
+                                                           @RequestParam FamilyMemberDTO.Role role, Principal principal, HttpServletRequest request)
             throws AppException {
         String userId = principal.getName();
-
-        familyService.inviteMember(userId, familyId, memberId, role);
-
+        InvitationDTO invitation = familyService.inviteMember(userId, familyId, memberId, role);
         return ResponseEntity.ok(
-                new Response(HttpStatus.OK.value(), "Invited member!", LocalDateTime.now(), request.getServletPath()));
+                new InvitationResponse(HttpStatus.OK.value(), "Invited member!", LocalDateTime.now(), request.getServletPath(), invitation));
     }
 
     @DeleteMapping(Endpoints.REMOVE_MEMBER_FROM_FAMILY_PATH)

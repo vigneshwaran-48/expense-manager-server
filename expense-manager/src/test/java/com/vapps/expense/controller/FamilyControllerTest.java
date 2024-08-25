@@ -45,6 +45,8 @@ public class FamilyControllerTest {
 
     private static String requestId;
 
+    private static String invitationId;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyControllerTest.class);
     private static final String USER_ID = "testing_user_id";
     private static final String MEMBER_ID = "testing_member_id";
@@ -450,6 +452,41 @@ public class FamilyControllerTest {
         assertThat(searchResponse.getResult().getCurrentPage()).isEqualTo(2);
 
         // logTestCasePassed("Search family", "Search family test passed!");
+    }
+
+    @Test
+    @Order(19)
+    public void shouldResendInvite() throws Exception {
+        mockMvc.perform(delete(UriComponentsBuilder.fromPath(Endpoints.REMOVE_MEMBER_FROM_FAMILY)
+                        .buildAndExpand(familyId, MEMBER_ID).toUriString()).with(
+                        oidcLogin().oidcUser(getOidcUser(USER_ID,
+                                List.of("SCOPE_ExpenseManager.Family.Member.REMOVE")))))
+                .andExpect(status().isOk()).andReturn();
+
+        MvcResult mvcResult = mockMvc.perform(
+                        post(UriComponentsBuilder.fromPath(Endpoints.INVITE_MEMBER).buildAndExpand(familyId, MEMBER_ID)
+                                .toUriString()).param("role", FamilyMemberDTO.Role.MEMBER.name()).with(oidcLogin().oidcUser(
+                                getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member" + ".INVITE")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.invitation").exists()).andReturn();
+        InvitationResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InvitationResponse.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+        InvitationDTO invitation = response.getInvitation();
+        invitationId = invitation.getId();
+
+        mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.RESEND_INVITATION).buildAndExpand(invitation.getId()).toUriString())
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member.INVITE")))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(20)
+    public void shouldRevokeInvite() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.REVOKE_INVITATION).buildAndExpand(invitationId).toUriString())
+                        .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member.INVITE")))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.invitation").exists()).andReturn();
+        InvitationResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InvitationResponse.class);
+        assertThat(response.getInvitation().getStatus()).isEqualTo(InvitationDTO.InvitationStatus.REVOKED);
     }
 
     @Data
