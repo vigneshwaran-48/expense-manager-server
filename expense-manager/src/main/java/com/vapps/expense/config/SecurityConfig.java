@@ -29,6 +29,8 @@ public class SecurityConfig {
                         .access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_PROFILE)
                         .access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
+                        .requestMatchers(HttpMethod.GET, Endpoints.GET_ALL_USERS)
+                        .access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.CREATE_USER)
                         .access(hasAnyScope("ExpenseManager.User.CREATE", "ExpenseManager.User.ALL"))
                         .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_USER)

@@ -59,6 +59,16 @@
     "method": "GET"
   },
   {
+    "path": "/api/user",
+    "params": [
+      {
+        "name": "includeFamilyMember",
+        "type": "BOOLEAN"
+      }
+    ],
+    "method": "GET"
+  },
+  {
     "path": "/api/user/{userId}",
     "params": [],
     "pathVariables": [

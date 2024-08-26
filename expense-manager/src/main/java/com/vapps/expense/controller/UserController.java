@@ -2,7 +2,9 @@ package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.dto.response.UserResponse;
+import com.vapps.expense.common.dto.response.UsersResponse;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping(Endpoints.USER_API)
@@ -20,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FamilyService familyService;
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserDTO user, HttpServletRequest request)
@@ -42,7 +48,7 @@ public class UserController {
 
     @PatchMapping(Endpoints.UPDATE_USER_PATH)
     public ResponseEntity<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserDTO user,
-            HttpServletRequest request, Principal principal) throws AppException {
+                                                   HttpServletRequest request, Principal principal) throws AppException {
 
         String currentUserId = principal.getName();
         UserDTO updatedUser = userService.updateUser(currentUserId, userId, user);
@@ -61,5 +67,21 @@ public class UserController {
         return ResponseEntity.ok(
                 new UserResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
                         userDTO));
+    }
+
+    @GetMapping
+    public ResponseEntity<UsersResponse> getAllUsers(@RequestParam(defaultValue = "true") boolean includeFamilyMembers, HttpServletRequest request, Principal principal) throws AppException {
+        String userId = principal.getName();
+        List<UserDTO> users = null;
+        // TODO There is a problem in this. Need to fix it tomorrow.
+        if (includeFamilyMembers) {
+            users = userService.findAllUser();
+        } else {
+            users = familyService.getNonFamilyUsers(userId);
+        }
+        userService.findAllUser();
+        return ResponseEntity.ok(
+                new UsersResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        users));
     }
 }

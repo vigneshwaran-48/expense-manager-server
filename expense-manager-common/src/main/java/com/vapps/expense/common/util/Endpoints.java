@@ -19,6 +19,7 @@ public class Endpoints {
     public static final String GET_USER = USER_API + GET_USER_PATH;
     public static final String UPDATE_USER = USER_API + UPDATE_USER_PATH;
     public static final String GET_PROFILE = USER_API + GET_PROFILE_PATH;
+    public static final String GET_ALL_USERS = USER_API;
 
     // Family APIs
     public static final String UPDATE_FAMILY_PATH = "/{familyId}";

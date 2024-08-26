@@ -43,4 +43,6 @@ public interface FamilyService {
     List<JoinRequestDTO> getFamilyJoinRequests(String userId, String familyId) throws AppException;
 
     List<InvitationDTO> getAllInvitationsOfFamily(String userId, String familyId) throws AppException;
+
+    List<UserDTO> getNonFamilyUsers(String userId) throws AppException;
 }
