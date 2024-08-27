@@ -70,14 +70,18 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UsersResponse> getAllUsers(@RequestParam(defaultValue = "true") boolean includeFamilyMembers, HttpServletRequest request, Principal principal) throws AppException {
+    public ResponseEntity<UsersResponse> getAllUsers(@RequestParam(defaultValue = "true") boolean includeFamilyMember, @RequestParam String query, HttpServletRequest request, Principal principal) throws AppException {
         String userId = principal.getName();
         List<UserDTO> users = null;
-        // TODO There is a problem in this. Need to fix it tomorrow.
-        if (includeFamilyMembers) {
+        if (includeFamilyMember) {
             users = userService.findAllUser();
         } else {
             users = familyService.getNonFamilyUsers(userId);
+        }
+        if (query != null) {
+            users = users.stream().filter(user -> user.getId().equals(query)
+                    || user.getName().toLowerCase().contains(query.toLowerCase())
+                    || user.getEmail().contains(query)).toList();
         }
         userService.findAllUser();
         return ResponseEntity.ok(

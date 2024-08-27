@@ -64,6 +64,9 @@
       {
         "name": "includeFamilyMember",
         "type": "BOOLEAN"
+      },
+      {
+        "name": "query"
       }
     ],
     "method": "GET"
