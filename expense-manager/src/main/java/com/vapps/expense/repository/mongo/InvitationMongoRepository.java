@@ -12,9 +12,9 @@ public interface InvitationMongoRepository extends MongoRepository<Invitation, S
 
     Optional<Invitation> findByRecipientIdAndFromIdAndType(String recipientId, String fromId, InvitationDTO.Type type);
 
-    List<Invitation> findByRecipientIdAndStatus(String recipientId, InvitationDTO.InvitationStatus status);
+    List<Invitation> findByRecipientId(String recipientId);
 
-    List<Invitation> findByFromIdAndStatus(String fromId, InvitationDTO.InvitationStatus status);
+    List<Invitation> findByFromId(String fromId);
 
     @Query("{'id': ?0,$or: [{ 'recipientId': ?1 }, {'fromId': ?2}]}")
     Optional<Invitation> findByIdAndRecipientIdOrFromId(String id, String recipientId, String fromId);

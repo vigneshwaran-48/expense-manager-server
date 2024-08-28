@@ -76,7 +76,7 @@ public class UserController {
         if (includeFamilyMember) {
             users = userService.findAllUser();
         } else {
-            users = familyService.getNonFamilyUsers(userId);
+            users = familyService.getNonFamilyAndNonInvitedUsers(userId);
         }
         if (query != null) {
             users = users.stream().filter(user -> user.getId().equals(query)

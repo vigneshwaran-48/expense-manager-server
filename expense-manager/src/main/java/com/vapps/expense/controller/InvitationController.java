@@ -53,10 +53,10 @@ public class InvitationController {
     }
 
     @PostMapping(Endpoints.REVOKE_INVITATION_PATH)
-    public ResponseEntity<InvitationResponse> revokeInvitation(@PathVariable String id, Principal principal, HttpServletRequest request) throws AppException {
+    public ResponseEntity<Response> revokeInvitation(@PathVariable String id, Principal principal, HttpServletRequest request) throws AppException {
         String userId = principal.getName();
-        InvitationDTO invitationDTO = invitationService.revokeInvitation(userId, id);
+        invitationService.revokeInvitation(userId, id);
         return ResponseEntity.ok(
-                new InvitationResponse(HttpStatus.OK.value(), "Resent invitation!", LocalDateTime.now(), request.getServletPath(), invitationDTO));
+                new Response(HttpStatus.OK.value(), "Revoked invitation!", LocalDateTime.now(), request.getServletPath()));
     }
 }

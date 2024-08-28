@@ -30,7 +30,6 @@ public class Invitation {
 
     private LocalDateTime sentTime;
 
-    private InvitationDTO.InvitationStatus status = InvitationDTO.InvitationStatus.ACTIVE;
 
     public InvitationDTO toDTO() {
         InvitationDTO invitationDTO = new InvitationDTO();
@@ -42,7 +41,6 @@ public class Invitation {
         invitationDTO.setProperties(properties);
         invitationDTO.setType(type);
         invitationDTO.setSentTime(sentTime);
-        invitationDTO.setStatus(status);
         return invitationDTO;
     }
 
@@ -56,7 +54,6 @@ public class Invitation {
         invitation.setTitle(invitationDTO.getTitle());
         invitation.setProperties(invitationDTO.getProperties());
         invitation.setSentTime(invitationDTO.getSentTime());
-        invitation.setStatus(invitationDTO.getStatus());
         return invitation;
     }
 }

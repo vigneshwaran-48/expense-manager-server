@@ -484,9 +484,8 @@ public class FamilyControllerTest {
     public void shouldRevokeInvite() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post(UriComponentsBuilder.fromPath(Endpoints.REVOKE_INVITATION).buildAndExpand(invitationId).toUriString())
                         .with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.Member.INVITE")))))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.invitation").exists()).andReturn();
-        InvitationResponse response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InvitationResponse.class);
-        assertThat(response.getInvitation().getStatus()).isEqualTo(InvitationDTO.InvitationStatus.REVOKED);
+                .andExpect(status().isOk()).andReturn();
+        Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
     }
 
     @Data
