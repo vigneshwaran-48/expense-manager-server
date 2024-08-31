@@ -415,6 +415,21 @@ public class FamilyServiceImpl implements FamilyService {
         return invitationService.getAllSentInvitations(leader.getMember().getId());
     }
 
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<UserDTO> getNonFamilyAndNonInvitedUsers(String userId) throws AppException {
+        List<UserDTO> users = userService.findAllUser().stream().filter(user -> !user.getId().equals(userId)
+                        && familyMemberRepository.findByMemberId(user.getId()).isEmpty())
+                .toList();
+        List<UserDTO> usersToSend = new ArrayList<>();
+        for (UserDTO user : users) {
+            if (!invitationService.isMemberInvitedToFamily(userId, user.getId())) {
+                usersToSend.add(user);
+            }
+        }
+        return usersToSend;
+    }
+
     private void deleteAllJoinRequestsOfUser(String userId) throws AppException {
         joinRequestRepository.findByRequestUserId(userId).forEach(request -> joinRequestRepository.deleteById(request.getId()));
     }

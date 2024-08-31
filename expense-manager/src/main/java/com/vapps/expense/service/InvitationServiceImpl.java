@@ -43,15 +43,20 @@ public class InvitationServiceImpl implements InvitationService {
         checkDuplicateInvitation(userId, invitation);
         Invitation invitationModel = Invitation.build(invitation);
         invitationModel.setSentTime(LocalDateTime.now());
-        invitationModel.setStatus(InvitationDTO.InvitationStatus.ACTIVE);
         Invitation savedInvitation = invitationRepository.save(invitationModel);
         if (savedInvitation == null) {
             throw new AppException("Error while saving invitation!");
         }
         context.setVariable("title", invitation.getTitle());
         context.setVariable("content", invitation.getContent());
-        emailService.sendEmail(savedInvitation.getRecipient().getEmail(), savedInvitation.getTitle(),
-                "invitation-template", context);
+        new Thread(() -> {
+            try {
+                emailService.sendEmail(savedInvitation.getRecipient().getEmail(), savedInvitation.getTitle(),
+                        "invitation-template", context);
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+        }).start();
         return savedInvitation.toDTO();
     }
 
@@ -64,10 +69,6 @@ public class InvitationServiceImpl implements InvitationService {
             LOGGER.error("User {} trying to accept user {}'s invitation {}", userId, invitation.getRecipient().getId(),
                     invitation.getId());
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You can't accept other's invitation!");
-        }
-        if (invitation.getStatus() == InvitationDTO.InvitationStatus.REVOKED) {
-            invitationRepository.deleteById(id); // Deleting it here once informed that it has been revoked!
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invitation has been revoked by the sender!");
         }
         switch (invitation.getType()) {
             case FAMILY_INVITE -> handleFamilyInvitationAccept(invitation);
@@ -96,14 +97,14 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     @UserIdValidator(positions = 0)
     public List<InvitationDTO> getAllInvitations(String userId) throws AppException {
-        return invitationRepository.findByRecipientIdAndStatus(userId, InvitationDTO.InvitationStatus.ACTIVE)
+        return invitationRepository.findByRecipientId(userId)
                 .stream().map(Invitation::toDTO).toList();
     }
 
     @Override
     @UserIdValidator(positions = 0)
     public List<InvitationDTO> getAllSentInvitations(String userId) throws AppException {
-        return invitationRepository.findByFromIdAndStatus(userId, InvitationDTO.InvitationStatus.ACTIVE)
+        return invitationRepository.findByFromId(userId)
                 .stream().map(Invitation::toDTO).toList();
     }
 
@@ -112,9 +113,6 @@ public class InvitationServiceImpl implements InvitationService {
     @InvitationIdValidator(userIdPosition = 0, positions = 1)
     public void resendInvitation(String userId, String invitationId) throws AppException {
         InvitationDTO invitationDTO = getInvitation(userId, invitationId).get();
-        if (invitationDTO.getStatus() == InvitationDTO.InvitationStatus.REVOKED) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invitation has been revoked already!");
-        }
         if (!invitationDTO.getFrom().getId().equals(userId)) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "Only invitation sent people can resend it!");
         }
@@ -147,18 +145,23 @@ public class InvitationServiceImpl implements InvitationService {
     @Override
     @UserIdValidator(positions = 0)
     @InvitationIdValidator(userIdPosition = 0, positions = 1)
-    public InvitationDTO revokeInvitation(String userId, String invitationId) throws AppException {
+    public void revokeInvitation(String userId, String invitationId) throws AppException {
         InvitationDTO invitationDTO = getInvitation(userId, invitationId).get();
         if (!invitationDTO.getFrom().getId().equals(userId)) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "Only invitation sent people can revoke it!");
         }
-        invitationDTO.setStatus(InvitationDTO.InvitationStatus.REVOKED);
-        Invitation model = Invitation.build(invitationDTO);
-        model = invitationRepository.update(model);
-        if (model == null) {
-            throw new AppException("Error while revoking the invitation!");
+        invitationRepository.deleteById(invitationId);
+    }
+
+    @Override
+    @UserIdValidator(positions = {0, 1})
+    public boolean isMemberInvitedToFamily(String userId, String memberId) throws AppException {
+        Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+        if (family.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "You are not in a family to search non invited users!");
         }
-        return model.toDTO();
+        return invitationRepository.findByRecipientIdAndFromIdAndType(memberId, userId,
+                InvitationDTO.Type.FAMILY_INVITE).isPresent();
     }
 
     private void checkDuplicateInvitation(String userId, InvitationDTO invitation) throws AppException {

@@ -59,6 +59,19 @@
     "method": "GET"
   },
   {
+    "path": "/api/user",
+    "params": [
+      {
+        "name": "includeFamilyMember",
+        "type": "BOOLEAN"
+      },
+      {
+        "name": "query"
+      }
+    ],
+    "method": "GET"
+  },
+  {
     "path": "/api/user/{userId}",
     "params": [],
     "pathVariables": [
@@ -478,6 +491,11 @@
         "name": "id"
       }
     ]
+  },
+  {
+    "path": "/api/category",
+    "params": [],
+    "method": "GET"
   },
   {
     "path": "/api/expense",

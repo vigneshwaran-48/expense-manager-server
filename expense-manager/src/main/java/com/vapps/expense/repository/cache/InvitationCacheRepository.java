@@ -59,14 +59,14 @@ public class InvitationCacheRepository implements InvitationRepository {
 
     @Override
     @Cacheable(value = "invitationRecipient", key = "'user_all_invitation_' + #recipientId")
-    public List<Invitation> findByRecipientIdAndStatus(String recipientId, InvitationDTO.InvitationStatus status) {
-        return invitationRepository.findByRecipientIdAndStatus(recipientId, status);
+    public List<Invitation> findByRecipientId(String recipientId) {
+        return invitationRepository.findByRecipientId(recipientId);
     }
 
     @Override
     @Cacheable(value = "invitationFromId", key = "'invitation_from_id_' + #fromId")
-    public List<Invitation> findByFromIdAndStatus(String fromId, InvitationDTO.InvitationStatus status) {
-        return invitationRepository.findByFromIdAndStatus(fromId, status);
+    public List<Invitation> findByFromId(String fromId) {
+        return invitationRepository.findByFromId(fromId);
     }
 
     @Override

@@ -23,5 +23,7 @@ public interface InvitationService {
 
     void resendInvitation(String userId, String invitationId) throws AppException;
 
-    InvitationDTO revokeInvitation(String userId, String invitationId) throws AppException;
+    void revokeInvitation(String userId, String invitationId) throws AppException;
+
+    boolean isMemberInvitedToFamily(String userId, String memberId) throws AppException;
 }

@@ -45,6 +45,12 @@ public class CategoryCacheRepository implements CategoryRepository {
         return categoryRepository.findByOwnerIdAndTypeAndName(ownerId, type, name);
     }
 
+    @Override
+    @Cacheable(value = "category_created_by_owner", key = "'category_created_by_' + #createdById + '_owner_id_' + #ownerId")
+    public List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId) {
+        return categoryRepository.findByCreatedByIdOrOwnerId(createdById, ownerId);
+    }
+
     /**
      * When a error occurs in the DB level the return value would be null. Because of this we are not using
      *
@@ -53,21 +59,21 @@ public class CategoryCacheRepository implements CategoryRepository {
 
     @Override
     @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
-            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true), @CacheEvict(value = "category_created_by_owner", allEntries = true)})
     public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
     @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
-            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true), @CacheEvict(value = "category_created_by_owner", allEntries = true)})
     public Category update(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
     @Caching(evict = {@CacheEvict(value = "category_owner_id", allEntries = true), @CacheEvict(value = "category_owner_id_name", allEntries = true),
-            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true)})
+            @CacheEvict(value = "category_id_owner_id", allEntries = true), @CacheEvict(value = "category", allEntries = true), @CacheEvict(value = "category_created_by_owner", allEntries = true)})
     public void deleteById(String id) {
         categoryRepository.deleteById(id);
     }

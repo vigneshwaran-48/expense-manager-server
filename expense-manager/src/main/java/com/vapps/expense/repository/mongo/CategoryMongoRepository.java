@@ -17,4 +17,5 @@ public interface CategoryMongoRepository extends MongoRepository<Category, Strin
 
     Optional<Category> findByIdAndOwnerId(String id, String ownerId);
 
+    List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
 }

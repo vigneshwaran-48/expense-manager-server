@@ -13,11 +13,6 @@ public class InvitationDTO {
         public static final String ROLE = "ROLE";
     }
 
-    public enum InvitationStatus {
-        ACTIVE,
-        REVOKED
-    }
-
     public enum Type {
         FAMILY_INVITE
     }
@@ -30,6 +25,5 @@ public class InvitationDTO {
     private UserDTO from;
     private Type type;
     private LocalDateTime sentTime;
-    private InvitationStatus status;
 
 }

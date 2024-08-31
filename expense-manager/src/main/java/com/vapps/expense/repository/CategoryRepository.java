@@ -23,6 +23,8 @@ public interface CategoryRepository {
 
     Category update(Category category);
 
+    List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
+
     @Transactional
     void deleteById(String id);
 }
