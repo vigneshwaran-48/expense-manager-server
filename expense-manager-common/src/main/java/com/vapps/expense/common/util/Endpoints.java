@@ -83,6 +83,7 @@ public class Endpoints {
     public static final String UPDATE_CATEGORY = CATEGORY_API + UPDATE_CATEGORY_PATH;
     public static final String DELETE_CATEGORY = CATEGORY_API + DELETE_CATEGORY_PATH;
     public static final String GET_CATEGORY = CATEGORY_API + GET_CATEGORY_PATH;
+    public static final String GET_ALL_CATEGORIES = CATEGORY_API;
 
     // Expense APIs
     public static final String GET_EXPENSE_PATH = "/{id}";

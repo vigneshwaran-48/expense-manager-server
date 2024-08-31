@@ -493,6 +493,11 @@
     ]
   },
   {
+    "path": "/api/category",
+    "params": [],
+    "method": "GET"
+  },
+  {
     "path": "/api/expense",
     "params": [],
     "method": "POST",

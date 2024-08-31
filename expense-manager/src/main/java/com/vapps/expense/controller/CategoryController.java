@@ -1,6 +1,7 @@
 package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.CategoryDTO;
+import com.vapps.expense.common.dto.response.CategoriesResponse;
 import com.vapps.expense.common.dto.response.CategoryResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -70,5 +72,15 @@ public class CategoryController {
 
         return ResponseEntity.ok(
                 new Response(HttpStatus.OK.value(), "Delete category!", LocalDateTime.now(), request.getServletPath()));
+    }
+
+    @GetMapping
+    public ResponseEntity<CategoriesResponse> getAllCategories(Principal principal, HttpServletRequest request) throws AppException {
+
+        String userId = principal.getName();
+        List<CategoryDTO> categories = categoryService.getAllCategories(userId);
+        return ResponseEntity.ok(
+                new CategoriesResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+                        categories));
     }
 }

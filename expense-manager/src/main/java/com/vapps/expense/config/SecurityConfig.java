@@ -76,6 +76,8 @@ public class SecurityConfig {
                                 "ExpenseManager.StaticResource.ALL"))
                         .requestMatchers(HttpMethod.POST, Endpoints.CREATE_CATEGORY)
                         .access(hasAnyScope("ExpenseManager.Category.CREATE", "ExpenseManager.Category.ALL"))
+                        .requestMatchers(HttpMethod.POST, Endpoints.GET_ALL_CATEGORIES)
+                        .access(hasAnyScope("ExpenseManager.Category.READ", "ExpenseManager.Category.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_CATEGORY)
                         .access(hasAnyScope("ExpenseManager.Category.READ", "ExpenseManager.Category.ALL"))
                         .requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_CATEGORY)
