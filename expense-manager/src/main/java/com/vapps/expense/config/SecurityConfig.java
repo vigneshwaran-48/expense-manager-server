@@ -24,7 +24,10 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
+        return httpSecurity
+                .cors(cors -> cors.disable())
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
                 .disable().authorizeHttpRequests(http -> http.requestMatchers(HttpMethod.GET, Endpoints.GET_USER)
                         .access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
                         .requestMatchers(HttpMethod.GET, Endpoints.GET_PROFILE)
