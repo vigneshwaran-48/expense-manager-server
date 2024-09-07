@@ -8,17 +8,14 @@ import com.vapps.expense.common.service.EmailService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.InvitationService;
 import com.vapps.expense.common.service.UserService;
-import com.vapps.expense.model.Family;
-import com.vapps.expense.model.FamilyMember;
-import com.vapps.expense.model.JoinRequest;
-import com.vapps.expense.model.User;
+import com.vapps.expense.model.*;
 import com.vapps.expense.repository.FamilyMemberRepository;
 import com.vapps.expense.repository.FamilyRepository;
+import com.vapps.expense.repository.FamilySettingsRepository;
 import com.vapps.expense.repository.JoinRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -48,6 +45,9 @@ public class FamilyServiceImpl implements FamilyService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private FamilySettingsRepository familySettingsRepository;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
     private static final int PAGE_SIZE = 10;
 
@@ -75,6 +75,13 @@ public class FamilyServiceImpl implements FamilyService {
         familyMemberRepository.save(familyMember);
 
         LOGGER.info("Added user {} as family {}'s leader", userId, savedFamily.getId());
+
+        FamilySettings settings = new FamilySettings();
+        settings.setFamily(savedFamily);
+        settings = familySettingsRepository.save(settings);
+
+        LOGGER.info("Created settings {} for family {}", settings.getId(), savedFamily.getId());
+
         return savedFamily.toDTO();
     }
 
@@ -83,8 +90,8 @@ public class FamilyServiceImpl implements FamilyService {
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public FamilyDTO updateFamily(String userId, String familyId, FamilyDTO familyDTO) throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
-        if (userMember.isEmpty() || (userMember.get().getRole() != FamilyMemberDTO.Role.LEADER && userMember.get()
-                .getRole() != FamilyMemberDTO.Role.MAINTAINER)) {
+        if (userMember.isEmpty() || !getFamilySettings(userId, familyId).getUpdateFamilyRoles()
+                .contains(userMember.get().getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to update this family!");
         }
         Family existingFamily = familyRepository.findById(familyId).get();
@@ -154,7 +161,8 @@ public class FamilyServiceImpl implements FamilyService {
         Family family = familyRepository.findById(familyId).get();
 
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
-        if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+        if (userMember.isEmpty() || !getFamilySettings(userId, familyId).getInviteAcceptRequestRoles()
+                .contains(userMember.get().getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed add member to this family");
         }
 
@@ -183,12 +191,13 @@ public class FamilyServiceImpl implements FamilyService {
     @FamilyIdValidator(userIdPosition = 0, positions = 1)
     public void removeMember(String userId, String familyId, String memberId) throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
-        if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
-            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed add member to this family");
+        if (userMember.isEmpty() || !getFamilySettings(userId, familyId).getRemoveMemberRoles()
+                .contains(userMember.get())) {
+            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed remove member from this family");
         }
         if (userId.equals(memberId)) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(),
-                    "Promote anyone as leader before exiting the family!");
+                    "Promote anyone as leader before removing yourself!");
         }
         familyMemberRepository.deleteByFamilyIdAndMemberId(familyId, memberId);
     }
@@ -231,7 +240,8 @@ public class FamilyServiceImpl implements FamilyService {
             throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByMemberId(userId);
 
-        if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+        if (userMember.isEmpty() || !getFamilySettings(userId, familyId).getInviteAcceptRequestRoles()
+                .contains(userMember.get().getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed invite member to this family!");
         }
 
@@ -364,9 +374,6 @@ public class FamilyServiceImpl implements FamilyService {
         if (familyMember.isEmpty()) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You can't accept other family request!");
         }
-        if (familyMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
-            throw new AppException(HttpStatus.FORBIDDEN.value(), "You aren't allowed to accept this request!");
-        }
         if (familyMemberRepository.findByMemberId(joinRequest.get().getRequestUser().getId()).isPresent()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Requested user has already a join a family!");
         }
@@ -385,7 +392,8 @@ public class FamilyServiceImpl implements FamilyService {
         if (familyMember.isEmpty()) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You can't reject other family request!");
         }
-        if (familyMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
+        if (!getFamilySettings(userId, family.getId()).getInviteAcceptRequestRoles()
+                .contains(familyMember.get().getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You aren't allowed to reject this request!");
         }
         joinRequestRepository.deleteById(requestId);
@@ -428,6 +436,25 @@ public class FamilyServiceImpl implements FamilyService {
             }
         }
         return usersToSend;
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    @FamilyIdValidator(userIdPosition = 0, positions = 1)
+    public FamilySettingsDTO getFamilySettings(String userId, String familyId) throws AppException {
+        Optional<FamilySettings> familySettings = familySettingsRepository.findByFamilyId(familyId);
+        if (familySettings.isEmpty()) {
+            /**
+             * This check should be removed in the future.
+             * As this is for migrating old users who have created family without
+             * this settings feature.
+             */
+            FamilySettings settings = new FamilySettings();
+            FamilyDTO family = getFamilyById(userId, familyId).get();
+            settings.setFamily(Family.build(family));
+            return familySettingsRepository.save(settings).toDTO();
+        }
+        return familySettings.get().toDTO();
     }
 
     private void deleteAllJoinRequestsOfUser(String userId) throws AppException {

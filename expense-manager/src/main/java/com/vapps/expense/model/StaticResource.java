@@ -15,8 +15,7 @@ public class StaticResource {
     @Id
     private String id;
 
-    @DocumentReference
-    private User owner;
+    private String ownerId;
 
     private ContentType type;
 
@@ -31,7 +30,7 @@ public class StaticResource {
         staticResourceDTO.setData(data);
         staticResourceDTO.setId(id);
         staticResourceDTO.setType(type);
-        staticResourceDTO.setOwner(owner.toDTO());
+        staticResourceDTO.setOwnerId(ownerId);
         staticResourceDTO.setVisibility(visibility);
         staticResourceDTO.setName(name);
         return staticResourceDTO;
@@ -41,7 +40,7 @@ public class StaticResource {
         StaticResource staticResource = new StaticResource();
         staticResource.setId(staticResourceDTO.getId());
         staticResource.setData(staticResourceDTO.getData());
-        staticResource.setOwner(User.build(staticResourceDTO.getOwner()));
+        staticResource.setOwnerId(staticResourceDTO.getOwnerId());
         staticResource.setType(staticResourceDTO.getType());
         staticResource.setVisibility(staticResourceDTO.getVisibility());
         staticResource.setName(staticResourceDTO.getName());

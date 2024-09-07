@@ -4,10 +4,7 @@ import com.vapps.expense.annotation.ExpenseIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
-import com.vapps.expense.common.service.CategoryService;
-import com.vapps.expense.common.service.ExpenseService;
-import com.vapps.expense.common.service.FamilyService;
-import com.vapps.expense.common.service.UserService;
+import com.vapps.expense.common.service.*;
 import com.vapps.expense.model.Category;
 import com.vapps.expense.model.Expense;
 import com.vapps.expense.model.Family;
@@ -16,6 +13,7 @@ import com.vapps.expense.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.Currency;
@@ -36,9 +34,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private StaticResourceService staticResourceService;
+
     @Override
-    @UserIdValidator(positions = 0)
-    public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload) throws AppException {
+    public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException {
+
         checkCurrency(payload.getCurrency());
         validateExpenseData(userId, payload.getCategoryId(), payload.getType(), payload.getFamilyId());
         checkExpenseAccess(userId, payload);
@@ -64,6 +65,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         if (payload.getType() == ExpenseDTO.ExpenseType.PERSONAL && payload.getFamilyId() != null) {
             expense.setFamily(Family.build(familyService.getFamilyById(userId, payload.getFamilyId()).get()));
         }
+
+
 
         expense = expenseRepository.save(expense);
         if (expense == null) {

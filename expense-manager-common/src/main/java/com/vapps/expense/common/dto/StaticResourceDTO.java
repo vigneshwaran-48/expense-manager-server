@@ -35,11 +35,12 @@ public class StaticResourceDTO {
 
     public enum Visibility {
         PUBLIC,
-        PRIVATE
+        PRIVATE,
+        FAMILY
     }
 
     private String id;
-    private UserDTO owner;
+    private String ownerId;
     private byte[] data;
     private ContentType type;
     private Visibility visibility;
