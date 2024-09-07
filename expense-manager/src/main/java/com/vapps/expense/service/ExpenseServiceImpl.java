@@ -4,9 +4,11 @@ import com.vapps.expense.annotation.ExpenseIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.CategoryService;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.UserService;
+import com.vapps.expense.model.Category;
 import com.vapps.expense.model.Expense;
 import com.vapps.expense.model.Family;
 import com.vapps.expense.model.User;
@@ -31,10 +33,14 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     @Override
     @UserIdValidator(positions = 0)
     public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload) throws AppException {
         checkCurrency(payload.getCurrency());
+        validateExpenseData(userId, payload.getCategoryId(), payload.getType(), payload.getFamilyId());
         checkExpenseAccess(userId, payload);
 
         Expense expense = new Expense();
@@ -45,6 +51,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setCurrency(payload.getCurrency());
         expense.setType(payload.getType());
         expense.setOwnerId(userId);
+        expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
         if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
             FamilyDTO family = familyService.getUserFamily(userId).get();
             expense.setOwnerId(family.getId());
@@ -88,6 +95,10 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
         if (payload.getAmount() > 0) {
             expense.setAmount(payload.getAmount());
+        }
+        if (payload.getCategoryId() != null && !expense.getCategory().getId().equals(payload.getCategoryId())) {
+            validateExpenseData(userId, payload.getCategoryId(), expense.getType(), expense.getFamily().getId());
+            expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
         }
         expense = expenseRepository.update(expense);
         if (expense == null) {
@@ -145,4 +156,29 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
     }
 
+    private void validateExpenseData(String userId, String categoryId, ExpenseDTO.ExpenseType type, String familyId) throws AppException {
+        if (categoryId == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category Id is required!");
+        }
+        Optional<CategoryDTO> category = categoryService.getCategory(userId, categoryId);
+        if (category.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category not exists!");
+        }
+        Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+        if (type == ExpenseDTO.ExpenseType.FAMILY) {
+            if (family.isEmpty()) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "You should be in a family");
+            }
+            if (!category.get().getOwnerId().equals(family.get().getId())) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
+            }
+        } else {
+            if (familyId != null && (family.isEmpty() || !family.get().getId().equals(familyId))) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid familyId");
+            }
+            if (category.get().getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
+                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Only personal categories can be used for personal expenses!");
+            }
+        }
+    }
 }

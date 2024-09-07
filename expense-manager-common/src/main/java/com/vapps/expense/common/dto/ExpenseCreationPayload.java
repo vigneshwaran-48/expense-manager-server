@@ -15,5 +15,6 @@ public class ExpenseCreationPayload {
     private String currency;
     private ExpenseDTO.ExpenseType type;
     private LocalDateTime time;
+    private String categoryId;
 
 }

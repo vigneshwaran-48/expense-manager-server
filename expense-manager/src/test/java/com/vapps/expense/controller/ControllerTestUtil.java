@@ -1,8 +1,10 @@
 package com.vapps.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vapps.expense.common.dto.CategoryDTO;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.UserDTO;
+import com.vapps.expense.common.dto.response.CategoryResponse;
 import com.vapps.expense.common.dto.response.FamilyResponse;
 import com.vapps.expense.common.dto.response.UserResponse;
 import com.vapps.expense.common.util.Endpoints;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class ControllerTestUtil {
@@ -103,5 +106,34 @@ public class ControllerTestUtil {
         payload.setVisibility(updatedVisibility);
         payload.setJoinType(FamilyDTO.JoinType.ANYONE);
         return payload;
+    }
+
+    public static String addCategory(MockMvc mockMvc, ObjectMapper objectMapper, String name, String description, String image, String ownerId, String userId, CategoryDTO.CategoryType type) throws Exception {
+
+        CategoryControllerTest.CategoryCreationPayload payload = new CategoryControllerTest.CategoryCreationPayload();
+        payload.setName(name);
+        payload.setDescription(description);
+        payload.setImage(image);
+        payload.setType(type);
+        payload.setOwnerId(ownerId);
+
+        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_CATEGORY).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)).with(oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.Category.CREATE")))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.category").exists())
+                .andReturn();
+
+        CategoryResponse response =
+                objectMapper.readValue(result.getResponse().getContentAsString(), CategoryResponse.class);
+        CategoryDTO category = response.getCategory();
+        assertThat(category.getId()).isNotNull();
+        assertThat(category.getType()).isEqualTo(type);
+        assertThat(category.getName()).isEqualTo(name);
+        assertThat(category.getDescription()).isEqualTo(description);
+        assertThat(category.getImage()).isEqualTo(image);
+        assertThat(category.getCreatedBy().getId()).isEqualTo(userId);
+        assertThat(category.getOwnerId()).isEqualTo(ownerId);
+
+        return response.getCategory().getId();
     }
 }

@@ -12,4 +12,5 @@ public class ExpenseUpdatePayload {
     private long amount;
     private String currency;
     private LocalDateTime time;
+    private String categoryId;
 }

@@ -23,6 +23,9 @@ public class Expense {
     private List<String> invoices; // For referencing the invoice attachment's id
 
     @DocumentReference
+    private Category category;
+
+    @DocumentReference
     private Family family;
 
     @DocumentReference
@@ -47,6 +50,7 @@ public class Expense {
         expense.setType(expenseDTO.getType());
         expense.setCurrency(expenseDTO.getCurrency());
         expense.setTime(expenseDTO.getTime());
+        expense.setCategory(Category.build(expenseDTO.getCategory()));
         return expense;
     }
 
@@ -65,6 +69,7 @@ public class Expense {
         expenseDTO.setType(type);
         expenseDTO.setCurrency(currency);
         expenseDTO.setTime(time);
+        expenseDTO.setCategory(category.toDTO());
         return expenseDTO;
     }
 

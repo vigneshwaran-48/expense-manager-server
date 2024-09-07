@@ -28,8 +28,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-import static com.vapps.expense.controller.ControllerTestUtil.createFamily;
-import static com.vapps.expense.controller.ControllerTestUtil.createUser;
+import static com.vapps.expense.controller.ControllerTestUtil.*;
 import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -254,13 +253,13 @@ public class CategoryControllerTest {
 
         createUser(mockMvc, objectMapper, "user34", "User34");
 
-        addCategory("test1", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
-        addCategory("test2", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
-        addCategory("test3", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
-        addCategory("test4", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
+        addCategory(mockMvc, objectMapper, "test1", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
+        addCategory(mockMvc, objectMapper, "test2", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
+        addCategory(mockMvc, objectMapper, "test3", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
+        addCategory(mockMvc, objectMapper, "test4", "test", "image", "user34", "user34", CategoryDTO.CategoryType.PERSONAL);
 
         String familyId = createFamily(mockMvc, objectMapper, "user34", "MyCategoryFamily", FamilyDTO.Visibility.PRIVATE);
-        addCategory("familytest", "test", "image", familyId, "user34", CategoryDTO.CategoryType.FAMILY);
+        addCategory(mockMvc, objectMapper, "familytest", "test", "image", familyId, "user34", CategoryDTO.CategoryType.FAMILY);
 
         MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_CATEGORIES)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.categories").exists()).andReturn();
@@ -269,34 +268,6 @@ public class CategoryControllerTest {
         assertThat(response.getCategories().size()).isEqualTo(5);
     }
 
-    private String addCategory(String name, String description, String image, String ownerId, String userId, CategoryDTO.CategoryType type) throws Exception {
-
-        CategoryCreationPayload payload = new CategoryCreationPayload();
-        payload.setName(name);
-        payload.setDescription(description);
-        payload.setImage(image);
-        payload.setType(type);
-        payload.setOwnerId(ownerId);
-
-        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_CATEGORY).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload)).with(oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.Category.CREATE")))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.category").exists())
-                .andReturn();
-
-        CategoryResponse response =
-                objectMapper.readValue(result.getResponse().getContentAsString(), CategoryResponse.class);
-        CategoryDTO category = response.getCategory();
-        assertThat(category.getId()).isNotNull();
-        assertThat(category.getType()).isEqualTo(type);
-        assertThat(category.getName()).isEqualTo(name);
-        assertThat(category.getDescription()).isEqualTo(description);
-        assertThat(category.getImage()).isEqualTo(image);
-        assertThat(category.getCreatedBy().getId()).isEqualTo(userId);
-        assertThat(category.getOwnerId()).isEqualTo(ownerId);
-
-        return response.getCategory().getId();
-    }
 
     private void addFamilyMember(String member) throws Exception {
         MvcResult mvcResult = mockMvc.perform(
@@ -328,7 +299,7 @@ public class CategoryControllerTest {
     }
 
     @Data
-    private static class CategoryCreationPayload {
+    static class CategoryCreationPayload {
         private String name;
         private String description;
         private CategoryDTO.CategoryType type;
@@ -337,7 +308,7 @@ public class CategoryControllerTest {
     }
 
     @Data
-    private static class CategoryUpdatePayload {
+    static class CategoryUpdatePayload {
         private String name;
         private String description;
         private String image;

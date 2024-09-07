@@ -23,4 +23,5 @@ public class ExpenseDTO {
     private ExpenseType type;
     private LocalDateTime time;
     private List<String> invoices;
+    private CategoryDTO category;
 }
