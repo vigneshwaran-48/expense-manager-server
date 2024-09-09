@@ -12,7 +12,8 @@ public interface ExpenseService {
 
     ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException;
 
-    ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload) throws AppException;
+    ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload, MultipartFile[] invoices)
+            throws AppException;
 
     Optional<ExpenseDTO> getExpense(String userId, String expenseId);
 

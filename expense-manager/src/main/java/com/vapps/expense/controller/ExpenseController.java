@@ -32,21 +32,18 @@ public class ExpenseController {
                                                          Principal principal, HttpServletRequest request) throws AppException {
         String userId = principal.getName();
         ExpenseDTO expense = null;
-        if (invoices == null) {
-            expenseService.addExpense(userId, payload);
-        } else {
-
-        }
+        expense = expenseService.addExpense(userId, payload, invoices);
         return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Created Expense!", LocalDateTime.now(),
                 request.getServletPath(), expense));
     }
 
     @PatchMapping(Endpoints.UPDATE_EXPENSE_PATH)
     public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable String id,
-                                                         @RequestBody ExpenseUpdatePayload payload, Principal principal, HttpServletRequest request)
+                                                         @RequestParam(value = "invoices", required = false) MultipartFile[] invoices,
+                                                         @RequestParam(value = "payload") ExpenseUpdatePayload payload, Principal principal, HttpServletRequest request)
             throws AppException {
         String userId = principal.getName();
-        ExpenseDTO expense = expenseService.updateExpense(userId, id, payload);
+        ExpenseDTO expense = expenseService.updateExpense(userId, id, payload, invoices);
         return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Updated Expense!", LocalDateTime.now(),
                 request.getServletPath(), expense));
     }

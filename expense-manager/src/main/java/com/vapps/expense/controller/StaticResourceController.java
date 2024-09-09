@@ -33,36 +33,19 @@ public class StaticResourceController {
 
     @PostMapping
     public ResponseEntity<StaticResourceResponse> addResource(@RequestParam("resource") MultipartFile resource,
-            @RequestParam(name = "private", required = false, defaultValue = "false") boolean isPrivate,
-            HttpServletRequest request, Principal principal) throws AppException {
-
+                                                              @RequestParam(name = "private", required = false, defaultValue = "false") boolean isPrivate,
+                                                              HttpServletRequest request, Principal principal) throws AppException {
         String userId = principal.getName();
-        ContentType contentType = ContentType.getContentType(resource.getContentType());
-        if (contentType == null) {
-            throw new AppException(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
-                    "Unsupported Resource type " + resource.getContentType());
-        }
-        StaticResourceDTO staticResource = new StaticResourceDTO();
-        try {
-            staticResource.setType(contentType);
-            staticResource.setName(resource.getName());
-            staticResource.setData(resource.getBytes());
-            staticResource.setVisibility(StaticResourceDTO.Visibility.PUBLIC);
-            if (isPrivate) {
-                staticResource.setVisibility(StaticResourceDTO.Visibility.PRIVATE);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error while parsing the resource", e);
-            throw new AppException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error while parsing the resource");
-        }
-        staticResource = staticResourceService.addResource(userId, staticResource);
+        StaticResourceDTO staticResource = staticResourceService.addResource(userId, resource, isPrivate
+                ? StaticResourceDTO.Visibility.PRIVATE
+                : StaticResourceDTO.Visibility.PUBLIC);
         return ResponseEntity.ok(new StaticResourceResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
                 request.getServletPath(), staticResource.getId()));
     }
 
     @GetMapping(Endpoints.GET_STATIC_RESOURCE_PATH)
     public ResponseEntity<?> getResource(@PathVariable("resourceId") String resourceId, HttpServletRequest request,
-            Principal principal) throws AppException {
+                                         Principal principal) throws AppException {
 
         String userId = principal.getName();
         Optional<StaticResourceDTO> resource = staticResourceService.getResource(userId, resourceId);
@@ -75,7 +58,7 @@ public class StaticResourceController {
 
     @DeleteMapping(Endpoints.DELETE_STATIC_RESOURCE_PATH)
     public ResponseEntity<Response> deleteResource(@PathVariable("resourceId") String resourceId,
-            HttpServletRequest request, Principal principal) throws AppException {
+                                                   HttpServletRequest request, Principal principal) throws AppException {
 
         String userId = principal.getName();
         staticResourceService.deleteResource(userId, resourceId);

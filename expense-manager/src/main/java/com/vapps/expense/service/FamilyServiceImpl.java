@@ -192,7 +192,7 @@ public class FamilyServiceImpl implements FamilyService {
     public void removeMember(String userId, String familyId, String memberId) throws AppException {
         Optional<FamilyMember> userMember = familyMemberRepository.findByFamilyIdAndMemberId(familyId, userId);
         if (userMember.isEmpty() || !getFamilySettings(userId, familyId).getRemoveMemberRoles()
-                .contains(userMember.get())) {
+                .contains(userMember.get().getRole())) {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed remove member from this family");
         }
         if (userId.equals(memberId)) {

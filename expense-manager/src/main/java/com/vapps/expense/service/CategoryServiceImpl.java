@@ -136,7 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
                         "Family " + category.getOwnerId() + " not " + "exists!");
             }
             FamilyMemberDTO.Role role = familyService.getUserRoleInFamily(userId, category.getOwnerId());
-            if (role != FamilyMemberDTO.Role.LEADER && role != FamilyMemberDTO.Role.MAINTAINER) {
+            if (!familyService.getFamilySettings(userId, category.getOwnerId()).getCategoryRoles().contains(role)) {
                 throw new AppException(HttpStatus.FORBIDDEN.value(),
                         "You are not allowed to perform category operation in this family");
             }

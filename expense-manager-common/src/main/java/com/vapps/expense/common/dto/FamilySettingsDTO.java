@@ -18,4 +18,7 @@ public class FamilySettingsDTO {
     private List<FamilyMemberDTO.Role> removeMemberRoles;
 
     private List<FamilyMemberDTO.Role> updateFamilyRoles;
+
+    private List<FamilyMemberDTO.Role> categoryRoles = List.of(FamilyMemberDTO.Role.LEADER,
+            FamilyMemberDTO.Role.MAINTAINER);
 }

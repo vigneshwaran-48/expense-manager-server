@@ -36,7 +36,7 @@ public class FamilySettingsCacheRepository implements FamilySettingsRepository {
     }
 
     @Override
-    @Cacheable(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
+    @Cacheable(value = "familySettings", key = "'family_settings_' + #familyId")
     public Optional<FamilySettings> findByFamilyId(String familyId) {
         return familySettingsRepository.findByFamilyId(familyId);
     }

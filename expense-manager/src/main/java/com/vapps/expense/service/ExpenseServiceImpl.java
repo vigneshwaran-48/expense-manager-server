@@ -10,13 +10,17 @@ import com.vapps.expense.model.Expense;
 import com.vapps.expense.model.Family;
 import com.vapps.expense.model.User;
 import com.vapps.expense.repository.ExpenseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,6 +40,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Autowired
     private StaticResourceService staticResourceService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseServiceImpl.class);
 
     @Override
     public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException {
@@ -66,7 +72,14 @@ public class ExpenseServiceImpl implements ExpenseService {
             expense.setFamily(Family.build(familyService.getFamilyById(userId, payload.getFamilyId()).get()));
         }
 
-
+        if (invoices != null) {
+            List<String> invoiceIds = new ArrayList<>();
+            for (MultipartFile invoice : invoices) {
+                StaticResourceDTO invoiceDTO = staticResourceService.addResource(userId, invoice, getStaticResourceVisibility(expense.getType()));
+                invoiceIds.add(invoiceDTO.getId());
+            }
+            expense.setInvoices(invoiceIds);
+        }
 
         expense = expenseRepository.save(expense);
         if (expense == null) {
@@ -78,7 +91,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     @UserIdValidator(positions = 0)
     @ExpenseIdValidator(userIdPosition = 0, positions = 1)
-    public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload) throws AppException {
+    public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload,
+                                    MultipartFile[] newInvoices) throws AppException {
         if (payload.getCurrency() != null) {
             checkCurrency(payload.getCurrency());
         }
@@ -103,6 +117,25 @@ public class ExpenseServiceImpl implements ExpenseService {
             validateExpenseData(userId, payload.getCategoryId(), expense.getType(), expense.getFamily().getId());
             expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
         }
+
+        List<String> invoices = new ArrayList<>(expense.getInvoices());
+        if (payload.getInvoices() != null) {
+            for (String invoiceId : expense.getInvoices()) {
+                if (!payload.getInvoices().contains(invoiceId)) {
+                    invoices.remove(invoiceId);
+                    staticResourceService.deleteResource(userId, invoiceId);
+                }
+            }
+        }
+        if (newInvoices != null) {
+            for (MultipartFile newInvoice : newInvoices) {
+                StaticResourceDTO newInvoiceDTO = staticResourceService
+                        .addResource(userId, newInvoice, getStaticResourceVisibility(expense.getType()));
+                invoices.add(newInvoiceDTO.getId());
+            }
+        }
+        expense.setInvoices(invoices);
+
         expense = expenseRepository.update(expense);
         if (expense == null) {
             throw new AppException("Error while updating expense!");
@@ -134,6 +167,14 @@ public class ExpenseServiceImpl implements ExpenseService {
             throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
         }
         expenseRepository.deleteById(expenseId);
+
+        if (expense.getInvoices().isEmpty()) {
+            return;
+        }
+        for (String invoiceId : expense.getInvoices()) {
+            staticResourceService.deleteResource(userId, invoiceId);
+            LOGGER.info("Deleted expense {}'s invoice {}", expenseId, invoiceId);
+        }
     }
 
     private void checkCurrency(String currency) throws AppException {
@@ -183,5 +224,10 @@ public class ExpenseServiceImpl implements ExpenseService {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Only personal categories can be used for personal expenses!");
             }
         }
+    }
+
+    private StaticResourceDTO.Visibility getStaticResourceVisibility(ExpenseDTO.ExpenseType type) {
+        return type == ExpenseDTO.ExpenseType.PERSONAL
+                ? StaticResourceDTO.Visibility.PRIVATE : StaticResourceDTO.Visibility.FAMILY;
     }
 }
