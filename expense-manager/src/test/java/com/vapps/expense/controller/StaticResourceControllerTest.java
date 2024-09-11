@@ -23,7 +23,7 @@ import static com.vapps.expense.controller.ControllerTestUtil.createUser;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@WebMvcTest(controllers = { StaticResourceController.class })
+@WebMvcTest(controllers = {StaticResourceController.class})
 @AutoConfigureMockMvc
 @EnableMongoTestServer
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -48,7 +48,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(1)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.CREATE" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.CREATE"})
     void testAddPrivateResource() throws Exception {
         MockMultipartFile file = new MockMultipartFile("resource", "invoice.pdf", MediaType.APPLICATION_PDF_VALUE,
                 "Test PDF content".getBytes(StandardCharsets.UTF_8));
@@ -65,7 +65,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(2)
-    @WithMockUser(username = "another", authorities = { "SCOPE_ExpenseManager.StaticResource.CREATE" })
+    @WithMockUser(username = "another", authorities = {"SCOPE_ExpenseManager.StaticResource.CREATE"})
     void testAddPublicResource() throws Exception {
         MockMultipartFile file = new MockMultipartFile("resource", "invoice.pdf", MediaType.APPLICATION_PDF_VALUE,
                 "Test PDF content".getBytes(StandardCharsets.UTF_8));
@@ -82,7 +82,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(3)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.READ" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.READ"})
     void testGetResource() throws Exception {
         mockMvc.perform(get(Endpoints.STATIC_RESOURCE_API + "/" + resourceId).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_PDF_VALUE))
@@ -91,7 +91,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(4)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.DELETE" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.DELETE"})
     void testDeleteResource() throws Exception {
         mockMvc.perform(
                         delete(Endpoints.STATIC_RESOURCE_API + "/" + resourceId).contentType(MediaType.APPLICATION_JSON))
@@ -101,7 +101,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(5)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.READ" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.READ"})
     void testGetResource_NotFound() throws Exception {
 
         mockMvc.perform(get(Endpoints.STATIC_RESOURCE_API + "/resourceId")).andExpect(status().isNotFound())
@@ -112,7 +112,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(6)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.CREATE" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.CREATE"})
     void testAddResource_UnsupportedMediaType() throws Exception {
         MockMultipartFile file = new MockMultipartFile("resource", "file.txt", "text/dummy", "some data".getBytes());
 
@@ -123,7 +123,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(7)
-    @WithMockUser(username = "another", authorities = { "SCOPE_ExpenseManager.StaticResource.READ" })
+    @WithMockUser(username = "another", authorities = {"SCOPE_ExpenseManager.StaticResource.READ"})
     void testGetResource_Private() throws Exception {
         mockMvc.perform(
                         get(Endpoints.STATIC_RESOURCE_API + "/" + privateResourceId).contentType(MediaType.APPLICATION_JSON))
@@ -134,7 +134,7 @@ public class StaticResourceControllerTest {
 
     @Test
     @Order(8)
-    @WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.StaticResource.READ" })
+    @WithMockUser(username = "user", authorities = {"SCOPE_ExpenseManager.StaticResource.READ"})
     void testGetPublicResource() throws Exception {
         mockMvc.perform(
                         get(Endpoints.STATIC_RESOURCE_API + "/" + publicResourceId).contentType(MediaType.APPLICATION_JSON))

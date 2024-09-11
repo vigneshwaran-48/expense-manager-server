@@ -502,6 +502,7 @@
     "params": [],
     "method": "POST",
     "requestBodyConfig": {
+      "type": "FORM_DATA",
       "fields": [
         {
           "key": "name",
@@ -556,6 +557,7 @@
     ],
     "method": "PATCH",
     "requestBodyConfig": {
+      "type": "FORM_DATA",
       "fields": [
         {
           "key": "name",

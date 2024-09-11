@@ -22,10 +22,7 @@ import java.time.LocalDateTime;
 
 import static com.vapps.expense.controller.ControllerTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -197,8 +194,8 @@ public class ExpenseControllerTest {
 
         MvcResult result = mockMvc.perform(
                         patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
-                                .toUriString()).contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(payload)))
+                                .toUriString())
+                                .param("payload", objectMapper.writeValueAsString(payload)))
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
                 .andReturn();
 
@@ -229,8 +226,9 @@ public class ExpenseControllerTest {
         payload.setName(name);
         payload.setCategoryId(categoryId);
 
-        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_EXPENSE).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
+        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_EXPENSE)
+                        .param("payload", objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.expense").exists()).andReturn();
 
