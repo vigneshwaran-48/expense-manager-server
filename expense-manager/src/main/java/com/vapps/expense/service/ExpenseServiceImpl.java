@@ -79,6 +79,8 @@ public class ExpenseServiceImpl implements ExpenseService {
                 invoiceIds.add(invoiceDTO.getId());
             }
             expense.setInvoices(invoiceIds);
+        } else {
+            expense.setInvoices(List.of());
         }
 
         expense = expenseRepository.save(expense);

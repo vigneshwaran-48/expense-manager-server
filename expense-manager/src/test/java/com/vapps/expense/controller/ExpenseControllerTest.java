@@ -10,14 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 import static com.vapps.expense.controller.ControllerTestUtil.*;
@@ -192,10 +196,18 @@ public class ExpenseControllerTest {
         payload.setDescription(description);
         payload.setCategoryId(categoryId);
 
+        MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
+                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
+                .getBytes(StandardCharsets.UTF_8));
+
         MvcResult result = mockMvc.perform(
-                        patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
+                        multipart(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
                                 .toUriString())
-                                .param("payload", objectMapper.writeValueAsString(payload)))
+                                .file(payloadPart)
+                                .with(request -> {
+                                    request.setMethod(HttpMethod.PATCH.name());
+                                    return request;
+                                }))
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
                 .andReturn();
 
@@ -226,8 +238,12 @@ public class ExpenseControllerTest {
         payload.setName(name);
         payload.setCategoryId(categoryId);
 
-        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_EXPENSE)
-                        .param("payload", objectMapper.writeValueAsString(payload)))
+        MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
+                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
+                .getBytes(StandardCharsets.UTF_8));
+
+        MvcResult result = mockMvc.perform(multipart(Endpoints.CREATE_EXPENSE)
+                        .file(payloadPart).contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.expense").exists()).andReturn();

@@ -27,8 +27,8 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @PostMapping
-    public ResponseEntity<ExpenseResponse> createExpense(@RequestParam(value = "invoices", required = false) MultipartFile[] invoices,
-                                                         @RequestParam("payload") ExpenseCreationPayload payload,
+    public ResponseEntity<ExpenseResponse> createExpense(@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
+                                                         @RequestPart("payload") ExpenseCreationPayload payload,
                                                          Principal principal, HttpServletRequest request) throws AppException {
         String userId = principal.getName();
         ExpenseDTO expense = null;
@@ -39,8 +39,8 @@ public class ExpenseController {
 
     @PatchMapping(Endpoints.UPDATE_EXPENSE_PATH)
     public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable String id,
-                                                         @RequestParam(value = "invoices", required = false) MultipartFile[] invoices,
-                                                         @RequestParam(value = "payload") ExpenseUpdatePayload payload, Principal principal, HttpServletRequest request)
+                                                         @RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
+                                                         @RequestPart(value = "payload") ExpenseUpdatePayload payload, Principal principal, HttpServletRequest request)
             throws AppException {
         String userId = principal.getName();
         ExpenseDTO expense = expenseService.updateExpense(userId, id, payload, invoices);
