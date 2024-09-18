@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(Endpoints.EXPENSE_API)
+@CrossOrigin("*")
 public class ExpenseController {
 
     @Autowired

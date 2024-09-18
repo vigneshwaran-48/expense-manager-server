@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,7 +26,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .cors(cors -> cors.disable())
+                .cors(Customizer.withDefaults())
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
                 .disable().authorizeHttpRequests(http -> http.requestMatchers(HttpMethod.GET, Endpoints.GET_USER)

@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(Endpoints.STATIC_RESOURCE_API)
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class StaticResourceController {
 
     @Autowired
