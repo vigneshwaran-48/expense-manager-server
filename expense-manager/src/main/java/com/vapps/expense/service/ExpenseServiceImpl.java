@@ -210,7 +210,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	}
 
 	private List<Expense> filterExpensesBySearch(String userId, List<Expense> expenses, String query,
-			ExpenseFilter.SearchBy searchBy) {
+			ExpenseFilter.SearchBy searchBy) throws AppException {
 
 		switch (searchBy) {
 			case NAME -> expenses = expenses.stream().filter(expense -> expense.getName().toLowerCase()
@@ -232,6 +232,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 				}
 				return false;
 			}).collect(Collectors.toList());
+			case CATEGORY -> expenses = expenses.stream()
+					.filter(expense -> expense.getCategory() != null && expense.getCategory().getName().toLowerCase()
+							.contains(query.toLowerCase())).collect(Collectors.toList());
+			default -> throw new AppException("Search by option " + searchBy + " not implemented!");
 		}
 		return expenses;
 	}

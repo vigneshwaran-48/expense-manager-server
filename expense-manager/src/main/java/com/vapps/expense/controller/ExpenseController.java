@@ -2,8 +2,10 @@ package com.vapps.expense.controller;
 
 import com.vapps.expense.common.dto.ExpenseCreationPayload;
 import com.vapps.expense.common.dto.ExpenseDTO;
+import com.vapps.expense.common.dto.ExpenseFilter;
 import com.vapps.expense.common.dto.ExpenseUpdatePayload;
 import com.vapps.expense.common.dto.response.ExpenseResponse;
+import com.vapps.expense.common.dto.response.ExpensesResponse;
 import com.vapps.expense.common.dto.response.Response;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -71,5 +74,21 @@ public class ExpenseController {
 		expenseService.deleteExpense(userId, id);
 		return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Delete the expense!", LocalDateTime.now(),
 				request.getServletPath()));
+	}
+
+	@GetMapping(Endpoints.GET_ALL_EXPENSES)
+	public ResponseEntity<ExpensesResponse> getAllExpenses(@RequestBody(required = false) ExpenseFilter filter,
+			Principal principal,
+			HttpServletRequest request)
+			throws AppException {
+
+		String userId = principal.getName();
+		if (filter == null) {
+			filter = new ExpenseFilter();
+		}
+		List<ExpenseDTO> expenses = expenseService.getAllExpense(userId, filter);
+
+		return ResponseEntity.ok(new ExpensesResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+				request.getServletPath(), expenses));
 	}
 }
