@@ -6,11 +6,11 @@ import java.util.Optional;
 
 public interface FamilySettingsRepository {
 
-    FamilySettings save(FamilySettings familySettings);
+	FamilySettings save(FamilySettings familySettings);
 
-    FamilySettings update(FamilySettings familySettings);
+	FamilySettings update(FamilySettings familySettings);
 
-    void deleteByFamilyId(String familyId);
+	void deleteByFamilyId(String familyId);
 
-    Optional<FamilySettings> findByFamilyId(String familyId);
+	Optional<FamilySettings> findByFamilyId(String familyId);
 }

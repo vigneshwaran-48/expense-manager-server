@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FamilyMongoRepository extends MongoRepository<Family, String> {
-    Optional<Family> findByCreatedById(String createdById);
+	Optional<Family> findByCreatedById(String createdById);
 
-    @Query("{$or: [{ 'id': ?0}, { 'name': { $regex: ?1, $options: 'i' } }], 'visibility': ?2}")
-    List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
-            FamilyDTO.Visibility visibility, Pageable pageable);
+	@Query("{$or: [{ 'id': ?0}, { 'name': { $regex: ?1, $options: 'i' } }], 'visibility': ?2}")
+	List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
+			FamilyDTO.Visibility visibility, Pageable pageable);
 
-    @Query("{$or: [{ 'id': ?0}, { 'name': { $regex: ?1, $options: 'i' } }], 'visibility': ?2}")
-    List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
-            FamilyDTO.Visibility visibility);
+	@Query("{$or: [{ 'id': ?0}, { 'name': { $regex: ?1, $options: 'i' } }], 'visibility': ?2}")
+	List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
+			FamilyDTO.Visibility visibility);
 }

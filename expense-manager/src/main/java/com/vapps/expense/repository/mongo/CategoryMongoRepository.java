@@ -10,12 +10,12 @@ import java.util.Optional;
 
 public interface CategoryMongoRepository extends MongoRepository<Category, String> {
 
-    List<Category> findByOwnerIdAndType(String createdById, CategoryDTO.CategoryType type);
+	List<Category> findByOwnerIdAndType(String createdById, CategoryDTO.CategoryType type);
 
-    Optional<Category> findByOwnerIdAndTypeAndName(String id, CategoryDTO.CategoryType type, String name)
-            throws AppException;
+	Optional<Category> findByOwnerIdAndTypeAndName(String id, CategoryDTO.CategoryType type, String name)
+			throws AppException;
 
-    Optional<Category> findByIdAndOwnerId(String id, String ownerId);
+	Optional<Category> findByIdAndOwnerId(String id, String ownerId);
 
-    List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
+	List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
 }

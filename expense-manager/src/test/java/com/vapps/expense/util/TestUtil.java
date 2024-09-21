@@ -9,15 +9,15 @@ import java.util.List;
 
 public class TestUtil {
 
-    public static void logTestCasePassed(String name, String description) {
-        System.out.println("\n----------------------------------------------------------------------\n");
-        System.out.println("Test case: " + name + " is passed");
-        System.out.println("Description: " + description);
-        System.out.println("\n----------------------------------------------------------------------\n");
-    }
+	public static void logTestCasePassed(String name, String description) {
+		System.out.println("\n----------------------------------------------------------------------\n");
+		System.out.println("Test case: " + name + " is passed");
+		System.out.println("Description: " + description);
+		System.out.println("\n----------------------------------------------------------------------\n");
+	}
 
-    public static OidcUser getOidcUser(String userId, List<String> scopes) {
-        return new DefaultOidcUser(AuthorityUtils.createAuthorityList(scopes),
-                OidcIdToken.withTokenValue("id-token").claim("sub", userId).build(), "sub");
-    }
+	public static OidcUser getOidcUser(String userId, List<String> scopes) {
+		return new DefaultOidcUser(AuthorityUtils.createAuthorityList(scopes),
+				OidcIdToken.withTokenValue("id-token").claim("sub", userId).build(), "sub");
+	}
 }

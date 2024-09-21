@@ -14,30 +14,30 @@ import java.util.Optional;
 @Repository
 public class FamilySettingsCacheRepository implements FamilySettingsRepository {
 
-    @Autowired
-    private FamilySettingsMongoRepository familySettingsRepository;
+	@Autowired
+	private FamilySettingsMongoRepository familySettingsRepository;
 
-    @Override
-    @Cacheable(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
-    public FamilySettings save(FamilySettings familySettings) {
-        return familySettingsRepository.save(familySettings);
-    }
+	@Override
+	@Cacheable(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
+	public FamilySettings save(FamilySettings familySettings) {
+		return familySettingsRepository.save(familySettings);
+	}
 
-    @Override
-    @CachePut(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
-    public FamilySettings update(FamilySettings familySettings) {
-        return familySettingsRepository.save(familySettings);
-    }
+	@Override
+	@CachePut(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
+	public FamilySettings update(FamilySettings familySettings) {
+		return familySettingsRepository.save(familySettings);
+	}
 
-    @Override
-    @CacheEvict(value = "familySettings", key = "'family_settings_' + #familyId")
-    public void deleteByFamilyId(String familyId) {
-        familySettingsRepository.deleteByFamilyId(familyId);
-    }
+	@Override
+	@CacheEvict(value = "familySettings", key = "'family_settings_' + #familyId")
+	public void deleteByFamilyId(String familyId) {
+		familySettingsRepository.deleteByFamilyId(familyId);
+	}
 
-    @Override
-    @Cacheable(value = "familySettings", key = "'family_settings_' + #familyId")
-    public Optional<FamilySettings> findByFamilyId(String familyId) {
-        return familySettingsRepository.findByFamilyId(familyId);
-    }
+	@Override
+	@Cacheable(value = "familySettings", key = "'family_settings_' + #familyId")
+	public Optional<FamilySettings> findByFamilyId(String familyId) {
+		return familySettingsRepository.findByFamilyId(familyId);
+	}
 }

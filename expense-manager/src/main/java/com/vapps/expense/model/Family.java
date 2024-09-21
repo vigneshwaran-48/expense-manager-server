@@ -14,56 +14,56 @@ import java.time.LocalDateTime;
 @Document
 public class Family {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    private String name;
-    private String description;
-    private Visibility visibility;
-    private LocalDateTime createdTime;
-    private String image;
-    private FamilyDTO.JoinType joinType;
+	private String name;
+	private String description;
+	private Visibility visibility;
+	private LocalDateTime createdTime;
+	private String image;
+	private FamilyDTO.JoinType joinType;
 
-    @DocumentReference
-    private User createdBy;
+	@DocumentReference
+	private User createdBy;
 
-    public FamilyDTO toDTO() {
-        FamilyDTO familyDTO = new FamilyDTO();
-        familyDTO.setId(id);
-        familyDTO.setName(name);
-        familyDTO.setDescription(description);
-        familyDTO.setVisibility(visibility);
-        familyDTO.setCreatedBy(createdBy.toDTO());
-        familyDTO.setCreatedTime(createdTime);
-        familyDTO.setImage(image);
-        familyDTO.setJoinType(joinType);
-        return familyDTO;
-    }
+	public FamilyDTO toDTO() {
+		FamilyDTO familyDTO = new FamilyDTO();
+		familyDTO.setId(id);
+		familyDTO.setName(name);
+		familyDTO.setDescription(description);
+		familyDTO.setVisibility(visibility);
+		familyDTO.setCreatedBy(createdBy.toDTO());
+		familyDTO.setCreatedTime(createdTime);
+		familyDTO.setImage(image);
+		familyDTO.setJoinType(joinType);
+		return familyDTO;
+	}
 
-    public FamilySearchDTO toSearchDTO(boolean isJoinRequestExists) {
-        FamilySearchDTO familyDTO = new FamilySearchDTO();
-        familyDTO.setId(id);
-        familyDTO.setName(name);
-        familyDTO.setDescription(description);
-        familyDTO.setVisibility(visibility);
-        familyDTO.setCreatedBy(createdBy.toDTO());
-        familyDTO.setCreatedTime(createdTime);
-        familyDTO.setImage(image);
-        familyDTO.setJoinType(joinType);
-        familyDTO.setJoinRequestExists(isJoinRequestExists);
-        return familyDTO;
-    }
+	public FamilySearchDTO toSearchDTO(boolean isJoinRequestExists) {
+		FamilySearchDTO familyDTO = new FamilySearchDTO();
+		familyDTO.setId(id);
+		familyDTO.setName(name);
+		familyDTO.setDescription(description);
+		familyDTO.setVisibility(visibility);
+		familyDTO.setCreatedBy(createdBy.toDTO());
+		familyDTO.setCreatedTime(createdTime);
+		familyDTO.setImage(image);
+		familyDTO.setJoinType(joinType);
+		familyDTO.setJoinRequestExists(isJoinRequestExists);
+		return familyDTO;
+	}
 
-    public static Family build(FamilyDTO familyDTO) {
-        Family family = new Family();
-        family.setId(familyDTO.getId());
-        family.setName(familyDTO.getName());
-        family.setDescription(familyDTO.getDescription());
-        family.setVisibility(familyDTO.getVisibility());
-        family.setCreatedBy(User.build(familyDTO.getCreatedBy()));
-        family.setCreatedTime(familyDTO.getCreatedTime());
-        family.setImage(familyDTO.getImage());
-        family.setJoinType(familyDTO.getJoinType());
-        return family;
-    }
+	public static Family build(FamilyDTO familyDTO) {
+		Family family = new Family();
+		family.setId(familyDTO.getId());
+		family.setName(familyDTO.getName());
+		family.setDescription(familyDTO.getDescription());
+		family.setVisibility(familyDTO.getVisibility());
+		family.setCreatedBy(User.build(familyDTO.getCreatedBy()));
+		family.setCreatedTime(familyDTO.getCreatedTime());
+		family.setImage(familyDTO.getImage());
+		family.setJoinType(familyDTO.getJoinType());
+		return family;
+	}
 }

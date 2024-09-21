@@ -3,7 +3,7 @@
     All the features of the application and behaviour should be defined
     here before developing it.
 
-## Expense Listing and Searching
+## Expense Listing and Searching: (Feature: 1)
 
     For listing expeneses we are going to use a Filter object which
     contains the conditions that should be met by the returned list

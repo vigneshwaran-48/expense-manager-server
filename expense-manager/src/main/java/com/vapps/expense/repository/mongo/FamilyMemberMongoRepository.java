@@ -9,19 +9,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FamilyMemberMongoRepository extends MongoRepository<FamilyMember, String> {
-    List<FamilyMember> findByFamilyId(String familyId);
+	List<FamilyMember> findByFamilyId(String familyId);
 
-    Optional<FamilyMember> findByFamilyIdAndMemberId(String familyId, String memberId);
+	Optional<FamilyMember> findByFamilyIdAndMemberId(String familyId, String memberId);
 
-    boolean existsByFamilyIdAndMemberId(String familyId, String memberId);
+	boolean existsByFamilyIdAndMemberId(String familyId, String memberId);
 
-    List<FamilyMember> findByFamilyIdAndRole(String familyId, FamilyMemberDTO.Role role);
+	List<FamilyMember> findByFamilyIdAndRole(String familyId, FamilyMemberDTO.Role role);
 
-    @Transactional
-    void deleteByFamilyIdAndMemberId(String familyId, String memberId);
+	@Transactional
+	void deleteByFamilyIdAndMemberId(String familyId, String memberId);
 
-    Optional<FamilyMember> findByMemberId(String memberId);
+	Optional<FamilyMember> findByMemberId(String memberId);
 
-    @Transactional
-    void deleteByFamilyId(String familyId);
+	@Transactional
+	void deleteByFamilyId(String familyId);
 }

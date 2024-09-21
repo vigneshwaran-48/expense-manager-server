@@ -9,19 +9,19 @@ import java.util.Optional;
 
 public interface FamilyRepository {
 
-    Optional<Family> findById(String id);
+	Optional<Family> findById(String id);
 
-    Family save(Family family);
+	Family save(Family family);
 
-    Family update(Family family);
+	Family update(Family family);
 
-    void deleteById(String id);
+	void deleteById(String id);
 
-    Optional<Family> findByCreatedById(String createdById);
+	Optional<Family> findByCreatedById(String createdById);
 
-    List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
-            FamilyDTO.Visibility visibility, Pageable pageable);
+	List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
+			FamilyDTO.Visibility visibility, Pageable pageable);
 
-    List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
-            FamilyDTO.Visibility visibility);
+	List<Family> findByIdOrNameContainingIgnoreCaseAndVisibility(String id, String query,
+			FamilyDTO.Visibility visibility);
 }

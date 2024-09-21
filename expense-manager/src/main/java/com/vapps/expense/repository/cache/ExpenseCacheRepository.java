@@ -16,52 +16,56 @@ import java.util.Optional;
 @Repository
 public class ExpenseCacheRepository implements ExpenseRepository {
 
-    @Autowired
-    private ExpenseMongoRepository expenseRepository;
+	@Autowired
+	private ExpenseMongoRepository expenseRepository;
 
-    @Override
-    @Cacheable(value = "expense", key = "'expense_' + #id")
-    public Optional<Expense> findById(String id) {
-        return expenseRepository.findById(id);
-    }
+	@Override
+	@Cacheable(value = "expense", key = "'expense_' + #id")
+	public Optional<Expense> findById(String id) {
+		return expenseRepository.findById(id);
+	}
 
-    @Override
-    @Caching(evict = {@CacheEvict(value = "expenseByFamilyId", allEntries = true), @CacheEvict(value = "expenseByOwnerId", allEntries = true),
-            @CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true)})
-    public Expense save(Expense expense) {
-        return expenseRepository.save(expense);
-    }
+	@Override
+	@Caching(evict = { @CacheEvict(value = "expenseByFamilyId", allEntries = true),
+			@CacheEvict(value = "expenseByOwnerId", allEntries = true),
+			@CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true) })
+	public Expense save(Expense expense) {
+		return expenseRepository.save(expense);
+	}
 
-    @Override
-    @Caching(put = {@CachePut(value = "expense", key = "'expense_' + #expense.getId()")},
-            evict = {@CacheEvict(value = "expenseByFamilyId", allEntries = true), @CacheEvict(value = "expenseByOwnerId", allEntries = true),
-                    @CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true)})
-    public Expense update(Expense expense) {
-        return expenseRepository.save(expense);
-    }
+	@Override
+	@Caching(put = { @CachePut(value = "expense", key = "'expense_' + #expense.getId()") },
+			evict = { @CacheEvict(value = "expenseByFamilyId", allEntries = true),
+					@CacheEvict(value = "expenseByOwnerId", allEntries = true),
+					@CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true) })
+	public Expense update(Expense expense) {
+		return expenseRepository.save(expense);
+	}
 
-    @Override
-    @Cacheable(value = "expenseByOwnerId", key = "'expense_owner_id_' + #ownerId")
-    public List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId) {
-        return expenseRepository.findByOwnerIdAndFamilyIsNull(ownerId);
-    }
+	@Override
+	@Cacheable(value = "expenseByOwnerId", key = "'expense_owner_id_' + #ownerId")
+	public List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId) {
+		return expenseRepository.findByOwnerIdAndFamilyIsNull(ownerId);
+	}
 
-    @Override
-    @Cacheable(value = "expenseByFamilyId", key = "'expense_family_id_' + #familyId")
-    public List<Expense> findByFamilyId(String familyId) {
-        return expenseRepository.findByFamilyId(familyId);
-    }
+	@Override
+	@Cacheable(value = "expenseByFamilyId", key = "'expense_family_id_' + #familyId")
+	public List<Expense> findByFamilyId(String familyId) {
+		return expenseRepository.findByFamilyId(familyId);
+	}
 
-    @Override
-    @Cacheable(value = "expenseByIdAndOwnerId", key = "'expense_id_' + #id + '_owner_' + #ownerId")
-    public Optional<Expense> findByIdAndOwnerId(String id, String ownerId) {
-        return expenseRepository.findByIdAndOwnerId(id, ownerId);
-    }
+	@Override
+	@Cacheable(value = "expenseByIdAndOwnerId", key = "'expense_id_' + #id + '_owner_' + #ownerId")
+	public Optional<Expense> findByIdAndOwnerId(String id, String ownerId) {
+		return expenseRepository.findByIdAndOwnerId(id, ownerId);
+	}
 
-    @Override
-    @Caching(evict = {@CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true), @CacheEvict(value = "expenseByFamilyId", allEntries = true),
-            @CacheEvict(value = "expenseByOwnerId", allEntries = true), @CacheEvict(value = "expense", allEntries = true)})
-    public void deleteById(String id) {
-        expenseRepository.deleteById(id);
-    }
+	@Override
+	@Caching(evict = { @CacheEvict(value = "expenseByIdAndOwnerId", allEntries = true),
+			@CacheEvict(value = "expenseByFamilyId", allEntries = true),
+			@CacheEvict(value = "expenseByOwnerId", allEntries = true),
+			@CacheEvict(value = "expense", allEntries = true) })
+	public void deleteById(String id) {
+		expenseRepository.deleteById(id);
+	}
 }

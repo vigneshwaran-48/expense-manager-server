@@ -10,21 +10,21 @@ import java.util.Optional;
 
 public interface CategoryRepository {
 
-    Optional<Category> findById(String id);
+	Optional<Category> findById(String id);
 
-    List<Category> findByOwnerIdAndType(String createdById, CategoryDTO.CategoryType type);
+	List<Category> findByOwnerIdAndType(String createdById, CategoryDTO.CategoryType type);
 
-    Optional<Category> findByIdAndOwnerId(String id, String ownerId);
+	Optional<Category> findByIdAndOwnerId(String id, String ownerId);
 
-    Optional<Category> findByOwnerIdAndTypeAndName(String id, CategoryDTO.CategoryType type, String name)
-            throws AppException;
+	Optional<Category> findByOwnerIdAndTypeAndName(String id, CategoryDTO.CategoryType type, String name)
+			throws AppException;
 
-    Category save(Category category);
+	Category save(Category category);
 
-    Category update(Category category);
+	Category update(Category category);
 
-    List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
+	List<Category> findByCreatedByIdOrOwnerId(String createdById, String ownerId);
 
-    @Transactional
-    void deleteById(String id);
+	@Transactional
+	void deleteById(String id);
 }

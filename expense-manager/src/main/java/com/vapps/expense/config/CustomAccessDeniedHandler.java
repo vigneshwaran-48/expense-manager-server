@@ -18,31 +18,31 @@ import java.time.LocalDateTime;
 
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
 
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response,
-            AccessDeniedException accessDeniedException) throws IOException, ServletException {
+	@Override
+	public void handle(HttpServletRequest request, HttpServletResponse response,
+			AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
-        response.setStatus(HttpStatus.FORBIDDEN.value());
+		response.setStatus(HttpStatus.FORBIDDEN.value());
 
-        AppErrorResponse appErrorResponse = new AppErrorResponse();
-        appErrorResponse.setError(accessDeniedException.getMessage());
-        appErrorResponse.setStatus(HttpStatus.FORBIDDEN.value());
-        appErrorResponse.setPath(request.getServletPath());
-        appErrorResponse.setTime(LocalDateTime.now());
+		AppErrorResponse appErrorResponse = new AppErrorResponse();
+		appErrorResponse.setError(accessDeniedException.getMessage());
+		appErrorResponse.setStatus(HttpStatus.FORBIDDEN.value());
+		appErrorResponse.setPath(request.getServletPath());
+		appErrorResponse.setTime(LocalDateTime.now());
 
-        String responseJSON = "Access Denied!";
+		String responseJSON = "Access Denied!";
 
-        try {
-            responseJSON = objectMapper.writeValueAsString(appErrorResponse);
-        } catch (JsonProcessingException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+		try {
+			responseJSON = objectMapper.writeValueAsString(appErrorResponse);
+		} catch (JsonProcessingException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
 
-        response.getWriter().println(responseJSON);
-    }
+		response.getWriter().println(responseJSON);
+	}
 }

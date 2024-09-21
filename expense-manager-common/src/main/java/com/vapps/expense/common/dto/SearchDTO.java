@@ -11,9 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 public class SearchDTO<T> {
 
-    private List<T> results;
-    private int currentPage;
-    private int nextPage;
-    private int totalPages;
+	private List<T> results;
+	private int currentPage;
+	private int nextPage;
+	private int totalPages;
 
 }

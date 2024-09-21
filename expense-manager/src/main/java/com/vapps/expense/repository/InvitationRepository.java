@@ -8,19 +8,19 @@ import java.util.Optional;
 
 public interface InvitationRepository {
 
-    Invitation save(Invitation invitation);
+	Invitation save(Invitation invitation);
 
-    Optional<Invitation> findById(String id);
+	Optional<Invitation> findById(String id);
 
-    void deleteById(String id);
+	void deleteById(String id);
 
-    Optional<Invitation> findByRecipientIdAndFromIdAndType(String recipientId, String fromId, InvitationDTO.Type type);
+	Optional<Invitation> findByRecipientIdAndFromIdAndType(String recipientId, String fromId, InvitationDTO.Type type);
 
-    List<Invitation> findByRecipientId(String recipientId);
+	List<Invitation> findByRecipientId(String recipientId);
 
-    List<Invitation> findByFromId(String fromId);
+	List<Invitation> findByFromId(String fromId);
 
-    Optional<Invitation> findByIdAndRecipientIdOrFromId(String id, String recipientId, String fromId);
+	Optional<Invitation> findByIdAndRecipientIdOrFromId(String id, String recipientId, String fromId);
 
-    Invitation update(Invitation invitation);
+	Invitation update(Invitation invitation);
 }

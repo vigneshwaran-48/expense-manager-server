@@ -21,54 +21,54 @@ import java.util.List;
 @Component
 public class DummyDataPopulator {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private FamilyService familyService;
+	@Autowired
+	private FamilyService familyService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DummyDataPopulator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DummyDataPopulator.class);
 
-    @EventListener(ContextRefreshedEvent.class)
-    public void onEvent() {
-        try {
-            populateDummyUsers();
-            populateDummyFamilies();
-        } catch (AppException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-        }
-    }
+	@EventListener(ContextRefreshedEvent.class)
+	public void onEvent() {
+		try {
+			populateDummyUsers();
+			populateDummyFamilies();
+		} catch (AppException ex) {
+			LOGGER.error(ex.getMessage(), ex);
+		}
+	}
 
-    private void populateDummyUsers() throws AppException {
-        InputStream inputStream = getClass().getResourceAsStream("/data/users.json");
-        try {
-            List<UserDTO> users = Arrays.asList(objectMapper.readValue(inputStream, UserDTO[].class));
-            for (UserDTO user : users) {
-                if (userService.getUser(user.getId()).isPresent()) {
-                    continue;
-                }
-                userService.addUser(user);
-            }
-        } catch (Exception e) {
-            throw new AppException("Error while creating dummy users!");
-        }
-    }
+	private void populateDummyUsers() throws AppException {
+		InputStream inputStream = getClass().getResourceAsStream("/data/users.json");
+		try {
+			List<UserDTO> users = Arrays.asList(objectMapper.readValue(inputStream, UserDTO[].class));
+			for (UserDTO user : users) {
+				if (userService.getUser(user.getId()).isPresent()) {
+					continue;
+				}
+				userService.addUser(user);
+			}
+		} catch (Exception e) {
+			throw new AppException("Error while creating dummy users!");
+		}
+	}
 
-    private void populateDummyFamilies() throws AppException {
-        InputStream inputStream = getClass().getResourceAsStream("/data/families.json");
-        try {
-            List<FamilyDTO> families = Arrays.asList(objectMapper.readValue(inputStream, FamilyDTO[].class));
-            for (FamilyDTO family : families) {
-                if (familyService.getFamilyById(family.getCreatedBy().getId(), family.getId()).isPresent()) {
-                    continue;
-                }
-                familyService.createFamily(family.getCreatedBy().getId(), family);
-            }
-        } catch (Exception e) {
-            throw new AppException("Error while creating dummy families!");
-        }
-    }
+	private void populateDummyFamilies() throws AppException {
+		InputStream inputStream = getClass().getResourceAsStream("/data/families.json");
+		try {
+			List<FamilyDTO> families = Arrays.asList(objectMapper.readValue(inputStream, FamilyDTO[].class));
+			for (FamilyDTO family : families) {
+				if (familyService.getFamilyById(family.getCreatedBy().getId(), family.getId()).isPresent()) {
+					continue;
+				}
+				familyService.createFamily(family.getCreatedBy().getId(), family);
+			}
+		} catch (Exception e) {
+			throw new AppException("Error while creating dummy families!");
+		}
+	}
 }

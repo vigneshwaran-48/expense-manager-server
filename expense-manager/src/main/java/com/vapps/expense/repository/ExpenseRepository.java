@@ -7,17 +7,17 @@ import java.util.Optional;
 
 public interface ExpenseRepository {
 
-    Optional<Expense> findById(String id);
+	Optional<Expense> findById(String id);
 
-    Expense save(Expense expense);
+	Expense save(Expense expense);
 
-    Expense update(Expense expense);
+	Expense update(Expense expense);
 
-    List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId);
+	List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId);
 
-    List<Expense> findByFamilyId(String familyId);
+	List<Expense> findByFamilyId(String familyId);
 
-    Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
+	Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
 
-    void deleteById(String id);
+	void deleteById(String id);
 }

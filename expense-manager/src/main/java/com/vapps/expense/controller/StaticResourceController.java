@@ -26,43 +26,43 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class StaticResourceController {
 
-    @Autowired
-    private StaticResourceService staticResourceService;
+	@Autowired
+	private StaticResourceService staticResourceService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceController.class);
 
-    @PostMapping
-    public ResponseEntity<StaticResourceResponse> addResource(@RequestParam("resource") MultipartFile resource,
-                                                              @RequestParam(name = "private", required = false, defaultValue = "false") boolean isPrivate,
-                                                              HttpServletRequest request, Principal principal) throws AppException {
-        String userId = principal.getName();
-        StaticResourceDTO staticResource = staticResourceService.addResource(userId, resource, isPrivate
-                ? StaticResourceDTO.Visibility.PRIVATE
-                : StaticResourceDTO.Visibility.PUBLIC);
-        return ResponseEntity.ok(new StaticResourceResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
-                request.getServletPath(), staticResource.getId()));
-    }
+	@PostMapping
+	public ResponseEntity<StaticResourceResponse> addResource(@RequestParam("resource") MultipartFile resource,
+			@RequestParam(name = "private", required = false, defaultValue = "false") boolean isPrivate,
+			HttpServletRequest request, Principal principal) throws AppException {
+		String userId = principal.getName();
+		StaticResourceDTO staticResource = staticResourceService.addResource(userId, resource, isPrivate
+				? StaticResourceDTO.Visibility.PRIVATE
+				: StaticResourceDTO.Visibility.PUBLIC);
+		return ResponseEntity.ok(new StaticResourceResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+				request.getServletPath(), staticResource.getId()));
+	}
 
-    @GetMapping(Endpoints.GET_STATIC_RESOURCE_PATH)
-    public ResponseEntity<?> getResource(@PathVariable("resourceId") String resourceId, HttpServletRequest request,
-                                         Principal principal) throws AppException {
+	@GetMapping(Endpoints.GET_STATIC_RESOURCE_PATH)
+	public ResponseEntity<?> getResource(@PathVariable("resourceId") String resourceId, HttpServletRequest request,
+			Principal principal) throws AppException {
 
-        String userId = principal.getName();
-        Optional<StaticResourceDTO> resource = staticResourceService.getResource(userId, resourceId);
-        if (resource.isEmpty()) {
-            throw new AppException(HttpStatus.NOT_FOUND.value(), "The requested resource not found");
-        }
-        String contentType = resource.get().getType().getType();
-        return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(resource.get().getData());
-    }
+		String userId = principal.getName();
+		Optional<StaticResourceDTO> resource = staticResourceService.getResource(userId, resourceId);
+		if (resource.isEmpty()) {
+			throw new AppException(HttpStatus.NOT_FOUND.value(), "The requested resource not found");
+		}
+		String contentType = resource.get().getType().getType();
+		return ResponseEntity.ok().contentType(MediaType.valueOf(contentType)).body(resource.get().getData());
+	}
 
-    @DeleteMapping(Endpoints.DELETE_STATIC_RESOURCE_PATH)
-    public ResponseEntity<Response> deleteResource(@PathVariable("resourceId") String resourceId,
-                                                   HttpServletRequest request, Principal principal) throws AppException {
+	@DeleteMapping(Endpoints.DELETE_STATIC_RESOURCE_PATH)
+	public ResponseEntity<Response> deleteResource(@PathVariable("resourceId") String resourceId,
+			HttpServletRequest request, Principal principal) throws AppException {
 
-        String userId = principal.getName();
-        staticResourceService.deleteResource(userId, resourceId);
-        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Deleted resource!", LocalDateTime.now(),
-                request.getServletPath()));
-    }
+		String userId = principal.getName();
+		staticResourceService.deleteResource(userId, resourceId);
+		return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Deleted resource!", LocalDateTime.now(),
+				request.getServletPath()));
+	}
 }

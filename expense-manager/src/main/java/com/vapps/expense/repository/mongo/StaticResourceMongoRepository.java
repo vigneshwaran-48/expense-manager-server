@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface StaticResourceMongoRepository extends MongoRepository<StaticResource, String> {
 
-    @Transactional
-    void deleteByIdAndOwnerId(String id, String ownerId);
+	@Transactional
+	void deleteByIdAndOwnerId(String id, String ownerId);
 
-    Optional<StaticResource> findByOwnerIdAndId(String ownerId, String id);
+	Optional<StaticResource> findByOwnerIdAndId(String ownerId, String id);
 
-    Optional<StaticResource> findByIdAndVisibility(String id, StaticResourceDTO.Visibility visibility);
+	Optional<StaticResource> findByIdAndVisibility(String id, StaticResourceDTO.Visibility visibility);
 }

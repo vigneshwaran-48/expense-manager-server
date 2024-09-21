@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface CategoryService {
 
-    CategoryDTO addCategory(String userId, CategoryDTO category) throws AppException;
+	CategoryDTO addCategory(String userId, CategoryDTO category) throws AppException;
 
-    CategoryDTO updatedCategory(String userId, String categoryId, CategoryDTO category) throws AppException;
+	CategoryDTO updatedCategory(String userId, String categoryId, CategoryDTO category) throws AppException;
 
-    void deleteCategory(String userId, String categoryId) throws AppException;
+	void deleteCategory(String userId, String categoryId) throws AppException;
 
-    Optional<CategoryDTO> getCategory(String userId, String categoryId);
+	Optional<CategoryDTO> getCategory(String userId, String categoryId);
 
-    List<CategoryDTO> getAllCategories(String userId) throws AppException;
+	List<CategoryDTO> getAllCategories(String userId) throws AppException;
 }

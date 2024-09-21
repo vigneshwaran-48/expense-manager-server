@@ -18,51 +18,51 @@ import org.thymeleaf.context.Context;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+	@Autowired
+	private JavaMailSender mailSender;
 
-    @Autowired
-    private TemplateEngine templateEngine;
+	@Autowired
+	private TemplateEngine templateEngine;
 
-    @Value("${mail.google.email}")
-    private String email;
+	@Value("${mail.google.email}")
+	private String email;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
-    @Override
-    public void sendEmail(String to, String subject, String template, Context context) throws AppException {
+	@Override
+	public void sendEmail(String to, String subject, String template, Context context) throws AppException {
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-        try {
-            helper.setFrom(email);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            String htmlContent = templateEngine.process(template, context);
-            helper.setText(htmlContent, true);
-            mailSender.send(mimeMessage);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new AppException("Error while sending email!");
-        }
-    }
+		try {
+			helper.setFrom(email);
+			helper.setTo(to);
+			helper.setSubject(subject);
+			String htmlContent = templateEngine.process(template, context);
+			helper.setText(htmlContent, true);
+			mailSender.send(mimeMessage);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new AppException("Error while sending email!");
+		}
+	}
 
-    @Override
-    public void sendEmail(String to, String subject, String content) throws AppException {
+	@Override
+	public void sendEmail(String to, String subject, String content) throws AppException {
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
 
-        try {
-            helper.setFrom(email);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(content, true);
-            mailSender.send(mimeMessage);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new AppException("Error while sending email!");
-        }
-    }
+		try {
+			helper.setFrom(email);
+			helper.setTo(to);
+			helper.setSubject(subject);
+			helper.setText(content, true);
+			mailSender.send(mimeMessage);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			throw new AppException("Error while sending email!");
+		}
+	}
 }

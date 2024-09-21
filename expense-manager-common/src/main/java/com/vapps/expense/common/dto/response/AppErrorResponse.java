@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AppErrorResponse {
 
-    private int status;
-    private String error;
-    private LocalDateTime time;
-    private String path = "/";
+	private int status;
+	private String error;
+	private LocalDateTime time;
+	private String path = "/";
 
 }

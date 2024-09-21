@@ -11,23 +11,23 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Data
 public class FamilyMember {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    @DocumentReference
-    private Family family;
+	@DocumentReference
+	private Family family;
 
-    @DocumentReference
-    private User member;
+	@DocumentReference
+	private User member;
 
-    private Role role;
+	private Role role;
 
-    public FamilyMemberDTO toDTO() {
-        FamilyMemberDTO familyMemberDTO = new FamilyMemberDTO();
-        familyMemberDTO.setId(id);
-        familyMemberDTO.setFamily(family.toDTO());
-        familyMemberDTO.setMember(member.toDTO());
-        familyMemberDTO.setRole(role);
-        return familyMemberDTO;
-    }
+	public FamilyMemberDTO toDTO() {
+		FamilyMemberDTO familyMemberDTO = new FamilyMemberDTO();
+		familyMemberDTO.setId(id);
+		familyMemberDTO.setFamily(family.toDTO());
+		familyMemberDTO.setMember(member.toDTO());
+		familyMemberDTO.setRole(role);
+		return familyMemberDTO;
+	}
 }

@@ -7,14 +7,14 @@ import java.util.Optional;
 
 public interface StaticResourceRepository {
 
-    Optional<StaticResource> findById(String id);
+	Optional<StaticResource> findById(String id);
 
-    Optional<StaticResource> findByOwnerIdAndId(String ownerId, String id);
+	Optional<StaticResource> findByOwnerIdAndId(String ownerId, String id);
 
-    StaticResource save(StaticResource staticResource);
+	StaticResource save(StaticResource staticResource);
 
-    void deleteByIdAndOwnerId(String id, String ownerId);
+	void deleteByIdAndOwnerId(String id, String ownerId);
 
-    Optional<StaticResource> findByIdAndVisibility(String id, StaticResourceDTO.Visibility visibility);
+	Optional<StaticResource> findByIdAndVisibility(String id, StaticResourceDTO.Visibility visibility);
 
 }

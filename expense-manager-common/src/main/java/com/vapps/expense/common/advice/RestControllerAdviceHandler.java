@@ -17,40 +17,40 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class RestControllerAdviceHandler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RestControllerAdviceHandler.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(RestControllerAdviceHandler.class);
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex, HttpServletRequest request) {
-        LOGGER.error(ex.getMessage(), ex);
-        AppErrorResponse response =
-                new AppErrorResponse(500, ex.getMessage(), LocalDateTime.now(), request.getServletPath());
-        return ResponseEntity.internalServerError().body(response);
-    }
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handleException(Exception ex, HttpServletRequest request) {
+		LOGGER.error(ex.getMessage(), ex);
+		AppErrorResponse response =
+				new AppErrorResponse(500, ex.getMessage(), LocalDateTime.now(), request.getServletPath());
+		return ResponseEntity.internalServerError().body(response);
+	}
 
-    @ExceptionHandler(AppException.class)
-    public ResponseEntity<?> handleException(AppException ex, HttpServletRequest request) {
-        LOGGER.error(ex.getMessage(), ex);
-        AppErrorResponse response =
-                new AppErrorResponse(ex.getStatus(), ex.getMessage(), LocalDateTime.now(), request.getServletPath());
-        return ResponseEntity.status(ex.getStatus()).body(response);
-    }
+	@ExceptionHandler(AppException.class)
+	public ResponseEntity<?> handleException(AppException ex, HttpServletRequest request) {
+		LOGGER.error(ex.getMessage(), ex);
+		AppErrorResponse response =
+				new AppErrorResponse(ex.getStatus(), ex.getMessage(), LocalDateTime.now(), request.getServletPath());
+		return ResponseEntity.status(ex.getStatus()).body(response);
+	}
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<?> handleException(MaxUploadSizeExceededException ex, HttpServletRequest request) {
-        LOGGER.error(ex.getMessage(), ex);
-        AppErrorResponse response =
-                new AppErrorResponse(HttpStatus.BAD_REQUEST.value(), "Upload size is larger", LocalDateTime.now(),
-                        request.getServletPath());
-        return ResponseEntity.internalServerError().body(response);
-    }
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<?> handleException(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+		LOGGER.error(ex.getMessage(), ex);
+		AppErrorResponse response =
+				new AppErrorResponse(HttpStatus.BAD_REQUEST.value(), "Upload size is larger", LocalDateTime.now(),
+						request.getServletPath());
+		return ResponseEntity.internalServerError().body(response);
+	}
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<?> handleException(AccessDeniedException ex, HttpServletRequest request) {
-        LOGGER.error(ex.getMessage(), ex);
-        AppErrorResponse response =
-                new AppErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage(), LocalDateTime.now(),
-                        request.getServletPath());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-    }
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<?> handleException(AccessDeniedException ex, HttpServletRequest request) {
+		LOGGER.error(ex.getMessage(), ex);
+		AppErrorResponse response =
+				new AppErrorResponse(HttpStatus.FORBIDDEN.value(), ex.getMessage(), LocalDateTime.now(),
+						request.getServletPath());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+	}
 
 }

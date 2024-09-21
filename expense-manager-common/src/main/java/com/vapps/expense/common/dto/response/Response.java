@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Response {
 
-    private int status;
-    private String message;
-    private LocalDateTime time;
-    private String path;
+	private int status;
+	private String message;
+	private LocalDateTime time;
+	private String path;
 
 }

@@ -11,28 +11,28 @@ import java.util.Properties;
 @Configuration
 public class EmailConfiguration {
 
-    @Value("${mail.google.appPassword}")
-    private String appPassword;
+	@Value("${mail.google.appPassword}")
+	private String appPassword;
 
-    @Value("${mail.google.email}")
-    private String email;
+	@Value("${mail.google.email}")
+	private String email;
 
-    @Bean
-    public JavaMailSender getJavaMailSender() {
-        System.out.println(appPassword);
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
+	@Bean
+	public JavaMailSender getJavaMailSender() {
+		System.out.println(appPassword);
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
 
-        mailSender.setUsername(email);
-        mailSender.setPassword(appPassword);
+		mailSender.setUsername(email);
+		mailSender.setPassword(appPassword);
 
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
+		Properties props = mailSender.getJavaMailProperties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.debug", "true");
 
-        return mailSender;
-    }
+		return mailSender;
+	}
 }
