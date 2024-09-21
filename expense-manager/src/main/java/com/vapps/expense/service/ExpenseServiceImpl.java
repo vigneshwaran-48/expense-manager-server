@@ -181,6 +181,17 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
     }
 
+    @Override
+    @UserIdValidator(positions = 0)
+    public List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException {
+       List<Expense> expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
+       Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+       if (family.isPresent()) {
+           expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
+       }
+
+    }
+
     private void checkCurrency(String currency) throws AppException {
         if (Currency.getAvailableCurrencies().stream().noneMatch(curr -> curr.getCurrencyCode().equals(currency))) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
