@@ -50,7 +50,9 @@ public class Expense {
         expense.setType(expenseDTO.getType());
         expense.setCurrency(expenseDTO.getCurrency());
         expense.setTime(expenseDTO.getTime());
-        expense.setCategory(Category.build(expenseDTO.getCategory()));
+        if (expenseDTO.getCategory() != null) {
+            expense.setCategory(Category.build(expenseDTO.getCategory()));
+        }
         return expense;
     }
 
@@ -69,7 +71,9 @@ public class Expense {
         expenseDTO.setType(type);
         expenseDTO.setCurrency(currency);
         expenseDTO.setTime(time);
-        expenseDTO.setCategory(category.toDTO());
+        if (category != null) {
+            expenseDTO.setCategory(category.toDTO());
+        }
         return expenseDTO;
     }
 

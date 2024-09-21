@@ -58,7 +58,9 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setCurrency(payload.getCurrency());
         expense.setType(payload.getType());
         expense.setOwnerId(userId);
-        expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
+        if (payload.getCategoryId() != null) {
+            expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
+        }
         if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
             FamilyDTO family = familyService.getUserFamily(userId).get();
             expense.setOwnerId(family.getId());
@@ -203,11 +205,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     private void validateExpenseData(String userId, String categoryId, ExpenseDTO.ExpenseType type, String familyId) throws AppException {
-        if (categoryId == null) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category Id is required!");
-        }
         Optional<CategoryDTO> category = categoryService.getCategory(userId, categoryId);
-        if (category.isEmpty()) {
+        if (categoryId != null && category.isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category not exists!");
         }
         Optional<FamilyDTO> family = familyService.getUserFamily(userId);
@@ -215,14 +214,14 @@ public class ExpenseServiceImpl implements ExpenseService {
             if (family.isEmpty()) {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "You should be in a family");
             }
-            if (!category.get().getOwnerId().equals(family.get().getId())) {
+            if (category.isPresent() && !category.get().getOwnerId().equals(family.get().getId())) {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
             }
         } else {
             if (familyId != null && (family.isEmpty() || !family.get().getId().equals(familyId))) {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid familyId");
             }
-            if (category.get().getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
+            if (category.isPresent() && category.get().getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
                 throw new AppException(HttpStatus.BAD_REQUEST.value(), "Only personal categories can be used for personal expenses!");
             }
         }
