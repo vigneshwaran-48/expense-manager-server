@@ -13,7 +13,6 @@ public class ExpenseFilter {
     }
 
     private boolean isPersonal;
-    private LocalDateTime time;
     private LocalDateTime start;
     private LocalDateTime end;
     private String query;
