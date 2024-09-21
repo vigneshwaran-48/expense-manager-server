@@ -49,5 +49,7 @@
 
     The search action on expenses will be done with this field. If no
     value given for this the default value should be "ALL". 
+    If the searchBy is "OWNER" then the respective family or user name
+    will be matched with the search query.
 
     Note: If the "query" is not present then this criteria is not used.
