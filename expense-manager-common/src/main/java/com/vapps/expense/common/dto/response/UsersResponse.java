@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsersResponse extends Response {
-    private List<UserDTO> users;
+	private List<UserDTO> users;
 
-    public UsersResponse(int status, String message, LocalDateTime time, String path, List<UserDTO> users) {
-        super(status, message, time, path);
-        this.users = users;
-    }
+	public UsersResponse(int status, String message, LocalDateTime time, String path, List<UserDTO> users) {
+		super(status, message, time, path);
+		this.users = users;
+	}
 }

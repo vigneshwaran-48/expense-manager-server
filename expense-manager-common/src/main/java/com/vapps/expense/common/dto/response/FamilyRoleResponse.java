@@ -7,10 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 public class FamilyRoleResponse extends Response {
-    private FamilyMemberDTO.Role role;
+	private FamilyMemberDTO.Role role;
 
-    public FamilyRoleResponse(int status, String message, LocalDateTime time, String path, FamilyMemberDTO.Role role) {
-        super(status, message, time, path);
-        this.role = role;
-    }
+	public FamilyRoleResponse(int status, String message, LocalDateTime time, String path, FamilyMemberDTO.Role role) {
+		super(status, message, time, path);
+		this.role = role;
+	}
 }

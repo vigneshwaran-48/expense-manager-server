@@ -7,15 +7,15 @@ import java.util.Optional;
 
 public interface JoinRequestRepository {
 
-    JoinRequest save(JoinRequest request);
+	JoinRequest save(JoinRequest request);
 
-    List<JoinRequest> findByFamilyId(String familyId);
+	List<JoinRequest> findByFamilyId(String familyId);
 
-    Optional<JoinRequest> findById(String id);
+	Optional<JoinRequest> findById(String id);
 
-    void deleteById(String id);
+	void deleteById(String id);
 
-    List<JoinRequest> findByRequestUserId(String requestUserId);
+	List<JoinRequest> findByRequestUserId(String requestUserId);
 
-    Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId);
+	Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId);
 }

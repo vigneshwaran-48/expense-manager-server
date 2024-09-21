@@ -22,224 +22,234 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
-    @Autowired
-    private ExpenseRepository expenseRepository;
+	@Autowired
+	private ExpenseRepository expenseRepository;
 
-    @Autowired
-    private FamilyService familyService;
+	@Autowired
+	private FamilyService familyService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private CategoryService categoryService;
+	@Autowired
+	private CategoryService categoryService;
 
-    @Autowired
-    private StaticResourceService staticResourceService;
+	@Autowired
+	private StaticResourceService staticResourceService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseServiceImpl.class);
 
-    @Override
-    public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException {
+	@Override
+	public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices)
+			throws AppException {
 
-        checkCurrency(payload.getCurrency());
-        validateExpenseData(userId, payload.getCategoryId(), payload.getType(), payload.getFamilyId());
-        checkExpenseAccess(userId, payload);
+		checkCurrency(payload.getCurrency());
+		validateExpenseData(userId, payload.getCategoryId(), payload.getType(), payload.getFamilyId());
+		checkExpenseAccess(userId, payload);
 
-        Expense expense = new Expense();
-        expense.setCreatedBy(User.build(userService.getUser(userId).get()));
-        expense.setName(payload.getName());
-        expense.setDescription(payload.getDescription());
-        expense.setAmount(payload.getAmount());
-        expense.setCurrency(payload.getCurrency());
-        expense.setType(payload.getType());
-        expense.setOwnerId(userId);
-        if (payload.getCategoryId() != null) {
-            expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
-        }
-        if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
-            FamilyDTO family = familyService.getUserFamily(userId).get();
-            expense.setOwnerId(family.getId());
-            expense.setFamily(Family.build(family));
-        }
-        expense.setTime(payload.getTime());
-        if (expense.getTime() == null) {
-            expense.setTime(LocalDateTime.now());
-        }
-        if (payload.getType() == ExpenseDTO.ExpenseType.PERSONAL && payload.getFamilyId() != null) {
-            expense.setFamily(Family.build(familyService.getFamilyById(userId, payload.getFamilyId()).get()));
-        }
+		Expense expense = new Expense();
+		expense.setCreatedBy(User.build(userService.getUser(userId).get()));
+		expense.setName(payload.getName());
+		expense.setDescription(payload.getDescription());
+		expense.setAmount(payload.getAmount());
+		expense.setCurrency(payload.getCurrency());
+		expense.setType(payload.getType());
+		expense.setOwnerId(userId);
+		if (payload.getCategoryId() != null) {
+			expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
+		}
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+			FamilyDTO family = familyService.getUserFamily(userId).get();
+			expense.setOwnerId(family.getId());
+			expense.setFamily(Family.build(family));
+		}
+		expense.setTime(payload.getTime());
+		if (expense.getTime() == null) {
+			expense.setTime(LocalDateTime.now());
+		}
+		if (payload.getType() == ExpenseDTO.ExpenseType.PERSONAL && payload.getFamilyId() != null) {
+			expense.setFamily(Family.build(familyService.getFamilyById(userId, payload.getFamilyId()).get()));
+		}
 
-        if (invoices != null) {
-            List<String> invoiceIds = new ArrayList<>();
-            for (MultipartFile invoice : invoices) {
-                StaticResourceDTO invoiceDTO = staticResourceService.addResource(userId, invoice, getStaticResourceVisibility(expense.getType()));
-                invoiceIds.add(invoiceDTO.getId());
-            }
-            expense.setInvoices(invoiceIds);
-        } else {
-            expense.setInvoices(List.of());
-        }
+		if (invoices != null) {
+			List<String> invoiceIds = new ArrayList<>();
+			for (MultipartFile invoice : invoices) {
+				StaticResourceDTO invoiceDTO = staticResourceService.addResource(userId, invoice,
+						getStaticResourceVisibility(expense.getType()));
+				invoiceIds.add(invoiceDTO.getId());
+			}
+			expense.setInvoices(invoiceIds);
+		} else {
+			expense.setInvoices(List.of());
+		}
 
-        expense = expenseRepository.save(expense);
-        if (expense == null) {
-            throw new AppException("Error while saving expense!");
-        }
-        return expense.toDTO();
-    }
+		expense = expenseRepository.save(expense);
+		if (expense == null) {
+			throw new AppException("Error while saving expense!");
+		}
+		return expense.toDTO();
+	}
 
-    @Override
-    @UserIdValidator(positions = 0)
-    @ExpenseIdValidator(userIdPosition = 0, positions = 1)
-    public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload,
-                                    MultipartFile[] newInvoices) throws AppException {
-        if (payload.getCurrency() != null) {
-            checkCurrency(payload.getCurrency());
-        }
-        Expense expense = Expense.build(getExpense(userId, expenseId).get());
+	@Override
+	@UserIdValidator(positions = 0)
+	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload,
+			MultipartFile[] newInvoices) throws AppException {
+		if (payload.getCurrency() != null) {
+			checkCurrency(payload.getCurrency());
+		}
+		Expense expense = Expense.build(getExpense(userId, expenseId).get());
 
-        if (payload.getName() != null) {
-            expense.setName(payload.getName());
-        }
-        if (payload.getDescription() != null) {
-            expense.setDescription(payload.getDescription());
-        }
-        if (payload.getTime() != null) {
-            expense.setTime(payload.getTime());
-        }
-        if (payload.getCurrency() != null) {
-            expense.setCurrency(payload.getCurrency());
-        }
-        if (payload.getAmount() > 0) {
-            expense.setAmount(payload.getAmount());
-        }
-        if (payload.getCategoryId() != null && !expense.getCategory().getId().equals(payload.getCategoryId())) {
-            validateExpenseData(userId, payload.getCategoryId(), expense.getType(), expense.getFamily().getId());
-            expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
-        }
+		if (payload.getName() != null) {
+			expense.setName(payload.getName());
+		}
+		if (payload.getDescription() != null) {
+			expense.setDescription(payload.getDescription());
+		}
+		if (payload.getTime() != null) {
+			expense.setTime(payload.getTime());
+		}
+		if (payload.getCurrency() != null) {
+			expense.setCurrency(payload.getCurrency());
+		}
+		if (payload.getAmount() > 0) {
+			expense.setAmount(payload.getAmount());
+		}
+		if (payload.getCategoryId() != null && !expense.getCategory().getId().equals(payload.getCategoryId())) {
+			validateExpenseData(userId, payload.getCategoryId(), expense.getType(), expense.getFamily().getId());
+			expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
+		}
 
-        List<String> invoices = new ArrayList<>(expense.getInvoices());
-        if (payload.getInvoices() != null) {
-            for (String invoiceId : expense.getInvoices()) {
-                if (!payload.getInvoices().contains(invoiceId)) {
-                    invoices.remove(invoiceId);
-                    staticResourceService.deleteResource(userId, invoiceId);
-                }
-            }
-        }
-        if (newInvoices != null) {
-            for (MultipartFile newInvoice : newInvoices) {
-                StaticResourceDTO newInvoiceDTO = staticResourceService
-                        .addResource(userId, newInvoice, getStaticResourceVisibility(expense.getType()));
-                invoices.add(newInvoiceDTO.getId());
-            }
-        }
-        expense.setInvoices(invoices);
+		List<String> invoices = new ArrayList<>(expense.getInvoices());
+		if (payload.getInvoices() != null) {
+			for (String invoiceId : expense.getInvoices()) {
+				if (!payload.getInvoices().contains(invoiceId)) {
+					invoices.remove(invoiceId);
+					staticResourceService.deleteResource(userId, invoiceId);
+				}
+			}
+		}
+		if (newInvoices != null) {
+			for (MultipartFile newInvoice : newInvoices) {
+				StaticResourceDTO newInvoiceDTO = staticResourceService
+						.addResource(userId, newInvoice, getStaticResourceVisibility(expense.getType()));
+				invoices.add(newInvoiceDTO.getId());
+			}
+		}
+		expense.setInvoices(invoices);
 
-        expense = expenseRepository.update(expense);
-        if (expense == null) {
-            throw new AppException("Error while updating expense!");
-        }
-        return expense.toDTO();
-    }
+		expense = expenseRepository.update(expense);
+		if (expense == null) {
+			throw new AppException("Error while updating expense!");
+		}
+		return expense.toDTO();
+	}
 
-    @Override
-    @UserIdValidator(positions = 0)
-    public Optional<ExpenseDTO> getExpense(String userId, String expenseId) {
-        Optional<Expense> expense = expenseRepository.findByIdAndOwnerId(expenseId, userId);
-        if (expense.isEmpty()) {
-            Optional<FamilyDTO> familyDTO = familyService.getUserFamily(userId);
-            if (familyDTO.isEmpty()) {
-                return Optional.empty();
-            }
-            expense = expenseRepository.findByIdAndOwnerId(expenseId, familyDTO.get().getId());
-        }
-        return expense.map(Expense::toDTO);
-    }
+	@Override
+	@UserIdValidator(positions = 0)
+	public Optional<ExpenseDTO> getExpense(String userId, String expenseId) {
+		Optional<Expense> expense = expenseRepository.findByIdAndOwnerId(expenseId, userId);
+		if (expense.isEmpty()) {
+			Optional<FamilyDTO> familyDTO = familyService.getUserFamily(userId);
+			if (familyDTO.isEmpty()) {
+				return Optional.empty();
+			}
+			expense = expenseRepository.findByIdAndOwnerId(expenseId, familyDTO.get().getId());
+		}
+		return expense.map(Expense::toDTO);
+	}
 
-    @Override
-    @UserIdValidator(positions = 0)
-    @ExpenseIdValidator(userIdPosition = 0, positions = 1)
-    public void deleteExpense(String userId, String expenseId) throws AppException {
-        ExpenseDTO expense = getExpense(userId, expenseId).get();
-        if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && familyService.getUserRoleInFamily(userId,
-                expense.getOwnerId()) == FamilyMemberDTO.Role.MEMBER) {
-            throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
-        }
-        expenseRepository.deleteById(expenseId);
+	@Override
+	@UserIdValidator(positions = 0)
+	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	public void deleteExpense(String userId, String expenseId) throws AppException {
+		ExpenseDTO expense = getExpense(userId, expenseId).get();
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && familyService.getUserRoleInFamily(userId,
+				expense.getOwnerId()) == FamilyMemberDTO.Role.MEMBER) {
+			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
+		}
+		expenseRepository.deleteById(expenseId);
 
-        if (expense.getInvoices().isEmpty()) {
-            return;
-        }
-        for (String invoiceId : expense.getInvoices()) {
-            staticResourceService.deleteResource(userId, invoiceId);
-            LOGGER.info("Deleted expense {}'s invoice {}", expenseId, invoiceId);
-        }
-    }
+		if (expense.getInvoices().isEmpty()) {
+			return;
+		}
+		for (String invoiceId : expense.getInvoices()) {
+			staticResourceService.deleteResource(userId, invoiceId);
+			LOGGER.info("Deleted expense {}'s invoice {}", expenseId, invoiceId);
+		}
+	}
 
-    @Override
-    @UserIdValidator(positions = 0)
-    public List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException {
-       List<Expense> expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
-       Optional<FamilyDTO> family = familyService.getUserFamily(userId);
-       if (family.isPresent()) {
-           expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
-       }
+	@Override
+	@UserIdValidator(positions = 0)
+	public List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException {
+		List<Expense> expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
+		Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+		if (!filter.isPersonal() && family.isPresent()) {
+			expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
+		}
+//		if (filter.getStart() != null) {
+//			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
+//					.collect(Collectors.toList());
+//		}
+		return List.of();
+	}
 
-    }
+	private void checkCurrency(String currency) throws AppException {
+		if (Currency.getAvailableCurrencies().stream().noneMatch(curr -> curr.getCurrencyCode().equals(currency))) {
+			throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
+		}
+	}
 
-    private void checkCurrency(String currency) throws AppException {
-        if (Currency.getAvailableCurrencies().stream().noneMatch(curr -> curr.getCurrencyCode().equals(currency))) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid currency " + currency);
-        }
-    }
+	private void checkExpenseAccess(String userId, ExpenseCreationPayload expense) throws AppException {
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+			Optional<FamilyDTO> familyDTO = familyService.getUserFamily(userId);
+			if (familyDTO.isEmpty()) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(),
+						"You should be in a family to create family type expense!");
+			}
+			if (familyService.getUserRoleInFamily(userId, familyDTO.get().getId()) == FamilyMemberDTO.Role.MEMBER) {
+				throw new AppException(HttpStatus.FORBIDDEN.value(),
+						"You are not allowed to add expense in behalf of your family!");
+			}
+		} else if (expense.getFamilyId() != null && familyService.getFamilyById(userId, expense.getFamilyId())
+				.isEmpty()) {
+			throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid family id " + expense.getFamilyId());
+		}
+	}
 
-    private void checkExpenseAccess(String userId, ExpenseCreationPayload expense) throws AppException {
-        if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
-            Optional<FamilyDTO> familyDTO = familyService.getUserFamily(userId);
-            if (familyDTO.isEmpty()) {
-                throw new AppException(HttpStatus.BAD_REQUEST.value(),
-                        "You should be in a family to create family type expense!");
-            }
-            if (familyService.getUserRoleInFamily(userId, familyDTO.get().getId()) == FamilyMemberDTO.Role.MEMBER) {
-                throw new AppException(HttpStatus.FORBIDDEN.value(),
-                        "You are not allowed to add expense in behalf of your family!");
-            }
-        } else if (expense.getFamilyId() != null && familyService.getFamilyById(userId, expense.getFamilyId())
-                .isEmpty()) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid family id " + expense.getFamilyId());
-        }
-    }
+	private void validateExpenseData(String userId, String categoryId, ExpenseDTO.ExpenseType type, String familyId)
+			throws AppException {
+		Optional<CategoryDTO> category = categoryService.getCategory(userId, categoryId);
+		if (categoryId != null && category.isEmpty()) {
+			throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category not exists!");
+		}
+		Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+		if (type == ExpenseDTO.ExpenseType.FAMILY) {
+			if (family.isEmpty()) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "You should be in a family");
+			}
+			if (category.isPresent() && !category.get().getOwnerId().equals(family.get().getId())) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
+			}
+		} else {
+			if (familyId != null && (family.isEmpty() || !family.get().getId().equals(familyId))) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid familyId");
+			}
+			if (category.isPresent() && category.get()
+					.getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(),
+						"Only personal categories can be used for personal expenses!");
+			}
+		}
+	}
 
-    private void validateExpenseData(String userId, String categoryId, ExpenseDTO.ExpenseType type, String familyId) throws AppException {
-        Optional<CategoryDTO> category = categoryService.getCategory(userId, categoryId);
-        if (categoryId != null && category.isEmpty()) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Category not exists!");
-        }
-        Optional<FamilyDTO> family = familyService.getUserFamily(userId);
-        if (type == ExpenseDTO.ExpenseType.FAMILY) {
-            if (family.isEmpty()) {
-                throw new AppException(HttpStatus.BAD_REQUEST.value(), "You should be in a family");
-            }
-            if (category.isPresent() && !category.get().getOwnerId().equals(family.get().getId())) {
-                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
-            }
-        } else {
-            if (familyId != null && (family.isEmpty() || !family.get().getId().equals(familyId))) {
-                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Invalid familyId");
-            }
-            if (category.isPresent() && category.get().getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
-                throw new AppException(HttpStatus.BAD_REQUEST.value(), "Only personal categories can be used for personal expenses!");
-            }
-        }
-    }
-
-    private StaticResourceDTO.Visibility getStaticResourceVisibility(ExpenseDTO.ExpenseType type) {
-        return type == ExpenseDTO.ExpenseType.PERSONAL
-                ? StaticResourceDTO.Visibility.PRIVATE : StaticResourceDTO.Visibility.FAMILY;
-    }
+	private StaticResourceDTO.Visibility getStaticResourceVisibility(ExpenseDTO.ExpenseType type) {
+		return type == ExpenseDTO.ExpenseType.PERSONAL
+				? StaticResourceDTO.Visibility.PRIVATE : StaticResourceDTO.Visibility.FAMILY;
+	}
 }

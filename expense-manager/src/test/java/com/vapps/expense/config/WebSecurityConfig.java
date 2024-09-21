@@ -14,21 +14,21 @@ import java.util.List;
 
 public class WebSecurityConfig {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
-//
-//    @Bean
-//    public WebSecurityConfiguration webSecurityConfiguration() throws IOException {
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        InputStream inputStream = getClass().getResourceAsStream("/security.json");
-//        List<URLConfig> urlConfigs = null;
-//        try {
-//            urlConfigs = Arrays.asList(mapper.readValue(inputStream, URLConfig[].class));
-//        } catch (IOException e) {
-//            LOGGER.error(e.getMessage(), e);
-//            throw e;
-//        }
-//
-//        return new WebSecurityConfiguration(urlConfigs);
-//    }
+	private final static Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
+	//
+	//    @Bean
+	//    public WebSecurityConfiguration webSecurityConfiguration() throws IOException {
+	//
+	//        ObjectMapper mapper = new ObjectMapper();
+	//        InputStream inputStream = getClass().getResourceAsStream("/security.json");
+	//        List<URLConfig> urlConfigs = null;
+	//        try {
+	//            urlConfigs = Arrays.asList(mapper.readValue(inputStream, URLConfig[].class));
+	//        } catch (IOException e) {
+	//            LOGGER.error(e.getMessage(), e);
+	//            throw e;
+	//        }
+	//
+	//        return new WebSecurityConfiguration(urlConfigs);
+	//    }
 }

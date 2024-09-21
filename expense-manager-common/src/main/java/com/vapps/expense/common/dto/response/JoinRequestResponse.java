@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 @Data
 public class JoinRequestResponse extends Response {
 
-    private JoinRequestDTO request;
+	private JoinRequestDTO request;
 
-    public JoinRequestResponse(int status, String message, LocalDateTime time, String path, JoinRequestDTO request) {
-        super(status, message, time, path);
-        this.request = request;
-    }
+	public JoinRequestResponse(int status, String message, LocalDateTime time, String path, JoinRequestDTO request) {
+		super(status, message, time, path);
+		this.request = request;
+	}
 }

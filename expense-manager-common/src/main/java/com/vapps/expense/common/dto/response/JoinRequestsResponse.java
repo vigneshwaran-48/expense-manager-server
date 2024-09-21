@@ -9,10 +9,11 @@ import java.util.List;
 @Data
 public class JoinRequestsResponse extends Response {
 
-    private List<JoinRequestDTO> requests;
+	private List<JoinRequestDTO> requests;
 
-    public JoinRequestsResponse(int status, String message, LocalDateTime time, String path, List<JoinRequestDTO> requests) {
-        super(status, message, time, path);
-        this.requests = requests;
-    }
+	public JoinRequestsResponse(int status, String message, LocalDateTime time, String path,
+			List<JoinRequestDTO> requests) {
+		super(status, message, time, path);
+		this.requests = requests;
+	}
 }

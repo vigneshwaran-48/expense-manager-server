@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class FamilyMembersResponse extends Response {
 
-    private List<FamilyMemberDTO> members;
+	private List<FamilyMemberDTO> members;
 
-    public FamilyMembersResponse(int status, String message, LocalDateTime time, String path,
-            List<FamilyMemberDTO> members) {
-        super(status, message, time, path);
-        this.members = members;
-    }
+	public FamilyMembersResponse(int status, String message, LocalDateTime time, String path,
+			List<FamilyMemberDTO> members) {
+		super(status, message, time, path);
+		this.members = members;
+	}
 }

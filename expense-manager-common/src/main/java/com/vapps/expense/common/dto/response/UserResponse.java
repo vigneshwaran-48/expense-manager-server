@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponse extends Response {
-    private UserDTO user;
+	private UserDTO user;
 
-    public UserResponse(int status, String message, LocalDateTime time, String path, UserDTO user) {
-        super(status, message, time, path);
-        this.user = user;
-    }
+	public UserResponse(int status, String message, LocalDateTime time, String path, UserDTO user) {
+		super(status, message, time, path);
+		this.user = user;
+	}
 }

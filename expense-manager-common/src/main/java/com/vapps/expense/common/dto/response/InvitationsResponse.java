@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 public class InvitationsResponse extends Response {
 
-    private List<InvitationDTO> invitations;
+	private List<InvitationDTO> invitations;
 
-    public InvitationsResponse(int status, String message, LocalDateTime time, String path,
-            List<InvitationDTO> invitations) {
-        super(status, message, time, path);
-        this.invitations = invitations;
-    }
+	public InvitationsResponse(int status, String message, LocalDateTime time, String path,
+			List<InvitationDTO> invitations) {
+		super(status, message, time, path);
+		this.invitations = invitations;
+	}
 }

@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserDTO {
 
-    private String id;
-    private String name;
-    private String firstName;
-    private String lastName;
-    private int age;
-    private String email;
-    private String image;
+	private String id;
+	private String name;
+	private String firstName;
+	private String lastName;
+	private int age;
+	private String email;
+	private String image;
 
 }

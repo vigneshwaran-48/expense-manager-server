@@ -5,14 +5,14 @@ import lombok.Data;
 @Data
 public class FamilyMemberDTO {
 
-    public enum Role {
-        LEADER,
-        MAINTAINER,
-        MEMBER
-    }
+	public enum Role {
+		LEADER,
+		MAINTAINER,
+		MEMBER
+	}
 
-    private String id;
-    private FamilyDTO family;
-    private UserDTO member;
-    private Role role;
+	private String id;
+	private FamilyDTO family;
+	private UserDTO member;
+	private Role role;
 }

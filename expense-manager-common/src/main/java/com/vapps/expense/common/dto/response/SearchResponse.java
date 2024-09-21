@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SearchResponse<T> extends Response {
 
-    private SearchDTO<T> result;
+	private SearchDTO<T> result;
 
-    public SearchResponse(int status, String message, LocalDateTime time, String path, SearchDTO<T> result) {
-        super(status, message, time, path);
-        this.result = result;
-    }
+	public SearchResponse(int status, String message, LocalDateTime time, String path, SearchDTO<T> result) {
+		super(status, message, time, path);
+		this.result = result;
+	}
 }

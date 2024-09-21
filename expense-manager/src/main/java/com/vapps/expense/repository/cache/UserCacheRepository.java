@@ -16,38 +16,38 @@ import java.util.Optional;
 @Repository
 public class UserCacheRepository implements UserRepository {
 
-    @Autowired
-    private UserMongoRepository userRepository;
+	@Autowired
+	private UserMongoRepository userRepository;
 
-    @Override
-    @Cacheable(value = "users", key = "'user_' + #id")
-    @CachePut(value = "users", key = "'user_' + #return?.getEmail()")
-    public Optional<User> findById(String id) {
-        return userRepository.findById(id);
-    }
+	@Override
+	@Cacheable(value = "users", key = "'user_' + #id")
+	@CachePut(value = "users", key = "'user_' + #return?.getEmail()")
+	public Optional<User> findById(String id) {
+		return userRepository.findById(id);
+	}
 
-    @Override
-    @CacheEvict(value = "users", key = "'all'")
-    public User save(User user) {
-        return userRepository.save(user);
-    }
+	@Override
+	@CacheEvict(value = "users", key = "'all'")
+	public User save(User user) {
+		return userRepository.save(user);
+	}
 
-    @Override
-    @CachePut(value = "users", key = "'user_' + #user.getId()")
-    @CacheEvict(value = "users", key = "'all'")
-    public User update(User user) {
-        return userRepository.save(user);
-    }
+	@Override
+	@CachePut(value = "users", key = "'user_' + #user.getId()")
+	@CacheEvict(value = "users", key = "'all'")
+	public User update(User user) {
+		return userRepository.save(user);
+	}
 
-    @Override
-    @Cacheable(value = "users", key = "#email")
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+	@Override
+	@Cacheable(value = "users", key = "#email")
+	public Optional<User> findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
 
-    @Override
-    @Cacheable(value = "users", key = "'all'")
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
+	@Override
+	@Cacheable(value = "users", key = "'all'")
+	public List<User> findAll() {
+		return userRepository.findAll();
+	}
 }

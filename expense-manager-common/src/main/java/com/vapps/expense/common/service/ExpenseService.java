@@ -12,14 +12,14 @@ import java.util.Optional;
 
 public interface ExpenseService {
 
-    ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException;
+	ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices) throws AppException;
 
-    ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload, MultipartFile[] invoices)
-            throws AppException;
+	ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload, MultipartFile[] invoices)
+			throws AppException;
 
-    Optional<ExpenseDTO> getExpense(String userId, String expenseId);
+	Optional<ExpenseDTO> getExpense(String userId, String expenseId);
 
-    void deleteExpense(String userId, String expenseId) throws AppException;
+	void deleteExpense(String userId, String expenseId) throws AppException;
 
-    List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException;
+	List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException;
 }

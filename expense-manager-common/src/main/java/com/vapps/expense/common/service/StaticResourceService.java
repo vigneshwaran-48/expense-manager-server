@@ -8,12 +8,13 @@ import java.util.Optional;
 
 public interface StaticResourceService {
 
-    Optional<StaticResourceDTO> getResource(String userId, String resourceId) throws AppException;
+	Optional<StaticResourceDTO> getResource(String userId, String resourceId) throws AppException;
 
-    StaticResourceDTO addResource(String userId, StaticResourceDTO staticResourceDTO) throws AppException;
+	StaticResourceDTO addResource(String userId, StaticResourceDTO staticResourceDTO) throws AppException;
 
-    StaticResourceDTO addResource(String userId, MultipartFile file, StaticResourceDTO.Visibility visibility) throws AppException;
+	StaticResourceDTO addResource(String userId, MultipartFile file, StaticResourceDTO.Visibility visibility)
+			throws AppException;
 
-    void deleteResource(String userId, String resourceId) throws AppException;
+	void deleteResource(String userId, String resourceId) throws AppException;
 
 }

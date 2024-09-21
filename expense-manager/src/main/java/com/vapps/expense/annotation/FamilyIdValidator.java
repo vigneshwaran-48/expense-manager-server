@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface FamilyIdValidator {
-    int userIdPosition();
-    int[] positions();
+	int userIdPosition();
+
+	int[] positions();
 }

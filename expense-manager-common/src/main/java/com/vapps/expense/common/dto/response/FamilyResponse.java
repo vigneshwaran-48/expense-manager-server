@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class FamilyResponse extends Response {
 
-    private FamilyDTO family;
+	private FamilyDTO family;
 
-    public FamilyResponse(int status, String message, LocalDateTime time, String path, FamilyDTO family) {
-        super(status, message, time, path);
-        this.family = family;
-    }
+	public FamilyResponse(int status, String message, LocalDateTime time, String path, FamilyDTO family) {
+		super(status, message, time, path);
+		this.family = family;
+	}
 }

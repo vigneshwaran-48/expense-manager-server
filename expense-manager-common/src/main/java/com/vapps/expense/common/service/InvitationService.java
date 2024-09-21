@@ -9,21 +9,21 @@ import java.util.Optional;
 
 public interface InvitationService {
 
-    InvitationDTO sendInvitation(String userId, InvitationDTO invitation, Context context) throws AppException;
+	InvitationDTO sendInvitation(String userId, InvitationDTO invitation, Context context) throws AppException;
 
-    void acceptInvitation(String userId, String id) throws AppException;
+	void acceptInvitation(String userId, String id) throws AppException;
 
-    void rejectInvitation(String userId, String id) throws AppException;
+	void rejectInvitation(String userId, String id) throws AppException;
 
-    Optional<InvitationDTO> getInvitation(String userId, String id) throws AppException;
+	Optional<InvitationDTO> getInvitation(String userId, String id) throws AppException;
 
-    List<InvitationDTO> getAllInvitations(String userId) throws AppException;
+	List<InvitationDTO> getAllInvitations(String userId) throws AppException;
 
-    List<InvitationDTO> getAllSentInvitations(String userId) throws AppException;
+	List<InvitationDTO> getAllSentInvitations(String userId) throws AppException;
 
-    void resendInvitation(String userId, String invitationId) throws AppException;
+	void resendInvitation(String userId, String invitationId) throws AppException;
 
-    void revokeInvitation(String userId, String invitationId) throws AppException;
+	void revokeInvitation(String userId, String invitationId) throws AppException;
 
-    boolean isMemberInvitedToFamily(String userId, String memberId) throws AppException;
+	boolean isMemberInvitedToFamily(String userId, String memberId) throws AppException;
 }

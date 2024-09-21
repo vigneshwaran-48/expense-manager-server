@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface FamilySettingsMongoRepository extends MongoRepository<FamilySettings, String> {
 
-    @Transactional
-    void deleteByFamilyId(String familyId);
+	@Transactional
+	void deleteByFamilyId(String familyId);
 
-    Optional<FamilySettings> findByFamilyId(String familyId);
+	Optional<FamilySettings> findByFamilyId(String familyId);
 }

@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface JoinRequestMongoRepository extends MongoRepository<JoinRequest, String> {
 
-    List<JoinRequest> findByFamilyId(String familyId);
+	List<JoinRequest> findByFamilyId(String familyId);
 
-    List<JoinRequest> findByRequestUserId(String requestUserId);
+	List<JoinRequest> findByRequestUserId(String requestUserId);
 
-    Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId);
+	Optional<JoinRequest> findByFamilyIdAndRequestUserId(String familyId, String requestUserId);
 }

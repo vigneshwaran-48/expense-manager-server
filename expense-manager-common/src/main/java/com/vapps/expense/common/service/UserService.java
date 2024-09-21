@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public interface UserService {
 
-    UserDTO addUser(UserDTO user) throws AppException;
+	UserDTO addUser(UserDTO user) throws AppException;
 
-    Optional<UserDTO> getUser(String userId) throws AppException;
+	Optional<UserDTO> getUser(String userId) throws AppException;
 
-    UserDTO updateUser(String currentUserId, String userId, UserDTO user) throws AppException;
+	UserDTO updateUser(String currentUserId, String userId, UserDTO user) throws AppException;
 
-    List<UserDTO> findAllUser() throws AppException;
+	List<UserDTO> findAllUser() throws AppException;
 }

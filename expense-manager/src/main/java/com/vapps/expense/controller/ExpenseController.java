@@ -24,50 +24,52 @@ import java.util.Optional;
 @CrossOrigin("*")
 public class ExpenseController {
 
-    @Autowired
-    private ExpenseService expenseService;
+	@Autowired
+	private ExpenseService expenseService;
 
-    @PostMapping
-    public ResponseEntity<ExpenseResponse> createExpense(@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
-                                                         @RequestPart("payload") ExpenseCreationPayload payload,
-                                                         Principal principal, HttpServletRequest request) throws AppException {
-        String userId = principal.getName();
-        ExpenseDTO expense = null;
-        expense = expenseService.addExpense(userId, payload, invoices);
-        return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Created Expense!", LocalDateTime.now(),
-                request.getServletPath(), expense));
-    }
+	@PostMapping
+	public ResponseEntity<ExpenseResponse> createExpense(
+			@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
+			@RequestPart("payload") ExpenseCreationPayload payload,
+			Principal principal, HttpServletRequest request) throws AppException {
+		String userId = principal.getName();
+		ExpenseDTO expense = null;
+		expense = expenseService.addExpense(userId, payload, invoices);
+		return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Created Expense!", LocalDateTime.now(),
+				request.getServletPath(), expense));
+	}
 
-    @PatchMapping(Endpoints.UPDATE_EXPENSE_PATH)
-    public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable String id,
-                                                         @RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
-                                                         @RequestPart(value = "payload") ExpenseUpdatePayload payload, Principal principal, HttpServletRequest request)
-            throws AppException {
-        String userId = principal.getName();
-        ExpenseDTO expense = expenseService.updateExpense(userId, id, payload, invoices);
-        return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Updated Expense!", LocalDateTime.now(),
-                request.getServletPath(), expense));
-    }
+	@PatchMapping(Endpoints.UPDATE_EXPENSE_PATH)
+	public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable String id,
+			@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
+			@RequestPart(value = "payload") ExpenseUpdatePayload payload, Principal principal,
+			HttpServletRequest request)
+			throws AppException {
+		String userId = principal.getName();
+		ExpenseDTO expense = expenseService.updateExpense(userId, id, payload, invoices);
+		return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Updated Expense!", LocalDateTime.now(),
+				request.getServletPath(), expense));
+	}
 
-    @GetMapping(Endpoints.GET_EXPENSE_PATH)
-    public ResponseEntity<ExpenseResponse> getExpense(@PathVariable String id, Principal principal,
-                                                      HttpServletRequest request) throws AppException {
-        String userId = principal.getName();
-        Optional<ExpenseDTO> expense = expenseService.getExpense(userId, id);
-        if (expense.isEmpty()) {
-            throw new AppException(HttpStatus.BAD_REQUEST.value(), "Expense " + id + " not found!");
-        }
-        return ResponseEntity.ok(
-                new ExpenseResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
-                        expense.get()));
-    }
+	@GetMapping(Endpoints.GET_EXPENSE_PATH)
+	public ResponseEntity<ExpenseResponse> getExpense(@PathVariable String id, Principal principal,
+			HttpServletRequest request) throws AppException {
+		String userId = principal.getName();
+		Optional<ExpenseDTO> expense = expenseService.getExpense(userId, id);
+		if (expense.isEmpty()) {
+			throw new AppException(HttpStatus.BAD_REQUEST.value(), "Expense " + id + " not found!");
+		}
+		return ResponseEntity.ok(
+				new ExpenseResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+						expense.get()));
+	}
 
-    @DeleteMapping(Endpoints.DELETE_EXPENSE_PATH)
-    public ResponseEntity<Response> deleteExpense(@PathVariable String id, Principal principal,
-                                                  HttpServletRequest request) throws AppException {
-        String userId = principal.getName();
-        expenseService.deleteExpense(userId, id);
-        return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Delete the expense!", LocalDateTime.now(),
-                request.getServletPath()));
-    }
+	@DeleteMapping(Endpoints.DELETE_EXPENSE_PATH)
+	public ResponseEntity<Response> deleteExpense(@PathVariable String id, Principal principal,
+			HttpServletRequest request) throws AppException {
+		String userId = principal.getName();
+		expenseService.deleteExpense(userId, id);
+		return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "Delete the expense!", LocalDateTime.now(),
+				request.getServletPath()));
+	}
 }

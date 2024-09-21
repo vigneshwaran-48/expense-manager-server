@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public interface ExpenseMongoRepository extends MongoRepository<Expense, String> {
 
-    List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId);
+	List<Expense> findByOwnerIdAndFamilyIsNull(String ownerId);
 
-    List<Expense> findByFamilyId(String familyId);
+	List<Expense> findByFamilyId(String familyId);
 
-    Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
+	Optional<Expense> findByIdAndOwnerId(String id, String ownerId);
 
 }
