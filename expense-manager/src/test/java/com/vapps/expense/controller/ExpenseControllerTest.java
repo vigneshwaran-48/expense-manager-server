@@ -1,10 +1,7 @@
 package com.vapps.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vapps.expense.common.dto.ExpenseCreationPayload;
-import com.vapps.expense.common.dto.ExpenseDTO;
-import com.vapps.expense.common.dto.ExpenseUpdatePayload;
-import com.vapps.expense.common.dto.FamilyDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.dto.response.ExpenseResponse;
 import com.vapps.expense.common.util.Endpoints;
 import com.vapps.expense.config.EnableMongoTestServer;
@@ -13,27 +10,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
-import static com.vapps.expense.controller.ControllerTestUtil.createFamily;
-import static com.vapps.expense.controller.ControllerTestUtil.createUser;
+import static com.vapps.expense.controller.ControllerTestUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = { ExpenseController.class })
+@WebMvcTest(controllers = {ExpenseController.class})
 @AutoConfigureMockMvc
 @EnableMongoTestServer
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -51,12 +48,24 @@ public class ExpenseControllerTest {
 
     private static String familyExpenseId;
 
+    private static String personalCategoryId;
+
+    private static String familyCategoryId;
+
     @BeforeEach
     public void setup() throws Exception {
         createUser(mockMvc, objectMapper, "user", "testuser");
         createUser(mockMvc, objectMapper, "another", "testuseranother");
         if (familyId == null) {
             familyId = createFamily(mockMvc, objectMapper, "user", "Testing Family", FamilyDTO.Visibility.PRIVATE);
+        }
+        if (personalCategoryId == null) {
+            personalCategoryId = addCategory(mockMvc, objectMapper, "Taxi", "For office", "test", "user",
+                    "user", CategoryDTO.CategoryType.PERSONAL);
+        }
+        if (familyCategoryId == null) {
+            familyCategoryId = addCategory(mockMvc, objectMapper, "Family Taxi", "For family trip", "test", familyId,
+                    "user", CategoryDTO.CategoryType.FAMILY);
         }
     }
 
@@ -68,10 +77,9 @@ public class ExpenseControllerTest {
         String description = "Testing description";
         ExpenseDTO.ExpenseType type = ExpenseDTO.ExpenseType.PERSONAL;
         LocalDateTime time = LocalDateTime.now();
-        String familyId = null;
         String currency = "USD";
         long amount = 70;
-        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, null, personalCategoryId);
         assertThat(expense.getFamily()).isNull();
         assertThat(expense.getOwnerId()).isEqualTo("user");
 
@@ -89,7 +97,7 @@ public class ExpenseControllerTest {
         String familyId = "this_will_be_ignored_for_family";
         String currency = "USD";
         long amount = 70;
-        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId, familyCategoryId);
         assertThat(expense.getFamily().getId()).isNotEqualTo(familyId);
         assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
         assertThat(expense.getOwnerId()).isEqualTo(ExpenseControllerTest.familyId);
@@ -107,7 +115,7 @@ public class ExpenseControllerTest {
         LocalDateTime time = LocalDateTime.now();
         String currency = "USD";
         long amount = 70;
-        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId);
+        ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId, familyCategoryId);
         assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
         assertThat(expense.getOwnerId()).isEqualTo("user");
     }
@@ -117,7 +125,7 @@ public class ExpenseControllerTest {
     @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.UPDATE")
     public void testUpdatePersonalExpense() throws Exception {
         updateExpense(personalExpenseId, "Updated Personal", "Updated personal expense Description",
-                LocalDateTime.now(), 7890, "INR");
+                LocalDateTime.now(), 7890, "INR", personalCategoryId);
     }
 
     @Test
@@ -125,7 +133,7 @@ public class ExpenseControllerTest {
     @WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.UPDATE")
     public void testUpdateFamilyExpense() throws Exception {
         updateExpense(familyExpenseId, "Updated Family", "Updated family expense Description", LocalDateTime.now(),
-                8000, "USD");
+                8000, "USD", familyCategoryId);
     }
 
     @Test
@@ -179,18 +187,27 @@ public class ExpenseControllerTest {
     }
 
     private ExpenseDTO updateExpense(String expenseId, String name, String description, LocalDateTime time, long amount,
-            String currency) throws Exception {
+                                     String currency, String categoryId) throws Exception {
         ExpenseUpdatePayload payload = new ExpenseUpdatePayload();
         payload.setAmount(amount);
         payload.setCurrency(currency);
         payload.setTime(time);
         payload.setName(name);
         payload.setDescription(description);
+        payload.setCategoryId(categoryId);
+
+        MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
+                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
+                .getBytes(StandardCharsets.UTF_8));
 
         MvcResult result = mockMvc.perform(
-                        patch(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
-                                .toUriString()).contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(payload)))
+                        multipart(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
+                                .toUriString())
+                                .file(payloadPart)
+                                .with(request -> {
+                                    request.setMethod(HttpMethod.PATCH.name());
+                                    return request;
+                                }))
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
                 .andReturn();
 
@@ -203,12 +220,13 @@ public class ExpenseControllerTest {
         assertThat(expense.getTime()).isEqualTo(time);
         assertThat(expense.getAmount()).isEqualTo(amount);
         assertThat(expense.getCurrency()).isEqualTo(currency);
+        assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
 
         return expense;
     }
 
     private ExpenseDTO createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
-            long amount, String currency, String familyId) throws Exception {
+                                     long amount, String currency, String familyId, String categoryId) throws Exception {
         ExpenseCreationPayload payload = new ExpenseCreationPayload();
 
         payload.setDescription(description);
@@ -218,9 +236,15 @@ public class ExpenseControllerTest {
         payload.setCurrency(currency);
         payload.setFamilyId(familyId);
         payload.setName(name);
+        payload.setCategoryId(categoryId);
 
-        MvcResult result = mockMvc.perform(post(Endpoints.CREATE_EXPENSE).contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload))).andExpect(status().isOk())
+        MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
+                MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
+                .getBytes(StandardCharsets.UTF_8));
+
+        MvcResult result = mockMvc.perform(multipart(Endpoints.CREATE_EXPENSE)
+                        .file(payloadPart).contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.expense").exists()).andReturn();
 
@@ -234,6 +258,8 @@ public class ExpenseControllerTest {
         assertThat(expense.getCurrency()).isEqualTo(currency);
         assertThat(expense.getDescription()).isEqualTo(description);
         assertThat(expense.getName()).isEqualTo(name);
+        assertThat(expense.getCategory()).isNotNull();
+        assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
 
         return expense;
     }

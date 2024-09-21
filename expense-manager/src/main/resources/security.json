@@ -502,6 +502,7 @@
     "params": [],
     "method": "POST",
     "requestBodyConfig": {
+      "type": "FORM_DATA",
       "fields": [
         {
           "key": "name",
@@ -538,6 +539,10 @@
           "type": "REGEX",
           "regex": "^[A-Z]{3}$",
           "mandatory": "true"
+        },
+        {
+          "key": "categoryId",
+          "mandatory": "true"
         }
       ]
     }
@@ -552,6 +557,7 @@
     ],
     "method": "PATCH",
     "requestBodyConfig": {
+      "type": "FORM_DATA",
       "fields": [
         {
           "key": "name",
@@ -576,6 +582,9 @@
           "key": "currency",
           "type": "REGEX",
           "regex": "^[A-Z]{3}$"
+        },
+        {
+          "key": "categoryId"
         }
       ]
     }
