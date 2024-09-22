@@ -286,6 +286,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 				throw new AppException(HttpStatus.BAD_REQUEST.value(),
 						"Only personal categories can be used for personal expenses!");
 			}
+			if (familyId != null && category.isPresent() && !category.get().getOwnerId().equals(familyId)) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
+			}
 		}
 	}
 

@@ -3,6 +3,7 @@ package com.vapps.expense.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.dto.response.ExpenseResponse;
+import com.vapps.expense.common.dto.response.ExpensesResponse;
 import com.vapps.expense.common.util.Endpoints;
 import com.vapps.expense.config.EnableMongoTestServer;
 import org.junit.jupiter.api.*;
@@ -162,6 +163,93 @@ public class ExpenseControllerTest {
 	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Expense.DELETE")
 	public void testDeleteFamilyExpense() throws Exception {
 		deleteExpense(familyExpenseId);
+	}
+
+	@Test
+	@Order(10)
+	@WithMockUser(username = "user", authorities = { "SCOPE_ExpenseManager.Expense.READ",
+			"SCOPE_ExpenseManager.Expense.CREATE" })
+	public void testGetAllExpense() throws Exception {
+		String currentPersonalCategoryId = personalCategoryId;
+		String currentFamilyCategoryId = familyCategoryId;
+		LocalDateTime jan2024 = LocalDateTime.of(2024, 1, 1, 1, 1);
+		LocalDateTime feb2024 = LocalDateTime.of(2024, 2, 1, 1, 1);
+		for (int i = 0; i < 50; i++) {
+			ExpenseDTO.ExpenseType type = i % 2 == 0 ? ExpenseDTO.ExpenseType.PERSONAL : ExpenseDTO.ExpenseType.FAMILY;
+			String expenseFamilyId = type == ExpenseDTO.ExpenseType.FAMILY ? familyId : null;
+			LocalDateTime time = i > 20 ? feb2024 : jan2024;
+
+			createExpense("Testing " + i, "Testing description " + i, type, time, 100, "INR",
+					expenseFamilyId,
+					type == ExpenseDTO.ExpenseType.FAMILY ? currentFamilyCategoryId : currentPersonalCategoryId);
+			if (i % 5 == 0) {
+				currentFamilyCategoryId = addCategory(mockMvc, objectMapper, "Testing Family Category" + i, "test",
+						"https://test.com/image",
+						familyId, "user", CategoryDTO.CategoryType.FAMILY);
+				currentPersonalCategoryId = addCategory(mockMvc, objectMapper, "Testing Personal Category" + i, "test",
+						"https://test.com/image",
+						"user", "user", CategoryDTO.CategoryType.PERSONAL);
+			}
+		}
+
+		// Test get all expenses without filter
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		ExpensesResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(40);
+
+		// Test with query
+		ExpenseFilter filter = new ExpenseFilter();
+		filter.setQuery("es");
+		filter.setSearchBy(ExpenseFilter.SearchBy.NAME);
+
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
+						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(40);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getName().toLowerCase().contains(filter.getQuery().toLowerCase()));
+		}
+
+		// Test with category name
+		filter = new ExpenseFilter();
+		filter.setQuery("category");
+		filter.setSearchBy(ExpenseFilter.SearchBy.CATEGORY);
+
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
+						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(40);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getCategory().getName().toLowerCase().contains(filter.getQuery().toLowerCase()));
+		}
+
+		// Test with date range
+		filter = new ExpenseFilter();
+		// From jan 15 2024 to feb 15 2024
+		LocalDateTime start = LocalDateTime.of(2024, 1, 15, 1, 1);
+		LocalDateTime end = LocalDateTime.of(2024, 2, 15, 1, 1);
+		filter.setStart(start);
+		filter.setEnd(end);
+
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
+						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(20);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getTime()).isAfter(start).isBefore(end);
+		}
 	}
 
 	private ExpenseDTO getExpense(String expenseId) throws Exception {

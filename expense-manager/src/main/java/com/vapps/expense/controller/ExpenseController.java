@@ -76,7 +76,7 @@ public class ExpenseController {
 				request.getServletPath()));
 	}
 
-	@GetMapping(Endpoints.GET_ALL_EXPENSES)
+	@GetMapping
 	public ResponseEntity<ExpensesResponse> getAllExpenses(@RequestBody(required = false) ExpenseFilter filter,
 			Principal principal,
 			HttpServletRequest request)
