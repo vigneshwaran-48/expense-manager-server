@@ -92,6 +92,8 @@ public class SecurityConfig {
 						.access(hasAnyScope("ExpenseManager.Category.DELETE", "ExpenseManager.Category.ALL"))
 						.requestMatchers(HttpMethod.POST, Endpoints.CREATE_EXPENSE)
 						.access(hasAnyScope("ExpenseManager.Expense.CREATE", "ExpenseManager.Expense.ALL"))
+						.requestMatchers(HttpMethod.GET, Endpoints.GET_ALL_EXPENSES)
+						.access(hasAnyScope("ExpenseManager.Expense.READ", "ExpenseManager.Expense.ALL"))
 						.requestMatchers(HttpMethod.GET, Endpoints.GET_EXPENSE)
 						.access(hasAnyScope("ExpenseManager.Expense.READ", "ExpenseManager.Expense.ALL"))
 						.requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_EXPENSE)

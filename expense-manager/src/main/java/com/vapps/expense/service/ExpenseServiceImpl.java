@@ -192,11 +192,52 @@ public class ExpenseServiceImpl implements ExpenseService {
 		if (!filter.isPersonal() && family.isPresent()) {
 			expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
 		}
-//		if (filter.getStart() != null) {
-//			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
-//					.collect(Collectors.toList());
-//		}
-		return List.of();
+		if (filter.getStart() != null) {
+			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
+					.collect(Collectors.toList());
+		}
+		if (filter.getEnd() != null) {
+			expenses = expenses.stream().filter(expense -> expense.getTime().isBefore(filter.getEnd()))
+					.collect(Collectors.toList());
+		}
+		if (filter.getQuery() != null) {
+			if (filter.getSearchBy() == null) {
+				filter.setSearchBy(ExpenseFilter.SearchBy.ALL);
+			}
+			expenses = filterExpensesBySearch(userId, expenses, filter.getQuery(), filter.getSearchBy());
+		}
+		return expenses.stream().map(Expense::toDTO).collect(Collectors.toList());
+	}
+
+	private List<Expense> filterExpensesBySearch(String userId, List<Expense> expenses, String query,
+			ExpenseFilter.SearchBy searchBy) throws AppException {
+
+		switch (searchBy) {
+			case NAME -> expenses = expenses.stream().filter(expense -> expense.getName().toLowerCase()
+					.contains(query.toLowerCase())).collect(Collectors.toList());
+			case DESCRIPTION -> expenses = expenses.stream()
+					.filter(expense -> expense.getDescription() != null && expense.getDescription().toLowerCase()
+							.contains(query.toLowerCase())).collect(Collectors.toList());
+			case OWNER -> expenses = expenses.stream().filter(expense -> {
+				try {
+					if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+						FamilyDTO family = familyService.getFamilyById(userId, expense.getOwnerId()).get();
+						return family.getName().toLowerCase().contains(query.toLowerCase());
+					}
+					UserDTO owner = userService.getUser(expense.getOwnerId()).get();
+					return owner.getName().toLowerCase().contains(query.toLowerCase());
+				} catch (AppException ex) {
+					LOGGER.error("Error while filtering expenses by owner, At expense {} for user {}", expense.getId(),
+							userId);
+				}
+				return false;
+			}).collect(Collectors.toList());
+			case CATEGORY -> expenses = expenses.stream()
+					.filter(expense -> expense.getCategory() != null && expense.getCategory().getName().toLowerCase()
+							.contains(query.toLowerCase())).collect(Collectors.toList());
+			default -> throw new AppException("Search by option " + searchBy + " not implemented!");
+		}
+		return expenses;
 	}
 
 	private void checkCurrency(String currency) throws AppException {
@@ -244,6 +285,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 					.getType() == CategoryDTO.CategoryType.FAMILY && familyId == null) {
 				throw new AppException(HttpStatus.BAD_REQUEST.value(),
 						"Only personal categories can be used for personal expenses!");
+			}
+			if (familyId != null && category.isPresent() && !category.get().getOwnerId().equals(familyId)) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Given category not belongs to the family!");
 			}
 		}
 	}

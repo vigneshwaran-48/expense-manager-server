@@ -94,5 +94,6 @@ public class Endpoints {
 	public static final String UPDATE_EXPENSE = EXPENSE_API + UPDATE_EXPENSE_PATH;
 	public static final String GET_EXPENSE = EXPENSE_API + GET_EXPENSE_PATH;
 	public static final String DELETE_EXPENSE = EXPENSE_API + DELETE_EXPENSE_PATH;
+	public static final String GET_ALL_EXPENSES = EXPENSE_API;
 
 }
