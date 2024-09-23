@@ -11,6 +11,8 @@ import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +32,13 @@ public class ExpenseController {
 	@Autowired
 	private ExpenseService expenseService;
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseController.class);
+
 	@PostMapping
 	public ResponseEntity<ExpenseResponse> createExpense(
 			@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
-			@RequestPart("payload") ExpenseCreationPayload payload,
-			Principal principal, HttpServletRequest request) throws AppException {
+			@RequestPart("payload") ExpenseCreationPayload payload, Principal principal, HttpServletRequest request)
+			throws AppException {
 		String userId = principal.getName();
 		ExpenseDTO expense = null;
 		expense = expenseService.addExpense(userId, payload, invoices);
@@ -46,8 +50,7 @@ public class ExpenseController {
 	public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable String id,
 			@RequestPart(value = "invoices", required = false) MultipartFile[] invoices,
 			@RequestPart(value = "payload") ExpenseUpdatePayload payload, Principal principal,
-			HttpServletRequest request)
-			throws AppException {
+			HttpServletRequest request) throws AppException {
 		String userId = principal.getName();
 		ExpenseDTO expense = expenseService.updateExpense(userId, id, payload, invoices);
 		return ResponseEntity.ok(new ExpenseResponse(HttpStatus.OK.value(), "Updated Expense!", LocalDateTime.now(),
@@ -77,18 +80,25 @@ public class ExpenseController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ExpensesResponse> getAllExpenses(@RequestBody(required = false) ExpenseFilter filter,
-			Principal principal,
-			HttpServletRequest request)
-			throws AppException {
+	public ResponseEntity<ExpensesResponse> getAllExpenses(
+			@RequestParam(required = false, defaultValue = "true") boolean isPersonal,
+			@RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end,
+			@RequestParam(required = false) String query,
+			@RequestParam(required = false, defaultValue = "ALL") ExpenseFilter.SearchBy searchBy, Principal principal,
+			HttpServletRequest request) throws AppException {
 
 		String userId = principal.getName();
-		if (filter == null) {
-			filter = new ExpenseFilter();
-		}
+		ExpenseFilter filter = new ExpenseFilter();
+		filter.setQuery(query);
+		filter.setEnd(end);
+		filter.setStart(start);
+		filter.setPersonal(isPersonal);
+		filter.setSearchBy(searchBy);
+		LOGGER.info(filter.toString());
 		List<ExpenseDTO> expenses = expenseService.getAllExpense(userId, filter);
 
-		return ResponseEntity.ok(new ExpensesResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
-				request.getServletPath(), expenses));
+		return ResponseEntity.ok(
+				new ExpensesResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
+						expenses));
 	}
 }
