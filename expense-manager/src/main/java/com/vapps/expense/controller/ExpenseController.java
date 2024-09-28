@@ -81,7 +81,7 @@ public class ExpenseController {
 
 	@GetMapping
 	public ResponseEntity<ExpensesResponse> getAllExpenses(
-			@RequestParam(required = false, defaultValue = "true") boolean isPersonal,
+			@RequestParam(required = false, defaultValue = "true") boolean isFamily,
 			@RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end,
 			@RequestParam(required = false) String query,
 			@RequestParam(required = false, defaultValue = "ALL") ExpenseFilter.SearchBy searchBy, Principal principal,
@@ -92,7 +92,7 @@ public class ExpenseController {
 		filter.setQuery(query);
 		filter.setEnd(end);
 		filter.setStart(start);
-		filter.setPersonal(isPersonal);
+		filter.setFamily(isFamily);
 		filter.setSearchBy(searchBy);
 		LOGGER.info(filter.toString());
 		List<ExpenseDTO> expenses = expenseService.getAllExpense(userId, filter);

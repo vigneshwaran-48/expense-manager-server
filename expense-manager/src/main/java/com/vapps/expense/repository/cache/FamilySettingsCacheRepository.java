@@ -18,7 +18,7 @@ public class FamilySettingsCacheRepository implements FamilySettingsRepository {
 	private FamilySettingsMongoRepository familySettingsRepository;
 
 	@Override
-	@Cacheable(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
+	@CachePut(value = "familySettings", key = "'family_settings_' + #familySettings.getFamily().getId()")
 	public FamilySettings save(FamilySettings familySettings) {
 		return familySettingsRepository.save(familySettings);
 	}

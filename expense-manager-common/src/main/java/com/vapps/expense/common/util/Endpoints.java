@@ -37,6 +37,7 @@ public class Endpoints {
 	public static final String FAMILY_REJECT_JOIN_REQUEST_PATH = "/{familyId}/request/{requestId}/reject";
 	public static final String GET_USERS_FAMILY_ROLE_PATH = "/{familyId}/role";
 	public static final String GET_FAMILY_INVITATIONS_PATH = "/{familyId}/invite";
+	public static final String GET_FAMILY_SETTINGS_PATH = "/{familyId}/settings";
 
 	public static final String CREATE_FAMILY = FAMILY_API;
 	public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -55,6 +56,7 @@ public class Endpoints {
 	public static final String FAMILY_LIST_JOIN_REQUEST = FAMILY_API + FAMILY_JOIN_REQUEST_PATH;
 	public static final String GET_USERS_FAMILY_ROLE = FAMILY_API + GET_USERS_FAMILY_ROLE_PATH;
 	public static final String GET_FAMILY_INVITATIONS = FAMILY_API + GET_FAMILY_INVITATIONS_PATH;
+	public static final String GET_FAMILY_SETTINGS = FAMILY_API + GET_FAMILY_SETTINGS_PATH;
 
 	// Invitation APIs
 	public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";

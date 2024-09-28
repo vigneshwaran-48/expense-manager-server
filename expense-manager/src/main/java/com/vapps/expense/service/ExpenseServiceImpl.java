@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -187,11 +188,18 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	public List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException {
-		List<Expense> expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
-		Optional<FamilyDTO> family = familyService.getUserFamily(userId);
-		if (!filter.isPersonal() && family.isPresent()) {
-			expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
+		List<Expense> expenses;
+		if (filter.isFamily()) {
+			Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+			if (family.isPresent()) {
+				expenses = expenseRepository.findByFamilyId(family.get().getId());
+			} else {
+				expenses = List.of();
+			}
+		} else {
+			expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
 		}
+
 		if (filter.getStart() != null) {
 			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
 					.collect(Collectors.toList());

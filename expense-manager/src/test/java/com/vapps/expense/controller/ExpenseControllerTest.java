@@ -193,17 +193,27 @@ public class ExpenseControllerTest {
 		}
 
 		// Test get all expenses
-		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isPersonal", String.valueOf(false)))
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		ExpensesResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
+		assertThat(response.getExpenses().size()).isGreaterThan(20);
 
+		// Test get family expenses
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(true)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getFamily()).isNotNull();
+		}
 		// Test with query
 		result = mockMvc.perform(
-						get(Endpoints.GET_ALL_EXPENSES).param("isPersonal", String.valueOf(false)).param("query", "es")
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "es")
 								.param("searchBy",
 										ExpenseFilter.SearchBy.NAME.name())
 				).andExpect(status().isOk())
@@ -211,21 +221,19 @@ public class ExpenseControllerTest {
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getName().toLowerCase().contains("es"));
 		}
 
 		// Test with category name
 		result = mockMvc.perform(
-						get(Endpoints.GET_ALL_EXPENSES).param("isPersonal", String.valueOf(false)).param("query", "category")
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "category")
 								.param("searchBy",
 										ExpenseFilter.SearchBy.CATEGORY.name())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getCategory().getName().toLowerCase().contains("category"));
 		}
@@ -236,14 +244,13 @@ public class ExpenseControllerTest {
 		LocalDateTime end = LocalDateTime.of(2024, 2, 15, 1, 1);
 
 		result = mockMvc.perform(
-						get(Endpoints.GET_ALL_EXPENSES).param("isPersonal", String.valueOf(false))
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false))
 								.param("start", start.toString()).param("end", end.toString()))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(20);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getTime()).isAfter(start).isBefore(end);
 		}

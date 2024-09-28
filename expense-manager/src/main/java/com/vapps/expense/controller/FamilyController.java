@@ -203,4 +203,15 @@ public class FamilyController {
 				new InvitationsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
 						invitations));
 	}
+
+	@GetMapping(Endpoints.GET_FAMILY_SETTINGS_PATH)
+	public ResponseEntity<FamilySettingsResponse> getFamilySettings(@PathVariable String familyId, Principal principal,
+			HttpServletRequest request) throws AppException {
+		String userId = principal.getName();
+		FamilySettingsDTO settings = familyService.getFamilySettings(userId, familyId);
+		return ResponseEntity.ok(
+				new FamilySettingsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+						request.getServletPath(),
+						settings));
+	}
 }
