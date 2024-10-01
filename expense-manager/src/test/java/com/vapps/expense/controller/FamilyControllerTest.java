@@ -499,6 +499,23 @@ public class FamilyControllerTest {
 		Response response = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Response.class);
 	}
 
+	@Test
+	@Order(21)
+	public void shouldGetFamilySettings() throws Exception {
+		createUser(mockMvc, objectMapper, "GetSettings", "Get Settings");
+		String tempFamilyId = createFamily(mockMvc, objectMapper, "GetSettings", "Get Settings",
+				FamilyDTO.Visibility.PUBLIC);
+
+		MvcResult result = mockMvc.perform(
+						get(UriComponentsBuilder.fromPath(Endpoints.GET_FAMILY_SETTINGS).buildAndExpand(tempFamilyId)
+								.toUriString())
+								.with(oidcLogin().oidcUser(getOidcUser(USER_ID, List.of("SCOPE_ExpenseManager.Family.READ")))))
+				.andExpect(status().isOk()).andReturn();
+		FamilySettingsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				FamilySettingsResponse.class);
+		assertThat(response.getSettings()).isNotNull();
+	}
+
 	@Data
 	public static class FamilyCreationPayload {
 		private String name;

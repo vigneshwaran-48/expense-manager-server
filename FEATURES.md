@@ -11,7 +11,7 @@
 
 ### Filter
 
-1. isPersonal
+1. isFamily
 2. start - end time
 3. query
 4. searchBy
@@ -26,13 +26,11 @@
     The filtering of the expenses will occur in the same order that has
     been listed above. Below will be the description for each criteria,
 
-#### isPersonal
+#### isFamily
 
-    If it is true then all expenses which are all not part of a family
-    only will be listed. If it is false then all the expenses of the
-    user's family and the expenses which are all owned by the user will
-    be taken.
-
+    If it is true then only the expenses which are all owned by the
+    user in his family and the expenses owned by its family will be 
+    listed.
 #### start - end time
 
     Expenses which are all have the time between these start and end

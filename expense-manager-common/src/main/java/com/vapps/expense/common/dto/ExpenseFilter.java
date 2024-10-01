@@ -15,7 +15,7 @@ public class ExpenseFilter {
 		ALL
 	}
 
-	private boolean isPersonal;
+	private boolean isFamily;
 	private LocalDateTime start;
 	private LocalDateTime end;
 	private String query;

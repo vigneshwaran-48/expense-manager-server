@@ -27,6 +27,9 @@ logging:
       springframework:
         security: trace
 
+  file:
+    name: logs/app.log
+
 mail:
   google:
     appPassword: ${FAMILY_EXPENSE_MANAGER_APP_PASSWORD}

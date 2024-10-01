@@ -192,61 +192,65 @@ public class ExpenseControllerTest {
 			}
 		}
 
-		// Test get all expenses without filter
-		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES)).andExpect(status().isOk())
+		// Test get all expenses
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)))
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		ExpensesResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
+		assertThat(response.getExpenses().size()).isGreaterThan(20);
 
-		// Test with query
-		ExpenseFilter filter = new ExpenseFilter();
-		filter.setQuery("es");
-		filter.setSearchBy(ExpenseFilter.SearchBy.NAME);
-
-		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
-						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		// Test get family expenses
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(true)))
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
 		for (ExpenseDTO expense : response.getExpenses()) {
-			assertThat(expense.getName().toLowerCase().contains(filter.getQuery().toLowerCase()));
+			assertThat(expense.getFamily()).isNotNull();
+		}
+		// Test with query
+		result = mockMvc.perform(
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "es")
+								.param("searchBy",
+										ExpenseFilter.SearchBy.NAME.name())
+				).andExpect(status().isOk())
+				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpensesResponse.class);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getName().toLowerCase().contains("es"));
 		}
 
 		// Test with category name
-		filter = new ExpenseFilter();
-		filter.setQuery("category");
-		filter.setSearchBy(ExpenseFilter.SearchBy.CATEGORY);
-
-		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
-						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		result = mockMvc.perform(
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "category")
+								.param("searchBy",
+										ExpenseFilter.SearchBy.CATEGORY.name())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(40);
 		for (ExpenseDTO expense : response.getExpenses()) {
-			assertThat(expense.getCategory().getName().toLowerCase().contains(filter.getQuery().toLowerCase()));
+			assertThat(expense.getCategory().getName().toLowerCase().contains("category"));
 		}
 
 		// Test with date range
-		filter = new ExpenseFilter();
 		// From jan 15 2024 to feb 15 2024
 		LocalDateTime start = LocalDateTime.of(2024, 1, 15, 1, 1);
 		LocalDateTime end = LocalDateTime.of(2024, 2, 15, 1, 1);
-		filter.setStart(start);
-		filter.setEnd(end);
 
-		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).content(objectMapper.writeValueAsString(filter))
-						.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		result = mockMvc.perform(
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false))
+								.param("start", start.toString()).param("end", end.toString()))
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
-		assertThat(response.getExpenses().size()).isGreaterThan(20);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getTime()).isAfter(start).isBefore(end);
 		}

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -187,11 +188,18 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	public List<ExpenseDTO> getAllExpense(String userId, ExpenseFilter filter) throws AppException {
-		List<Expense> expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
-		Optional<FamilyDTO> family = familyService.getUserFamily(userId);
-		if (!filter.isPersonal() && family.isPresent()) {
-			expenses.addAll(expenseRepository.findByFamilyId(family.get().getId()));
+		List<Expense> expenses;
+		if (filter.isFamily()) {
+			Optional<FamilyDTO> family = familyService.getUserFamily(userId);
+			if (family.isPresent()) {
+				expenses = expenseRepository.findByFamilyId(family.get().getId());
+			} else {
+				expenses = List.of();
+			}
+		} else {
+			expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
 		}
+
 		if (filter.getStart() != null) {
 			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
 					.collect(Collectors.toList());
@@ -213,31 +221,50 @@ public class ExpenseServiceImpl implements ExpenseService {
 			ExpenseFilter.SearchBy searchBy) throws AppException {
 
 		switch (searchBy) {
-			case NAME -> expenses = expenses.stream().filter(expense -> expense.getName().toLowerCase()
-					.contains(query.toLowerCase())).collect(Collectors.toList());
+			case NAME -> expenses = expenses.stream().filter(expense -> isNameMatches(query, expense))
+					.collect(Collectors.toList());
 			case DESCRIPTION -> expenses = expenses.stream()
-					.filter(expense -> expense.getDescription() != null && expense.getDescription().toLowerCase()
-							.contains(query.toLowerCase())).collect(Collectors.toList());
-			case OWNER -> expenses = expenses.stream().filter(expense -> {
-				try {
-					if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
-						FamilyDTO family = familyService.getFamilyById(userId, expense.getOwnerId()).get();
-						return family.getName().toLowerCase().contains(query.toLowerCase());
-					}
-					UserDTO owner = userService.getUser(expense.getOwnerId()).get();
-					return owner.getName().toLowerCase().contains(query.toLowerCase());
-				} catch (AppException ex) {
-					LOGGER.error("Error while filtering expenses by owner, At expense {} for user {}", expense.getId(),
-							userId);
-				}
-				return false;
-			}).collect(Collectors.toList());
+					.filter(expense -> isDescriptionMatches(query, expense)).collect(Collectors.toList());
+			case OWNER -> expenses = expenses.stream().filter(expense -> isOwnerMatches(userId, query, expense))
+					.collect(Collectors.toList());
 			case CATEGORY -> expenses = expenses.stream()
-					.filter(expense -> expense.getCategory() != null && expense.getCategory().getName().toLowerCase()
-							.contains(query.toLowerCase())).collect(Collectors.toList());
+					.filter(expense -> isCategoryMatches(query, expense)).collect(Collectors.toList());
+			case ALL -> expenses = expenses.stream()
+					.filter(expense -> isNameMatches(query, expense) || isDescriptionMatches(query,
+							expense) || isOwnerMatches(userId, query, expense) || isCategoryMatches(query, expense))
+					.collect(Collectors.toList());
 			default -> throw new AppException("Search by option " + searchBy + " not implemented!");
 		}
+		LOGGER.info("Search Option: {}", searchBy);
 		return expenses;
+	}
+
+	private boolean isNameMatches(String query, Expense expense) {
+		return expense.getName().toLowerCase().contains(query.toLowerCase());
+	}
+
+	private boolean isDescriptionMatches(String query, Expense expense) {
+		return expense.getDescription().toLowerCase().contains(query.toLowerCase());
+	}
+
+	private boolean isOwnerMatches(String userId, String query, Expense expense) {
+		try {
+			if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+				FamilyDTO family = familyService.getFamilyById(userId, expense.getOwnerId()).get();
+				return family.getName().toLowerCase().contains(query.toLowerCase());
+			}
+			UserDTO owner = userService.getUser(expense.getOwnerId()).get();
+			return owner.getName().toLowerCase().contains(query.toLowerCase());
+		} catch (AppException ex) {
+			LOGGER.error("Error while filtering expenses by owner, At expense {} for user {}", expense.getId(),
+					userId);
+		}
+		return false;
+	}
+
+	private boolean isCategoryMatches(String query, Expense expense) {
+		return expense.getCategory() != null && expense.getCategory().getName().toLowerCase()
+				.contains(query.toLowerCase());
 	}
 
 	private void checkCurrency(String currency) throws AppException {

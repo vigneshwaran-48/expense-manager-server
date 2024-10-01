@@ -43,7 +43,7 @@ public class SecurityConfig {
 						.access(hasAnyScope("ExpenseManager.Family.CREATE", "ExpenseManager.Family.ALL"))
 						.requestMatchers(HttpMethod.GET, Endpoints.GET_FAMILY, Endpoints.GET_USER_FAMILY,
 								Endpoints.SEARCH_FAMILY, Endpoints.GET_USERS_FAMILY_ROLE,
-								Endpoints.GET_FAMILY_INVITATIONS)
+								Endpoints.GET_FAMILY_INVITATIONS, Endpoints.GET_FAMILY_SETTINGS)
 						.access(hasAnyScope("ExpenseManager.Family.READ", "ExpenseManager.Family.ALL"))
 						.requestMatchers(HttpMethod.PATCH, Endpoints.UPDATE_FAMILY)
 						.access(hasAnyScope("ExpenseManager.Family.UPDATE", "ExpenseManager.Family.ALL"))
