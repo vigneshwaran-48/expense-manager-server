@@ -12,11 +12,9 @@ A expense manager app by which you can track your personal and family expenses.
 
 ### TODO
 
-1. List expenses
-2. Search expenses with filter options.
-3. Dashboard for personal and family.
-4. Settings page for personal and family.
-5. Notification listing. (Currently only notifying via email and not showing it in the app. No accept or reject interactive features!)
+1. Dashboard for personal and family.
+2. Settings page for personal and family.
+3. Notification listing. (Currently only notifying via email and not showing it in the app. No accept or reject interactive features!)
 
 ### Running
 
