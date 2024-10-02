@@ -170,8 +170,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
 	public void deleteExpense(String userId, String expenseId) throws AppException {
 		ExpenseDTO expense = getExpense(userId, expenseId).get();
-		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && familyService.getUserRoleInFamily(userId,
-				expense.getOwnerId()) == FamilyMemberDTO.Role.MEMBER) {
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && !familyService.getFamilySettings(userId,
+				expense.getFamily().getId()).getFamilyExpenseRoles().contains(familyService.getUserRoleInFamily(userId,
+				expense.getOwnerId()))) {
 			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
 		}
 		expenseRepository.deleteById(expenseId);
