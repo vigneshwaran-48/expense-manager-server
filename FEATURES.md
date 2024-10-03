@@ -51,3 +51,16 @@
     will be matched with the search query.
 
     Note: If the "query" is not present then this criteria is not used.
+
+
+## Expense Stats: (Feature: 1)
+
+      Expenses can be maintained for both personal family expenses. We
+      can distinguish between personal and family stats with a type enum
+      and to find the user or family we will have a common "ownerId" to 
+      store their ids.
+
+
+      We will store all the stats in a single record that will contain
+      this month, week total expenses amount. Recent expeneses, Top
+      categories by amount, top user by expenses spent.
