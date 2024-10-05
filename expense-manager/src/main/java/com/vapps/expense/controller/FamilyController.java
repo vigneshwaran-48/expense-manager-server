@@ -3,6 +3,7 @@ package com.vapps.expense.controller;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.dto.response.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,9 @@ public class FamilyController {
 
 	@Autowired
 	private FamilyService familyService;
+
+	@Autowired
+	private ExpenseStatsService statsService;
 
 	@PostMapping
 	public ResponseEntity<FamilyResponse> createFamily(@RequestBody FamilyDTO family, Principal principal,
@@ -213,5 +217,18 @@ public class FamilyController {
 				new FamilySettingsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
 						request.getServletPath(),
 						settings));
+	}
+
+	@GetMapping(Endpoints.GET_FAMILY_STATS_PATH)
+	public ResponseEntity<ExpenseStatsResponse> getFamilyStats(@PathVariable String familyId, Principal principal,
+			HttpServletRequest request) throws AppException {
+
+		String userId = principal.getName();
+		ExpenseStatsDTO stats = statsService.getStats(userId, familyId, ExpenseStatsDTO.ExpenseStatsType.FAMILY).get();
+
+		return ResponseEntity.ok(
+				new ExpenseStatsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
+						request.getServletPath(),
+						stats));
 	}
 }

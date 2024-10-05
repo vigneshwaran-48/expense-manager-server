@@ -14,12 +14,14 @@ public class Endpoints {
 	public static final String GET_USER_PATH = "/{userId}";
 	public static final String UPDATE_USER_PATH = "/{userId}";
 	public static final String GET_PROFILE_PATH = "/profile";
+	public static final String GET_STATS_PATH = "/stats";
 
 	public static final String CREATE_USER = USER_API;
 	public static final String GET_USER = USER_API + GET_USER_PATH;
 	public static final String UPDATE_USER = USER_API + UPDATE_USER_PATH;
 	public static final String GET_PROFILE = USER_API + GET_PROFILE_PATH;
 	public static final String GET_ALL_USERS = USER_API;
+	public static final String GET_STATS = USER_API + GET_STATS_PATH;
 
 	// Family APIs
 	public static final String UPDATE_FAMILY_PATH = "/{familyId}";
@@ -38,6 +40,7 @@ public class Endpoints {
 	public static final String GET_USERS_FAMILY_ROLE_PATH = "/{familyId}/role";
 	public static final String GET_FAMILY_INVITATIONS_PATH = "/{familyId}/invite";
 	public static final String GET_FAMILY_SETTINGS_PATH = "/{familyId}/settings";
+	public static final String GET_FAMILY_STATS_PATH = "/{familyId}/stats";
 
 	public static final String CREATE_FAMILY = FAMILY_API;
 	public static final String UPDATE_FAMILY = FAMILY_API + UPDATE_FAMILY_PATH;
@@ -57,6 +60,7 @@ public class Endpoints {
 	public static final String GET_USERS_FAMILY_ROLE = FAMILY_API + GET_USERS_FAMILY_ROLE_PATH;
 	public static final String GET_FAMILY_INVITATIONS = FAMILY_API + GET_FAMILY_INVITATIONS_PATH;
 	public static final String GET_FAMILY_SETTINGS = FAMILY_API + GET_FAMILY_SETTINGS_PATH;
+	public static final String GET_FAMILY_STATS = FAMILY_API + GET_FAMILY_STATS_PATH;
 
 	// Invitation APIs
 	public static final String ACCEPT_INVITATION_PATH = "/{id}/accept";

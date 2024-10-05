@@ -1,9 +1,10 @@
 package com.vapps.expense.common.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class ExpenseStatsDTO {
@@ -13,12 +14,18 @@ public class ExpenseStatsDTO {
 		FAMILY
 	}
 
-	public class CategoryAmount {
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class CategoryAmount {
 		private long amount;
 		private CategoryDTO category;
 	}
 
-	public class UserAmount {
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class UserAmount {
 		private long amount;
 		private UserDTO user;
 	}
