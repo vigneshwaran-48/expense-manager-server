@@ -70,6 +70,9 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			// For migrating old users, Need to remove this.
 			statsDTO = createStats(userId, ownerId, type);
 		}
-		return statsOptional.isEmpty() && statsDTO == null ? Optional.empty() : Optional.of(statsDTO);
+		if (statsOptional.isPresent()) {
+			return Optional.of(statsOptional.get().toDTO());
+		}
+		return statsDTO != null ? Optional.of(statsDTO) : Optional.empty();
 	}
 }
