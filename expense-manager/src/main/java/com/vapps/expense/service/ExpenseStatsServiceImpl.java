@@ -1,10 +1,12 @@
 package com.vapps.expense.service;
 
 import com.vapps.expense.annotation.UserIdValidator;
+import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.FamilyMemberDTO;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.model.ExpenseStats;
@@ -12,8 +14,9 @@ import com.vapps.expense.repository.ExpenseStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseStatsServiceImpl implements ExpenseStatsService {
@@ -23,6 +26,9 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 
 	@Autowired
 	private FamilyService familyService;
+
+	@Autowired
+	private ExpenseService expenseService;
 
 	@Override
 	@UserIdValidator(positions = 0)
@@ -47,6 +53,7 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		stats.setRecentExpenses(List.of());
 		stats.setTopUsers(List.of());
 		stats.setTopCategories(List.of());
+		stats.setAmountSpentPerDay(Map.of());
 		stats = expenseStatsRepository.save(stats);
 		if (stats == null) {
 			throw new AppException("Error while saving Expense Stats");
@@ -74,5 +81,32 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			return Optional.of(statsOptional.get().toDTO());
 		}
 		return statsDTO != null ? Optional.of(statsDTO) : Optional.empty();
+	}
+
+	@Override
+	public void addExpense(ExpenseDTO expense) throws AppException {
+
+		if (expenseService.getExpense(expense.getCreatedBy().getId(), expense.getId()).isEmpty()) {
+			throw new AppException("Expense not found");
+		}
+		ExpenseStatsDTO stats = getStats(expense.getCreatedBy().getId(), expense.getOwnerId(),
+				expense.getFamily() != null
+						? ExpenseStatsDTO.ExpenseStatsType.FAMILY
+						: ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
+
+		LocalDate date = expense.getTime().toLocalDate();
+		if (stats.getAmountSpentPerDay().containsKey(date)) {
+			stats.getAmountSpentPerDay().put(date, stats.getAmountSpentPerDay().get(date) + expense.getAmount());
+		}
+		stats.getRecentExpenses().add(expense);
+		stats.setRecentExpenses(stats.getRecentExpenses().stream().sorted(Comparator.comparing(ExpenseDTO::getTime))
+				.collect(Collectors.toList()));
+		if (stats.getRecentExpenses().size() > 5) {
+			stats.getRecentExpenses().remove(stats.getRecentExpenses().size() - 1);
+		}
+	}
+
+	private void updateStats(ExpenseStatsDTO stats) throws AppException {
+
 	}
 }

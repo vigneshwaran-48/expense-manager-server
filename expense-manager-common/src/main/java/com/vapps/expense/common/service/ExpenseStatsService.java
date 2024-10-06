@@ -1,5 +1,6 @@
 package com.vapps.expense.common.service;
 
+import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.exception.AppException;
 
@@ -12,4 +13,6 @@ public interface ExpenseStatsService {
 
 	Optional<ExpenseStatsDTO> getStats(String userId, String ownerId, ExpenseStatsDTO.ExpenseStatsType type)
 			throws AppException;
+
+	void addExpense(ExpenseDTO expense) throws AppException;
 }
