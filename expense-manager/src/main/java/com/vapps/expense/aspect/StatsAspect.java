@@ -1,8 +1,9 @@
 package com.vapps.expense.aspect;
 
 import com.vapps.expense.annotation.Stats;
+import com.vapps.expense.common.dto.ExpenseDTO;
+import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseStatsService;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -20,8 +21,23 @@ public class StatsAspect {
 	private ExpenseStatsService statsService;
 
 	@AfterReturning(value = "@annotation(stats)", returning = "result")
-	public void stats(Object result, Stats stats) {
+	public void stats(Object result, Stats stats) throws AppException {
 
-		LOGGER.info("Got entity: {}", result);
+		if (!(result instanceof ExpenseDTO)) {
+			return;
+		}
+
+		Thread statsProcessThread = new Thread(() -> {
+			try {
+				processStats((ExpenseDTO) result, stats);
+			} catch (AppException ex) {
+				LOGGER.error(ex.getMessage(), ex);
+			}
+		});
+		statsProcessThread.start();
+	}
+
+	private void processStats(ExpenseDTO expense, Stats stats) throws AppException {
+		statsService.addExpense(expense);
 	}
 }

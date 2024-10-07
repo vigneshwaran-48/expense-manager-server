@@ -12,4 +12,6 @@ public interface ExpenseStatsRepository {
 	Optional<ExpenseStats> findByOwnerIdAndType(String ownerId, ExpenseStatsDTO.ExpenseStatsType type);
 
 	Optional<ExpenseStats> findById(String id);
+
+	ExpenseStats update(ExpenseStats stats);
 }

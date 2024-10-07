@@ -89,7 +89,8 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		if (expenseService.getExpense(expense.getCreatedBy().getId(), expense.getId()).isEmpty()) {
 			throw new AppException("Expense not found");
 		}
-		ExpenseStatsDTO stats = getStats(expense.getCreatedBy().getId(), expense.getOwnerId(),
+		ExpenseStatsDTO stats = getStats(expense.getCreatedBy().getId(),
+				expense.getFamily() != null ? expense.getFamily().getId() : expense.getOwnerId(),
 				expense.getFamily() != null
 						? ExpenseStatsDTO.ExpenseStatsType.FAMILY
 						: ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
@@ -102,11 +103,17 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		stats.setRecentExpenses(stats.getRecentExpenses().stream().sorted(Comparator.comparing(ExpenseDTO::getTime))
 				.collect(Collectors.toList()));
 		if (stats.getRecentExpenses().size() > 5) {
-			stats.getRecentExpenses().remove(stats.getRecentExpenses().size() - 1);
+			stats.getRecentExpenses().remove(0);
 		}
+		updateStats(stats);
 	}
 
-	private void updateStats(ExpenseStatsDTO stats) throws AppException {
-
+	private ExpenseStatsDTO updateStats(ExpenseStatsDTO statsDTO) throws AppException {
+		ExpenseStats stats = ExpenseStats.build(statsDTO);
+		stats = expenseStatsRepository.update(stats);
+		if (stats == null) {
+			throw new AppException("Error while updating expense");
+		}
+		return stats.toDTO();
 	}
 }

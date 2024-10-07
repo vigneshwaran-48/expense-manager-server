@@ -6,7 +6,9 @@ import com.vapps.expense.repository.ExpenseStatsRepository;
 import com.vapps.expense.repository.mongo.ExpenseStatsMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -33,5 +35,18 @@ public class ExpenseStatsCacheRepository implements ExpenseStatsRepository {
 	@Cacheable(value = "expense_stats", unless = "#result == null", key = "'expense_stats_' + #id")
 	public Optional<ExpenseStats> findById(String id) {
 		return expenseStatsRepository.findById(id);
+	}
+
+	@Override
+	@Caching(
+			put = {
+					@CachePut(value = "expense_stats", unless = "#result == null", key = "'expense_stats_' + #stats.getId()"),
+					@CachePut(value = "expense_stats", unless = "#result == null",
+							key = "'expense_stats_owner_' + #stats.getOwnerId() + '_' + #stats.getType()")
+			}
+
+	)
+	public ExpenseStats update(ExpenseStats stats) {
+		return expenseStatsRepository.save(stats);
 	}
 }

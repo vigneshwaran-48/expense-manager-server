@@ -2,7 +2,9 @@ package com.vapps.expense.model;
 
 import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseStatsDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,13 +19,17 @@ import java.util.stream.Collectors;
 public class ExpenseStats {
 
 	@Data
-	public class CategoryAmount {
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class CategoryAmount {
 		private Category category;
 		private long amount;
 	}
 
 	@Data
-	public class UserAmount {
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class UserAmount {
 		private User user;
 		private long amount;
 	}
@@ -57,5 +63,24 @@ public class ExpenseStats {
 						.collect(Collectors.toList()));
 		stats.setAmountSpentPerDay(amountSpentPerDay);
 		return stats;
+	}
+
+	public static ExpenseStats build(ExpenseStatsDTO expenseStatsDTO) {
+		ExpenseStats expenseStats = new ExpenseStats();
+		expenseStats.setId(expenseStatsDTO.getId());
+		expenseStats.setRecentExpenses(
+				expenseStatsDTO.getRecentExpenses().stream().map(Expense::build).collect(Collectors.toList()));
+		expenseStats.setType(expenseStatsDTO.getType());
+		expenseStats.setAmountSpentPerDay(expenseStatsDTO.getAmountSpentPerDay());
+		expenseStats.setTopUsers(expenseStatsDTO.getTopUsers().stream()
+				.map(userAmount -> new UserAmount(User.build(userAmount.getUser()), userAmount.getAmount()))
+				.collect(Collectors.toList()));
+		expenseStats.setTopCategories(expenseStatsDTO.getTopCategories().stream()
+				.map(categoryAmount -> new CategoryAmount(Category.build(categoryAmount.getCategory()),
+						categoryAmount.getAmount())).collect(Collectors.toList()));
+		expenseStats.setCurrentWeekTotal(expenseStatsDTO.getCurrentWeekTotal());
+		expenseStats.setCurrentMonthTotal(expenseStatsDTO.getCurrentMonthTotal());
+		expenseStats.setOwnerId(expenseStatsDTO.getOwnerId());
+		return expenseStats;
 	}
 }
