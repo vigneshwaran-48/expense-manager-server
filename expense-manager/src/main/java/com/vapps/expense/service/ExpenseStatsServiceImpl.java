@@ -96,9 +96,9 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 						: ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
 
 		LocalDate date = expense.getTime().toLocalDate();
-		if (stats.getAmountSpentPerDay().containsKey(date)) {
-			stats.getAmountSpentPerDay().put(date, stats.getAmountSpentPerDay().get(date) + expense.getAmount());
-		}
+		stats.getAmountSpentPerDay().put(date,
+				stats.getAmountSpentPerDay().containsKey(date) ? stats.getAmountSpentPerDay()
+						.get(date) + expense.getAmount() : expense.getAmount());
 		stats.getRecentExpenses().add(expense);
 		stats.setRecentExpenses(stats.getRecentExpenses().stream().sorted(Comparator.comparing(ExpenseDTO::getTime))
 				.collect(Collectors.toList()));
