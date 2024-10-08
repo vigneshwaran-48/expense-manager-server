@@ -11,8 +11,10 @@ public interface ExpenseStatsService {
 	ExpenseStatsDTO createStats(String userId, String ownerId, ExpenseStatsDTO.ExpenseStatsType type)
 			throws AppException;
 
-	Optional<ExpenseStatsDTO> getStats(String userId, String ownerId, ExpenseStatsDTO.ExpenseStatsType type)
+	Optional<ExpenseStatsDTO> getPersonalStats(String userId)
 			throws AppException;
+
+	Optional<ExpenseStatsDTO> getFamilyStats(String userId) throws AppException;
 
 	void addExpense(ExpenseDTO expense) throws AppException;
 }

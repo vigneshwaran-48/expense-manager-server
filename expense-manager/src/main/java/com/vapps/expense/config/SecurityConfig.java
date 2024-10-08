@@ -30,7 +30,7 @@ public class SecurityConfig {
 				.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf()
 				.disable().authorizeHttpRequests(
-						http -> http.requestMatchers(HttpMethod.GET, Endpoints.GET_USER, Endpoints.GET_STATS)
+						http -> http.requestMatchers(HttpMethod.GET, Endpoints.GET_USER)
 								.access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))
 								.requestMatchers(HttpMethod.GET, Endpoints.GET_PROFILE)
 								.access(hasAnyScope("ExpenseManager.User.READ", "ExpenseManager.User.ALL"))

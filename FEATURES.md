@@ -53,7 +53,7 @@
     Note: If the "query" is not present then this criteria is not used.
 
 
-## Expense Stats: (Feature: 1)
+## Expense Stats: (Feature: 2)
 
       Expenses can be maintained for both personal family expenses. We
       can distinguish between personal and family stats with a type enum

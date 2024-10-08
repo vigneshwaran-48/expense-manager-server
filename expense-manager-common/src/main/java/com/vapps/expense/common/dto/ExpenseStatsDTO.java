@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +41,6 @@ public class ExpenseStatsDTO {
 	private List<ExpenseDTO> recentExpenses;
 	private List<CategoryAmount> topCategories;
 	private List<UserAmount> topUsers;
-	private Map<LocalDate, Long> amountSpentPerDay;
+	private Map<DayOfWeek, Long> weekAmount;
 
 }

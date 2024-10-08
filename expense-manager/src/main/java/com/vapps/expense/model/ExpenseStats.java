@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ExpenseStats {
 	private List<Expense> recentExpenses;
 	private List<CategoryAmount> topCategories;
 	private List<UserAmount> topUsers;
-	private Map<LocalDate, Long> amountSpentPerDay;
+	private Map<DayOfWeek, Long> weekAmount;
 
 	public ExpenseStatsDTO toDTO() {
 		ExpenseStatsDTO stats = new ExpenseStatsDTO();
@@ -61,7 +62,7 @@ public class ExpenseStats {
 		stats.setTopUsers(
 				topUsers.stream().map(user -> new ExpenseStatsDTO.UserAmount(user.getAmount(), user.getUser().toDTO()))
 						.collect(Collectors.toList()));
-		stats.setAmountSpentPerDay(amountSpentPerDay);
+		stats.setWeekAmount(weekAmount);
 		return stats;
 	}
 
@@ -71,7 +72,6 @@ public class ExpenseStats {
 		expenseStats.setRecentExpenses(
 				expenseStatsDTO.getRecentExpenses().stream().map(Expense::build).collect(Collectors.toList()));
 		expenseStats.setType(expenseStatsDTO.getType());
-		expenseStats.setAmountSpentPerDay(expenseStatsDTO.getAmountSpentPerDay());
 		expenseStats.setTopUsers(expenseStatsDTO.getTopUsers().stream()
 				.map(userAmount -> new UserAmount(User.build(userAmount.getUser()), userAmount.getAmount()))
 				.collect(Collectors.toList()));
@@ -81,6 +81,7 @@ public class ExpenseStats {
 		expenseStats.setCurrentWeekTotal(expenseStatsDTO.getCurrentWeekTotal());
 		expenseStats.setCurrentMonthTotal(expenseStatsDTO.getCurrentMonthTotal());
 		expenseStats.setOwnerId(expenseStatsDTO.getOwnerId());
+		expenseStats.setWeekAmount(expenseStatsDTO.getWeekAmount());
 		return expenseStats;
 	}
 }
