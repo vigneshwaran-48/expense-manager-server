@@ -64,3 +64,10 @@
       We will store all the stats in a single record that will contain
       this month, week total expenses amount. Recent expeneses, Top
       categories by amount, top user by expenses spent.
+
+     We will also store the expenses amount each day of the current 
+     week. But for the previous weeks or Last month we would make 
+     a API call to get the info.
+         Then need to show this data in curve chart. For week
+     show current week days in x axis and for month show weeks number
+     in the x axis.
