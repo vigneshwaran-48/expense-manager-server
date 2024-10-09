@@ -96,16 +96,4 @@ public class UserController {
 						users));
 	}
 
-	@GetMapping(Endpoints.GET_STATS_PATH)
-	public ResponseEntity<ExpenseStatsResponse> getUserStats(Principal principal, HttpServletRequest request)
-			throws AppException {
-
-		String userId = principal.getName();
-		ExpenseStatsDTO stats = statsService.getStats(userId, userId, ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
-
-		return ResponseEntity.ok(
-				new ExpenseStatsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
-						request.getServletPath(),
-						stats));
-	}
 }

@@ -219,16 +219,4 @@ public class FamilyController {
 						settings));
 	}
 
-	@GetMapping(Endpoints.GET_FAMILY_STATS_PATH)
-	public ResponseEntity<ExpenseStatsResponse> getFamilyStats(@PathVariable String familyId, Principal principal,
-			HttpServletRequest request) throws AppException {
-
-		String userId = principal.getName();
-		ExpenseStatsDTO stats = statsService.getStats(userId, familyId, ExpenseStatsDTO.ExpenseStatsType.FAMILY).get();
-
-		return ResponseEntity.ok(
-				new ExpenseStatsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
-						request.getServletPath(),
-						stats));
-	}
 }

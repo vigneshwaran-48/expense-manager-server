@@ -2,6 +2,7 @@ package com.vapps.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vapps.expense.common.dto.CategoryDTO;
+import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.dto.FamilyDTO;
 import com.vapps.expense.common.dto.response.ExpenseStatsResponse;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.time.LocalDateTime;
 
 import static com.vapps.expense.controller.ControllerTestUtil.*;
 import static com.vapps.expense.controller.ControllerTestUtil.addCategory;
@@ -59,12 +62,59 @@ public class StatsControllerTest {
 
 	@Test
 	@Order(1)
-	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.FAMILY.READ")
+	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Family.READ")
 	public void testDefaultFamilyStats() throws Exception {
 		MvcResult result = mockMvc.perform(get(Endpoints.GET_FAMILY_STATS)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").exists()).andReturn();
 		ExpenseStatsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpenseStatsResponse.class);
 		ExpenseStatsDTO stats = response.getStats();
+		assertThat(stats.getId()).isNotNull();
+		assertThat(stats.getType()).isEqualTo(ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+		assertThat(stats.getOwnerId()).isEqualTo(familyId);
+		assertThat(stats.getRecentExpenses().size()).isEqualTo(0);
+		assertThat(stats.getTopUsers().size()).isEqualTo(0);
+		assertThat(stats.getTopCategories().size()).isEqualTo(0);
+		assertThat(stats.getCurrentMonthTotal()).isEqualTo(0);
+		assertThat(stats.getCurrentWeekTotal()).isEqualTo(0);
+	}
+
+	@Test
+	@Order(2)
+	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.User.READ")
+	public void testDefaultPersonalStats() throws Exception {
+
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_PERSONAL_STATS)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").exists()).andReturn();
+		ExpenseStatsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseStatsResponse.class);
+		ExpenseStatsDTO stats = response.getStats();
+		assertThat(stats.getId()).isNotNull();
+		assertThat(stats.getType()).isEqualTo(ExpenseStatsDTO.ExpenseStatsType.PERSONAL);
+		assertThat(stats.getOwnerId()).isEqualTo("user");
+		assertThat(stats.getRecentExpenses().size()).isEqualTo(0);
+		assertThat(stats.getTopUsers().size()).isEqualTo(0);
+		assertThat(stats.getTopCategories().size()).isEqualTo(0);
+		assertThat(stats.getCurrentMonthTotal()).isEqualTo(0);
+		assertThat(stats.getCurrentWeekTotal()).isEqualTo(0);
+	}
+
+	@Test
+	@Order(3)
+	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.FAMILY.READ")
+	public void testRecentExpenseStats() throws Exception {
+
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 1", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "IND", null, null);
+
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_PERSONAL_STATS)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").exists()).andReturn();
+		ExpenseStatsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseStatsResponse.class);
+		ExpenseStatsDTO stats = response.getStats();
+		assertThat(stats.getRecentExpenses().size()).isEqualTo(1);
+		assertThat(stats.getRecentExpenses().get(0).getName()).isEqualTo("Recent Expense 1");
+
+
 	}
 }
