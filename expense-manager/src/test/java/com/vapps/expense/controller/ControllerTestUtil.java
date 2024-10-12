@@ -1,26 +1,28 @@
 package com.vapps.expense.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vapps.expense.common.dto.CategoryDTO;
-import com.vapps.expense.common.dto.FamilyDTO;
-import com.vapps.expense.common.dto.UserDTO;
+import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.dto.response.CategoryResponse;
+import com.vapps.expense.common.dto.response.ExpenseResponse;
 import com.vapps.expense.common.dto.response.FamilyResponse;
 import com.vapps.expense.common.dto.response.UserResponse;
 import com.vapps.expense.common.util.Endpoints;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.vapps.expense.util.TestUtil.getOidcUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -137,5 +139,46 @@ public class ControllerTestUtil {
 		assertThat(category.getOwnerId()).isEqualTo(ownerId);
 
 		return response.getCategory().getId();
+	}
+
+	public static ExpenseDTO createExpense(MockMvc mockMvc, ObjectMapper objectMapper, String userId, String name,
+			String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
+			long amount, String currency, String familyId, String categoryId) throws Exception {
+		ExpenseCreationPayload payload = new ExpenseCreationPayload();
+
+		payload.setDescription(description);
+		payload.setType(type);
+		payload.setTime(time);
+		payload.setAmount(amount);
+		payload.setCurrency(currency);
+		payload.setFamilyId(familyId);
+		payload.setName(name);
+		payload.setCategoryId(categoryId);
+
+		MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
+				MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
+				.getBytes(StandardCharsets.UTF_8));
+
+		MvcResult result = mockMvc.perform(multipart(Endpoints.CREATE_EXPENSE)
+						.file(payloadPart).contentType(MediaType.MULTIPART_FORM_DATA)
+						.with(oidcLogin().oidcUser(getOidcUser(userId, List.of("SCOPE_ExpenseManager.Expense.CREATE")))))
+				.andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
+				.andExpect(jsonPath("$.expense").exists()).andReturn();
+
+		ExpenseResponse response =
+				objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+		ExpenseDTO expense = response.getExpense();
+		assertThat(expense.getType()).isEqualTo(type);
+		assertThat(expense.getTime()).isEqualTo(time);
+		assertThat(expense.getId()).isNotNull();
+		assertThat(expense.getAmount()).isEqualTo(amount);
+		assertThat(expense.getCurrency()).isEqualTo(currency);
+		assertThat(expense.getDescription()).isEqualTo(description);
+		assertThat(expense.getName()).isEqualTo(name);
+		assertThat(expense.getCategory()).isNotNull();
+		assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
+
+		return expense;
 	}
 }

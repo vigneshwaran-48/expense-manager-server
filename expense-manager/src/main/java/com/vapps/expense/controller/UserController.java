@@ -1,9 +1,12 @@
 package com.vapps.expense.controller;
 
+import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.dto.UserDTO;
+import com.vapps.expense.common.dto.response.ExpenseStatsResponse;
 import com.vapps.expense.common.dto.response.UserResponse;
 import com.vapps.expense.common.dto.response.UsersResponse;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.common.util.Endpoints;
@@ -23,6 +26,9 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ExpenseStatsService statsService;
 
 	@Autowired
 	private FamilyService familyService;
@@ -89,4 +95,5 @@ public class UserController {
 				new UsersResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(), request.getServletPath(),
 						users));
 	}
+
 }

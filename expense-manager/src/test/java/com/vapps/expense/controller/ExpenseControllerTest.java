@@ -61,8 +61,8 @@ public class ExpenseControllerTest {
 			familyId = createFamily(mockMvc, objectMapper, "user", "Testing Family", FamilyDTO.Visibility.PRIVATE);
 		}
 		if (personalCategoryId == null) {
-			personalCategoryId = addCategory(mockMvc, objectMapper, "Taxi", "For office", "test", "user",
-					"user", CategoryDTO.CategoryType.PERSONAL);
+			personalCategoryId = addCategory(mockMvc, objectMapper, "Taxi", "For office", "test", "user", "user",
+					CategoryDTO.CategoryType.PERSONAL);
 		}
 		if (familyCategoryId == null) {
 			familyCategoryId = addCategory(mockMvc, objectMapper, "Family Taxi", "For family trip", "test", familyId,
@@ -80,7 +80,8 @@ public class ExpenseControllerTest {
 		LocalDateTime time = LocalDateTime.now();
 		String currency = "USD";
 		long amount = 70;
-		ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, null, personalCategoryId);
+		ExpenseDTO expense = createExpense(mockMvc, objectMapper, "user", name, description, type, time, amount,
+				currency, null, personalCategoryId);
 		assertThat(expense.getFamily()).isNull();
 		assertThat(expense.getOwnerId()).isEqualTo("user");
 
@@ -98,7 +99,8 @@ public class ExpenseControllerTest {
 		String familyId = "this_will_be_ignored_for_family";
 		String currency = "USD";
 		long amount = 70;
-		ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId, familyCategoryId);
+		ExpenseDTO expense = createExpense(mockMvc, objectMapper, "user", name, description, type, time, amount,
+				currency, familyId, familyCategoryId);
 		assertThat(expense.getFamily().getId()).isNotEqualTo(familyId);
 		assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
 		assertThat(expense.getOwnerId()).isEqualTo(ExpenseControllerTest.familyId);
@@ -116,7 +118,8 @@ public class ExpenseControllerTest {
 		LocalDateTime time = LocalDateTime.now();
 		String currency = "USD";
 		long amount = 70;
-		ExpenseDTO expense = createExpense(name, description, type, time, amount, currency, familyId, familyCategoryId);
+		ExpenseDTO expense = createExpense(mockMvc, objectMapper, "user", name, description, type, time, amount,
+				currency, familyId, familyCategoryId);
 		assertThat(expense.getFamily().getId()).isEqualTo(ExpenseControllerTest.familyId);
 		assertThat(expense.getOwnerId()).isEqualTo("user");
 	}
@@ -179,23 +182,20 @@ public class ExpenseControllerTest {
 			String expenseFamilyId = type == ExpenseDTO.ExpenseType.FAMILY ? familyId : null;
 			LocalDateTime time = i > 20 ? feb2024 : jan2024;
 
-			createExpense("Testing " + i, "Testing description " + i, type, time, 100, "INR",
-					expenseFamilyId,
+			createExpense(mockMvc, objectMapper, "user", "Testing " + i, "Testing description " + i, type, time, 100,
+					"INR", expenseFamilyId,
 					type == ExpenseDTO.ExpenseType.FAMILY ? currentFamilyCategoryId : currentPersonalCategoryId);
 			if (i % 5 == 0) {
 				currentFamilyCategoryId = addCategory(mockMvc, objectMapper, "Testing Family Category" + i, "test",
-						"https://test.com/image",
-						familyId, "user", CategoryDTO.CategoryType.FAMILY);
+						"https://test.com/image", familyId, "user", CategoryDTO.CategoryType.FAMILY);
 				currentPersonalCategoryId = addCategory(mockMvc, objectMapper, "Testing Personal Category" + i, "test",
-						"https://test.com/image",
-						"user", "user", CategoryDTO.CategoryType.PERSONAL);
+						"https://test.com/image", "user", "user", CategoryDTO.CategoryType.PERSONAL);
 			}
 		}
 
 		// Test get all expenses
 		MvcResult result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+				.andExpect(status().isOk()).andExpect(jsonPath("$.expenses").exists()).andReturn();
 
 		ExpensesResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpensesResponse.class);
@@ -203,24 +203,19 @@ public class ExpenseControllerTest {
 
 		// Test get family expenses
 		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(true)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.expenses").exists()).andReturn();
+				.andExpect(status().isOk()).andExpect(jsonPath("$.expenses").exists()).andReturn();
 
-		response = objectMapper.readValue(result.getResponse().getContentAsString(),
-				ExpensesResponse.class);
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getFamily()).isNotNull();
 		}
 		// Test with query
 		result = mockMvc.perform(
 						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "es")
-								.param("searchBy",
-										ExpenseFilter.SearchBy.NAME.name())
-				).andExpect(status().isOk())
+								.param("searchBy", ExpenseFilter.SearchBy.NAME.name())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
-		response = objectMapper.readValue(result.getResponse().getContentAsString(),
-				ExpensesResponse.class);
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getName().toLowerCase().contains("es"));
 		}
@@ -228,12 +223,10 @@ public class ExpenseControllerTest {
 		// Test with category name
 		result = mockMvc.perform(
 						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false)).param("query", "category")
-								.param("searchBy",
-										ExpenseFilter.SearchBy.CATEGORY.name())).andExpect(status().isOk())
+								.param("searchBy", ExpenseFilter.SearchBy.CATEGORY.name())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
-		response = objectMapper.readValue(result.getResponse().getContentAsString(),
-				ExpensesResponse.class);
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getCategory().getName().toLowerCase().contains("category"));
 		}
@@ -243,14 +236,11 @@ public class ExpenseControllerTest {
 		LocalDateTime start = LocalDateTime.of(2024, 1, 15, 1, 1);
 		LocalDateTime end = LocalDateTime.of(2024, 2, 15, 1, 1);
 
-		result = mockMvc.perform(
-						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false))
-								.param("start", start.toString()).param("end", end.toString()))
-				.andExpect(status().isOk())
+		result = mockMvc.perform(get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false))
+						.param("start", start.toString()).param("end", end.toString())).andExpect(status().isOk())
 				.andExpect(jsonPath("$.expenses").exists()).andReturn();
 
-		response = objectMapper.readValue(result.getResponse().getContentAsString(),
-				ExpensesResponse.class);
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getTime()).isAfter(start).isBefore(end);
 		}
@@ -262,8 +252,8 @@ public class ExpenseControllerTest {
 						get(UriComponentsBuilder.fromPath(Endpoints.GET_EXPENSE).buildAndExpand(expenseId).toUriString()))
 				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
 				.andReturn();
-		ExpenseResponse response =
-				objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+		ExpenseResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseResponse.class);
 		ExpenseDTO expense = response.getExpense();
 		assertThat(expense.getId()).isEqualTo(expenseId);
 		return expense;
@@ -274,8 +264,8 @@ public class ExpenseControllerTest {
 		MvcResult result = mockMvc.perform(
 						delete(UriComponentsBuilder.fromPath(Endpoints.DELETE_EXPENSE).buildAndExpand(expenseId).toUriString()))
 				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andReturn();
-		ExpenseResponse response =
-				objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+		ExpenseResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseResponse.class);
 	}
 
 	private ExpenseDTO updateExpense(String expenseId, String name, String description, LocalDateTime time, long amount,
@@ -288,23 +278,19 @@ public class ExpenseControllerTest {
 		payload.setDescription(description);
 		payload.setCategoryId(categoryId);
 
-		MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
-				MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
-				.getBytes(StandardCharsets.UTF_8));
+		MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload", MediaType.APPLICATION_JSON_VALUE,
+				objectMapper.writeValueAsString(payload).getBytes(StandardCharsets.UTF_8));
 
-		MvcResult result = mockMvc.perform(
-						multipart(UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId)
-								.toUriString())
-								.file(payloadPart)
-								.with(request -> {
-									request.setMethod(HttpMethod.PATCH.name());
-									return request;
-								}))
-				.andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
+		MvcResult result = mockMvc.perform(multipart(
+						UriComponentsBuilder.fromPath(Endpoints.UPDATE_EXPENSE).buildAndExpand(expenseId).toUriString()).file(
+						payloadPart).with(request -> {
+					request.setMethod(HttpMethod.PATCH.name());
+					return request;
+				})).andExpect(jsonPath("$.status").value(HttpStatus.OK.value())).andExpect(jsonPath("$.expense").exists())
 				.andReturn();
 
-		ExpenseResponse response =
-				objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
+		ExpenseResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseResponse.class);
 		ExpenseDTO expense = response.getExpense();
 		assertThat(expense.getId()).isEqualTo(expenseId);
 		assertThat(expense.getName()).isEqualTo(name);
@@ -317,42 +303,4 @@ public class ExpenseControllerTest {
 		return expense;
 	}
 
-	private ExpenseDTO createExpense(String name, String description, ExpenseDTO.ExpenseType type, LocalDateTime time,
-			long amount, String currency, String familyId, String categoryId) throws Exception {
-		ExpenseCreationPayload payload = new ExpenseCreationPayload();
-
-		payload.setDescription(description);
-		payload.setType(type);
-		payload.setTime(time);
-		payload.setAmount(amount);
-		payload.setCurrency(currency);
-		payload.setFamilyId(familyId);
-		payload.setName(name);
-		payload.setCategoryId(categoryId);
-
-		MockMultipartFile payloadPart = new MockMultipartFile("payload", "payload",
-				MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(payload)
-				.getBytes(StandardCharsets.UTF_8));
-
-		MvcResult result = mockMvc.perform(multipart(Endpoints.CREATE_EXPENSE)
-						.file(payloadPart).contentType(MediaType.MULTIPART_FORM_DATA))
-				.andExpect(status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(HttpStatus.OK.value()))
-				.andExpect(jsonPath("$.expense").exists()).andReturn();
-
-		ExpenseResponse response =
-				objectMapper.readValue(result.getResponse().getContentAsString(), ExpenseResponse.class);
-		ExpenseDTO expense = response.getExpense();
-		assertThat(expense.getType()).isEqualTo(type);
-		assertThat(expense.getTime()).isEqualTo(time);
-		assertThat(expense.getId()).isNotNull();
-		assertThat(expense.getAmount()).isEqualTo(amount);
-		assertThat(expense.getCurrency()).isEqualTo(currency);
-		assertThat(expense.getDescription()).isEqualTo(description);
-		assertThat(expense.getName()).isEqualTo(name);
-		assertThat(expense.getCategory()).isNotNull();
-		assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
-
-		return expense;
-	}
 }

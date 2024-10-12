@@ -1,6 +1,7 @@
 package com.vapps.expense.service;
 
 import com.vapps.expense.annotation.ExpenseIdValidator;
+import com.vapps.expense.annotation.Stats;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,6 +46,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseServiceImpl.class);
 
 	@Override
+	@UserIdValidator(positions = 0)
+	@Stats
 	public ExpenseDTO addExpense(String userId, ExpenseCreationPayload payload, MultipartFile[] invoices)
 			throws AppException {
 
@@ -170,8 +172,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
 	public void deleteExpense(String userId, String expenseId) throws AppException {
 		ExpenseDTO expense = getExpense(userId, expenseId).get();
-		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && familyService.getUserRoleInFamily(userId,
-				expense.getOwnerId()) == FamilyMemberDTO.Role.MEMBER) {
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && !familyService.getFamilySettings(userId,
+				expense.getFamily().getId()).getFamilyExpenseRoles().contains(familyService.getUserRoleInFamily(userId,
+				expense.getOwnerId()))) {
 			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete family's expense!");
 		}
 		expenseRepository.deleteById(expenseId);
