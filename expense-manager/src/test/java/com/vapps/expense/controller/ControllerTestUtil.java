@@ -176,8 +176,10 @@ public class ControllerTestUtil {
 		assertThat(expense.getCurrency()).isEqualTo(currency);
 		assertThat(expense.getDescription()).isEqualTo(description);
 		assertThat(expense.getName()).isEqualTo(name);
-		assertThat(expense.getCategory()).isNotNull();
-		assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
+		if (categoryId != null) {
+			assertThat(expense.getCategory()).isNotNull();
+			assertThat(expense.getCategory().getId()).isEqualTo(categoryId);
+		}
 
 		return expense;
 	}

@@ -55,6 +55,7 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		for (DayOfWeek weekDay : DayOfWeek.values()) {
 			weekAmount.put(weekDay, 0L);
 		}
+		resetWeekDayAmountSpent(weekAmount);
 		stats.setWeekAmount(weekAmount);
 		stats = expenseStatsRepository.save(stats);
 		if (stats == null) {
@@ -126,5 +127,44 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			return Optional.of(statsOptional.get().toDTO());
 		}
 		return statsDTO != null ? Optional.of(statsDTO) : Optional.empty();
+	}
+
+	private void resetWeekDayAmountSpent(Map<DayOfWeek, Long> weekAmount) {
+		DayOfWeek currentDayOfWeek = LocalDate.now().getDayOfWeek();
+		switch (currentDayOfWeek) {
+			case SUNDAY -> {
+				weekAmount.put(DayOfWeek.MONDAY, 0L);
+				weekAmount.put(DayOfWeek.TUESDAY, 0L);
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case MONDAY -> {
+				weekAmount.put(DayOfWeek.TUESDAY, 0L);
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case TUESDAY -> {
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case WEDNESDAY -> {
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case THURSDAY -> {
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case FRIDAY -> {
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+		}
 	}
 }

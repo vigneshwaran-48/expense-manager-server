@@ -101,13 +101,13 @@ public class StatsControllerTest {
 
 	@Test
 	@Order(3)
-	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.FAMILY.READ")
-	public void testRecentExpenseStats() throws Exception {
+	@WithMockUser(username = "user", authorities = "SCOPE_ExpenseManager.Family.READ")
+	public void testFamilyRecentExpenseStats() throws Exception {
 
 		createExpense(mockMvc, objectMapper, "user", "Recent Expense 1", "Recent expense description",
-				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "IND", null, null);
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
 
-		MvcResult result = mockMvc.perform(get(Endpoints.GET_PERSONAL_STATS)).andExpect(status().isOk())
+		MvcResult result = mockMvc.perform(get(Endpoints.GET_FAMILY_STATS)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").exists()).andReturn();
 		ExpenseStatsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),
 				ExpenseStatsResponse.class);
@@ -115,6 +115,40 @@ public class StatsControllerTest {
 		assertThat(stats.getRecentExpenses().size()).isEqualTo(1);
 		assertThat(stats.getRecentExpenses().get(0).getName()).isEqualTo("Recent Expense 1");
 
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 2", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 3", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 4", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 5", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
 
+		// Stats will be done in separate thread. So waiting for it.
+		Thread.sleep(2000);
+		result = mockMvc.perform(get(Endpoints.GET_FAMILY_STATS)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").exists()).andReturn();
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseStatsResponse.class);
+		stats = response.getStats();
+		assertThat(stats.getRecentExpenses().size()).isEqualTo(5);
+		assertThat(stats.getRecentExpenses().get(stats.getRecentExpenses().size() - 1).getName()).isEqualTo(
+				"Recent Expense 5");
+		assertThat(stats.getRecentExpenses().get(0).getName()).isEqualTo(
+				"Recent Expense 1");
+
+		createExpense(mockMvc, objectMapper, "user", "Recent Expense 6", "Recent expense description",
+				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
+
+		// Stats will be done in separate thread. So waiting for it.
+		Thread.sleep(2000);
+		result = mockMvc.perform(get(Endpoints.GET_FAMILY_STATS)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.status").exists()).andReturn();
+		response = objectMapper.readValue(result.getResponse().getContentAsString(),
+				ExpenseStatsResponse.class);
+		stats = response.getStats();
+		assertThat(stats.getRecentExpenses().size()).isEqualTo(5);
+		assertThat(stats.getRecentExpenses().get(0).getName()).isEqualTo(
+				"Recent Expense 2");
 	}
 }
