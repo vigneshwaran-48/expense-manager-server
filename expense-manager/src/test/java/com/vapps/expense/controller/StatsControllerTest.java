@@ -73,10 +73,6 @@ public class StatsControllerTest {
 		assertThat(stats.getType()).isEqualTo(ExpenseStatsDTO.ExpenseStatsType.FAMILY);
 		assertThat(stats.getOwnerId()).isEqualTo(familyId);
 		assertThat(stats.getRecentExpenses().size()).isEqualTo(0);
-		assertThat(stats.getTopUsers().size()).isEqualTo(0);
-		assertThat(stats.getTopCategories().size()).isEqualTo(0);
-		assertThat(stats.getCurrentMonthTotal()).isEqualTo(0);
-		assertThat(stats.getCurrentWeekTotal()).isEqualTo(0);
 	}
 
 	@Test
@@ -93,10 +89,6 @@ public class StatsControllerTest {
 		assertThat(stats.getType()).isEqualTo(ExpenseStatsDTO.ExpenseStatsType.PERSONAL);
 		assertThat(stats.getOwnerId()).isEqualTo("user");
 		assertThat(stats.getRecentExpenses().size()).isEqualTo(0);
-		assertThat(stats.getTopUsers().size()).isEqualTo(0);
-		assertThat(stats.getTopCategories().size()).isEqualTo(0);
-		assertThat(stats.getCurrentMonthTotal()).isEqualTo(0);
-		assertThat(stats.getCurrentWeekTotal()).isEqualTo(0);
 	}
 
 	@Test

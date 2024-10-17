@@ -6,6 +6,7 @@ import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
+import com.vapps.expense.model.Category;
 import com.vapps.expense.model.ExpenseStats;
 import com.vapps.expense.repository.ExpenseStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +50,14 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		stats.setOwnerId(ownerId);
 		stats.setType(type);
 		stats.setRecentExpenses(List.of());
-		stats.setTopUsers(List.of());
-		stats.setTopCategories(List.of());
 		Map<DayOfWeek, Long> weekAmount = new HashMap<>();
 		for (DayOfWeek weekDay : DayOfWeek.values()) {
 			weekAmount.put(weekDay, 0L);
 		}
 		resetWeekDayAmountSpent(weekAmount);
 		stats.setWeekAmount(weekAmount);
+		stats.setCategoryAmount(Map.of());
+		stats.setUserAmount(Map.of());
 		stats = expenseStatsRepository.save(stats);
 		if (stats == null) {
 			throw new AppException("Error while saving Expense Stats");
@@ -101,6 +102,13 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 				.collect(Collectors.toList()));
 		if (stats.getRecentExpenses().size() > 5) {
 			stats.getRecentExpenses().remove(0);
+		}
+		if (expense.getCategory() != null) {
+			Map<String, Long> categoryAmount = stats.getCategoryAmount();
+			categoryAmount.put(expense.getCategory().getId(),
+					categoryAmount.containsKey(expense.getCategory().getId()) ? stats.getCategoryAmount()
+							.get(expense.getCategory().getId()) + expense.getAmount() : expense.getAmount());
+			stats.setCategoryAmount(categoryAmount);
 		}
 		updateStats(stats);
 	}
