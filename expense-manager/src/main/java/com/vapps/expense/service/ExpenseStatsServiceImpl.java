@@ -6,6 +6,7 @@ import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
+import com.vapps.expense.model.Category;
 import com.vapps.expense.model.ExpenseStats;
 import com.vapps.expense.repository.ExpenseStatsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +50,14 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		stats.setOwnerId(ownerId);
 		stats.setType(type);
 		stats.setRecentExpenses(List.of());
-		stats.setTopUsers(List.of());
-		stats.setTopCategories(List.of());
 		Map<DayOfWeek, Long> weekAmount = new HashMap<>();
 		for (DayOfWeek weekDay : DayOfWeek.values()) {
 			weekAmount.put(weekDay, 0L);
 		}
+		resetWeekDayAmountSpent(weekAmount);
 		stats.setWeekAmount(weekAmount);
+		stats.setCategoryAmount(Map.of());
+		stats.setUserAmount(Map.of());
 		stats = expenseStatsRepository.save(stats);
 		if (stats == null) {
 			throw new AppException("Error while saving Expense Stats");
@@ -101,6 +103,13 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		if (stats.getRecentExpenses().size() > 5) {
 			stats.getRecentExpenses().remove(0);
 		}
+		if (expense.getCategory() != null) {
+			Map<String, Long> categoryAmount = stats.getCategoryAmount();
+			categoryAmount.put(expense.getCategory().getId(),
+					categoryAmount.containsKey(expense.getCategory().getId()) ? stats.getCategoryAmount()
+							.get(expense.getCategory().getId()) + expense.getAmount() : expense.getAmount());
+			stats.setCategoryAmount(categoryAmount);
+		}
 		updateStats(stats);
 	}
 
@@ -126,5 +135,44 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			return Optional.of(statsOptional.get().toDTO());
 		}
 		return statsDTO != null ? Optional.of(statsDTO) : Optional.empty();
+	}
+
+	private void resetWeekDayAmountSpent(Map<DayOfWeek, Long> weekAmount) {
+		DayOfWeek currentDayOfWeek = LocalDate.now().getDayOfWeek();
+		switch (currentDayOfWeek) {
+			case SUNDAY -> {
+				weekAmount.put(DayOfWeek.MONDAY, 0L);
+				weekAmount.put(DayOfWeek.TUESDAY, 0L);
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case MONDAY -> {
+				weekAmount.put(DayOfWeek.TUESDAY, 0L);
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case TUESDAY -> {
+				weekAmount.put(DayOfWeek.WEDNESDAY, 0L);
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case WEDNESDAY -> {
+				weekAmount.put(DayOfWeek.THURSDAY, 0L);
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case THURSDAY -> {
+				weekAmount.put(DayOfWeek.FRIDAY, 0L);
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+			case FRIDAY -> {
+				weekAmount.put(DayOfWeek.SATURDAY, 0L);
+			}
+		}
 	}
 }

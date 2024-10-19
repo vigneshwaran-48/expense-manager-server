@@ -1,8 +1,10 @@
 package com.vapps.expense.service;
 
 import com.vapps.expense.annotation.UserIdValidator;
+import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.model.User;
 import com.vapps.expense.repository.UserRepository;
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private ExpenseStatsService expenseStatsService;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Override
@@ -34,6 +39,12 @@ public class UserServiceImpl implements UserService {
 			LOGGER.error("Error while creating user, SavedUser is null!");
 			throw new AppException("Error while creating user!");
 		}
+
+		expenseStatsService.createStats(savedUser.getId(), savedUser.getId(),
+				ExpenseStatsDTO.ExpenseStatsType.PERSONAL);
+
+		LOGGER.info("Created stats for user {}", savedUser.getId());
+
 		return savedUser.toDTO();
 	}
 

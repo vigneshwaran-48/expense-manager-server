@@ -4,10 +4,7 @@ import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
-import com.vapps.expense.common.service.EmailService;
-import com.vapps.expense.common.service.FamilyService;
-import com.vapps.expense.common.service.InvitationService;
-import com.vapps.expense.common.service.UserService;
+import com.vapps.expense.common.service.*;
 import com.vapps.expense.model.*;
 import com.vapps.expense.repository.FamilyMemberRepository;
 import com.vapps.expense.repository.FamilyRepository;
@@ -48,6 +45,9 @@ public class FamilyServiceImpl implements FamilyService {
 	@Autowired
 	private FamilySettingsRepository familySettingsRepository;
 
+	@Autowired
+	private ExpenseStatsService expenseStatsService;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(FamilyServiceImpl.class);
 	private static final int PAGE_SIZE = 10;
 
@@ -81,6 +81,9 @@ public class FamilyServiceImpl implements FamilyService {
 		settings = familySettingsRepository.save(settings);
 
 		LOGGER.info("Created settings {} for family {}", settings.getId(), savedFamily.getId());
+
+		expenseStatsService.createStats(userId, savedFamily.getId(), ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+		LOGGER.info("Created stats for family {}", savedFamily.getId());
 
 		return savedFamily.toDTO();
 	}
