@@ -103,12 +103,21 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		if (stats.getRecentExpenses().size() > 5) {
 			stats.getRecentExpenses().remove(0);
 		}
+
+		// Category based amount spent stats.
 		if (expense.getCategory() != null) {
 			Map<String, Long> categoryAmount = stats.getCategoryAmount();
 			categoryAmount.put(expense.getCategory().getId(),
 					categoryAmount.containsKey(expense.getCategory().getId()) ? stats.getCategoryAmount()
 							.get(expense.getCategory().getId()) + expense.getAmount() : expense.getAmount());
 			stats.setCategoryAmount(categoryAmount);
+		}
+
+		// User Amount spent stats.
+		if (expense.getType() == ExpenseDTO.ExpenseType.PERSONAL) {
+			long oldSpentAmount = stats.getUserAmount().containsKey(expense.getOwnerId()) ? stats.getUserAmount()
+					.get(expense.getOwnerId()) + expense.getAmount() : expense.getAmount();
+			stats.getUserAmount().put(expense.getOwnerId(), oldSpentAmount);
 		}
 		updateStats(stats);
 	}
