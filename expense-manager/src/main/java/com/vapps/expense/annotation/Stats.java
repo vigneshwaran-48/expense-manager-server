@@ -8,4 +8,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Stats {
+	enum StatsType {
+		EXPENSE_ADD,
+		EXPENSE_UPDATE,
+		EXPENSE_DELETE
+	}
+
+	StatsType type() default StatsType.EXPENSE_ADD;
 }

@@ -101,6 +101,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	@Stats(type = Stats.StatsType.EXPENSE_UPDATE)
 	public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload,
 			MultipartFile[] newInvoices) throws AppException {
 		if (payload.getCurrency() != null) {
@@ -170,6 +171,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	@Stats(type = Stats.StatsType.EXPENSE_DELETE)
 	public void deleteExpense(String userId, String expenseId) throws AppException {
 		ExpenseDTO expense = getExpense(userId, expenseId).get();
 		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && !familyService.getFamilySettings(userId,

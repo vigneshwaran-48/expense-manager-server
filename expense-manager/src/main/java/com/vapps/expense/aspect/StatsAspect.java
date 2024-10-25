@@ -38,6 +38,10 @@ public class StatsAspect {
 	}
 
 	private void processStats(ExpenseDTO expense, Stats stats) throws AppException {
-		statsService.addExpense(expense);
+		switch (stats.type()) {
+			case EXPENSE_ADD -> statsService.addExpense(expense);
+			case EXPENSE_UPDATE -> statsService.updateExpense(expense);
+			default -> LOGGER.info("Stats Type {} is not handled", stats.type());
+		}
 	}
 }

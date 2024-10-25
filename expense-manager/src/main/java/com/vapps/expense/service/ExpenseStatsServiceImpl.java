@@ -9,11 +9,14 @@ import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.model.Category;
 import com.vapps.expense.model.ExpenseStats;
 import com.vapps.expense.repository.ExpenseStatsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,8 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 
 	@Autowired
 	private ExpenseService expenseService;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseStatsServiceImpl.class);
 
 	@Override
 	@UserIdValidator(positions = 0)
@@ -84,14 +89,8 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 	@Override
 	public void addExpense(ExpenseDTO expense) throws AppException {
 
-		if (expenseService.getExpense(expense.getCreatedBy().getId(), expense.getId()).isEmpty()) {
-			throw new AppException("Expense not found");
-		}
-		ExpenseStatsDTO stats = getStats(expense.getCreatedBy().getId(),
-				expense.getFamily() != null ? expense.getFamily().getId() : expense.getOwnerId(),
-				expense.getFamily() != null
-						? ExpenseStatsDTO.ExpenseStatsType.FAMILY
-						: ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
+		checkExpenseExists(expense);
+		ExpenseStatsDTO stats = getStatsForExpense(expense);
 
 		LocalDate date = expense.getTime().toLocalDate();
 		Map<DayOfWeek, Long> weekAmount = stats.getWeekAmount();
@@ -120,6 +119,42 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			stats.getUserAmount().put(expense.getOwnerId(), oldSpentAmount);
 		}
 		updateStats(stats);
+	}
+
+	@Override
+	public void updateExpense(ExpenseDTO expense) throws AppException {
+		checkExpenseExists(expense);
+		ExpenseStatsDTO stats = getStatsForExpense(expense);
+		checkAndUpdateWeekStats(stats, expense);
+		checkAndUpdateCategoryStats(stats, expense);
+	}
+
+	private void checkAndUpdateCategoryStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+
+	}
+
+	private void checkAndUpdateWeekStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+		LocalDateTime weekStart = LocalDateTime.now().with(DayOfWeek.SUNDAY);
+		LocalDateTime weekEnd = LocalDateTime.now().with(DayOfWeek.SATURDAY);
+
+		if (expense.getTime().isBefore(weekStart) || expense.getTime().isAfter(weekEnd)) {
+			return;
+		}
+
+		ExpenseFilter filter = new ExpenseFilter();
+		filter.setStart(LocalDateTime.now().with(DayOfWeek.SUNDAY));
+		filter.setEnd(LocalDateTime.now().with(DayOfWeek.SATURDAY));
+		filter.setFamily(expense.getFamily() != null);
+		List<ExpenseDTO> expenses = expenseService.getAllExpense(expense.getCreatedBy().getId(),
+				filter);
+		for (Map.Entry<DayOfWeek, Long> entry : stats.getWeekAmount().entrySet()) {
+			stats.getWeekAmount().put(entry.getKey(), 0L);
+		}
+		for (ExpenseDTO currExpense : expenses) {
+			DayOfWeek expenseDayOfWeek = currExpense.getTime().getDayOfWeek();
+			stats.getWeekAmount()
+					.put(expenseDayOfWeek, stats.getWeekAmount().get(expenseDayOfWeek) + currExpense.getAmount());
+		}
 	}
 
 	private ExpenseStatsDTO updateStats(ExpenseStatsDTO statsDTO) throws AppException {
@@ -184,4 +219,20 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 			}
 		}
 	}
+
+	private void checkExpenseExists(ExpenseDTO expense) throws AppException {
+		if (expenseService.getExpense(expense.getOwnerId(), expense.getId()).isEmpty()) {
+			throw new AppException("Expense not exists!");
+		}
+	}
+
+	private ExpenseStatsDTO getStatsForExpense(ExpenseDTO expense) throws AppException {
+
+		return getStats(expense.getCreatedBy().getId(),
+				expense.getFamily() != null ? expense.getFamily().getId() : expense.getOwnerId(),
+				expense.getFamily() != null
+						? ExpenseStatsDTO.ExpenseStatsType.FAMILY
+						: ExpenseStatsDTO.ExpenseStatsType.PERSONAL).get();
+	}
+
 }
