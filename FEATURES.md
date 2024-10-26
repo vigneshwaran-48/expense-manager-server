@@ -12,6 +12,7 @@
 ### Filter
 
 1. isFamily
+2. categoryId
 2. start - end time
 3. query
 4. searchBy
@@ -31,6 +32,13 @@
     If it is true then only the expenses which are all owned by the
     user in his family and the expenses owned by its family will be 
     listed.
+
+#### Category
+
+    If the category id is not null then all the expenses will be
+    filtered based on its catgory. If the isFamily is true but the 
+    category not belongs to the family then exception will be thrown.
+
 #### start - end time
 
     Expenses which are all have the time between these start and end
