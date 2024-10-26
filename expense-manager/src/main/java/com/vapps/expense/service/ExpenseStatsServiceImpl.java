@@ -3,6 +3,7 @@ package com.vapps.expense.service;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.CategoryService;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
@@ -31,6 +32,9 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 
 	@Autowired
 	private ExpenseService expenseService;
+
+	@Autowired
+	private CategoryService categoryService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseStatsServiceImpl.class);
 
@@ -130,7 +134,19 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 	}
 
 	private void checkAndUpdateCategoryStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+		for (String categoryId : stats.getCategoryAmount().keySet()) {
 
+			stats.getCategoryAmount().put(categoryId, 0L);
+
+			ExpenseFilter filter = new ExpenseFilter();
+			filter.setFamily(stats.getType() == ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+			filter.setCategoryId(categoryId);
+			List<ExpenseDTO> expenses = expenseService.getAllExpense(expense.getCreatedBy().getId(), filter);
+			expenses.forEach(expenseDTO -> {
+				stats.getCategoryAmount()
+						.put(categoryId, stats.getCategoryAmount().get(categoryId) + expenseDTO.getAmount());
+			});
+		}
 	}
 
 	private void checkAndUpdateWeekStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
