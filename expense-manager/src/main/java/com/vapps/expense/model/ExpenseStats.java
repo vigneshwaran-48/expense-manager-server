@@ -1,16 +1,13 @@
 package com.vapps.expense.model;
 
-import com.vapps.expense.common.dto.CategoryDTO;
 import com.vapps.expense.common.dto.ExpenseDTO;
 import com.vapps.expense.common.dto.ExpenseStatsDTO;
-import com.vapps.expense.common.dto.UserDTO;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.DayOfWeek;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

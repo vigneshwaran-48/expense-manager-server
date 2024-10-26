@@ -101,6 +101,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	@Stats(type = Stats.StatsType.EXPENSE_UPDATE)
 	public ExpenseDTO updateExpense(String userId, String expenseId, ExpenseUpdatePayload payload,
 			MultipartFile[] newInvoices) throws AppException {
 		if (payload.getCurrency() != null) {
@@ -170,6 +171,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 	@Override
 	@UserIdValidator(positions = 0)
 	@ExpenseIdValidator(userIdPosition = 0, positions = 1)
+	@Stats(type = Stats.StatsType.EXPENSE_DELETE)
 	public void deleteExpense(String userId, String expenseId) throws AppException {
 		ExpenseDTO expense = getExpense(userId, expenseId).get();
 		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY && !familyService.getFamilySettings(userId,
@@ -201,6 +203,19 @@ public class ExpenseServiceImpl implements ExpenseService {
 			}
 		} else {
 			expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
+		}
+
+		if (filter.getCategoryId() != null) {
+			Optional<CategoryDTO> category = categoryService.getCategory(userId, filter.getCategoryId());
+			if (category.isEmpty()) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Filter category not exists");
+			}
+			if (filter.isFamily() && category.get().getType() == CategoryDTO.CategoryType.PERSONAL) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(),
+						"Given category for filter is not belongs to the family!");
+			}
+			expenses = expenses.stream().filter(expense -> expense.getCategory() != null && expense.getCategory()
+					.getId().equals(filter.getCategoryId())).collect(Collectors.toList());
 		}
 
 		if (filter.getStart() != null) {

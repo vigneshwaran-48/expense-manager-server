@@ -244,6 +244,30 @@ public class ExpenseControllerTest {
 		for (ExpenseDTO expense : response.getExpenses()) {
 			assertThat(expense.getTime()).isAfter(start).isBefore(end);
 		}
+
+		// Test by getting all expense with family category id
+		result = mockMvc.perform(
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(true))
+								.param("categoryId", currentFamilyCategoryId))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.expenses").exists()).andReturn();
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(0);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getCategory()).isNotNull();
+			assertThat(expense.getCategory().getId()).isEqualTo(currentFamilyCategoryId);
+		}
+
+		// Test by getting all expense with personal category id
+		result = mockMvc.perform(
+						get(Endpoints.GET_ALL_EXPENSES).param("isFamily", String.valueOf(false))
+								.param("categoryId", currentPersonalCategoryId))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.expenses").exists()).andReturn();
+		response = objectMapper.readValue(result.getResponse().getContentAsString(), ExpensesResponse.class);
+		assertThat(response.getExpenses().size()).isGreaterThan(0);
+		for (ExpenseDTO expense : response.getExpenses()) {
+			assertThat(expense.getCategory()).isNotNull();
+			assertThat(expense.getCategory().getId()).isEqualTo(currentPersonalCategoryId);
+		}
 	}
 
 	private ExpenseDTO getExpense(String expenseId) throws Exception {
