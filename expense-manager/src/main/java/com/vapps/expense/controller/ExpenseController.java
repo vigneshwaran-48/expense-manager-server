@@ -85,7 +85,8 @@ public class ExpenseController {
 			@RequestParam(required = false, defaultValue = "true") boolean isFamily,
 			@RequestParam(required = false) LocalDateTime start, @RequestParam(required = false) LocalDateTime end,
 			@RequestParam(required = false) String query,
-			@RequestParam(required = false, defaultValue = "ALL") ExpenseFilter.SearchBy searchBy, Principal principal,
+			@RequestParam(required = false, defaultValue = "ALL") ExpenseFilter.SearchBy searchBy,
+			@RequestParam(required = false) String categoryId, Principal principal,
 			HttpServletRequest request) throws AppException {
 
 		String userId = principal.getName();
@@ -95,7 +96,7 @@ public class ExpenseController {
 		filter.setStart(start);
 		filter.setFamily(isFamily);
 		filter.setSearchBy(searchBy);
-		LOGGER.info(filter.toString());
+		filter.setCategoryId(categoryId);
 		List<ExpenseDTO> expenses = expenseService.getAllExpense(userId, filter);
 
 		return ResponseEntity.ok(

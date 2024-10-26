@@ -205,6 +205,19 @@ public class ExpenseServiceImpl implements ExpenseService {
 			expenses = expenseRepository.findByOwnerIdAndFamilyIsNull(userId);
 		}
 
+		if (filter.getCategoryId() != null) {
+			Optional<CategoryDTO> category = categoryService.getCategory(userId, filter.getCategoryId());
+			if (category.isEmpty()) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(), "Filter category not exists");
+			}
+			if (filter.isFamily() && category.get().getType() == CategoryDTO.CategoryType.PERSONAL) {
+				throw new AppException(HttpStatus.BAD_REQUEST.value(),
+						"Given category for filter is not belongs to the family!");
+			}
+			expenses = expenses.stream().filter(expense -> expense.getCategory() != null && expense.getCategory()
+					.getId().equals(filter.getCategoryId())).collect(Collectors.toList());
+		}
+
 		if (filter.getStart() != null) {
 			expenses = expenses.stream().filter(expense -> expense.getTime().isAfter(filter.getStart()))
 					.collect(Collectors.toList());

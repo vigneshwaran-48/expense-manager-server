@@ -221,7 +221,7 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 	}
 
 	private void checkExpenseExists(ExpenseDTO expense) throws AppException {
-		if (expenseService.getExpense(expense.getOwnerId(), expense.getId()).isEmpty()) {
+		if (expenseService.getExpense(expense.getCreatedBy().getId(), expense.getId()).isEmpty()) {
 			throw new AppException("Expense not exists!");
 		}
 	}

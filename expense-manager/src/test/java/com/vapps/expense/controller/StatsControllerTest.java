@@ -99,6 +99,9 @@ public class StatsControllerTest {
 		createExpense(mockMvc, objectMapper, "user", "Recent Expense 1", "Recent expense description",
 				ExpenseDTO.ExpenseType.PERSONAL, LocalDateTime.now(), 90, "INR", familyId, null);
 
+		// Stats will be done in separate thread. So waiting for it.
+		Thread.sleep(2000);
+
 		MvcResult result = mockMvc.perform(get(Endpoints.GET_FAMILY_STATS)).andExpect(status().isOk())
 				.andExpect(jsonPath("$.status").exists()).andReturn();
 		ExpenseStatsResponse response = objectMapper.readValue(result.getResponse().getContentAsString(),

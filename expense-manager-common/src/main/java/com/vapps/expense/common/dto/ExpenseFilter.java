@@ -20,4 +20,6 @@ public class ExpenseFilter {
 	private LocalDateTime end;
 	private String query;
 	private SearchBy searchBy;
+	private String categoryId;
+
 }
