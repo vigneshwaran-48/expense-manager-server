@@ -131,6 +131,24 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		ExpenseStatsDTO stats = getStatsForExpense(expense);
 		checkAndUpdateWeekStats(stats, expense);
 		checkAndUpdateCategoryStats(stats, expense);
+		checkAndUpdateUserExpenseStats(stats, expense);
+		updateStats(stats);
+	}
+
+	private void checkAndUpdateUserExpenseStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+			return;
+		}
+		ExpenseFilter filter = new ExpenseFilter();
+		filter.setQuery(expense.getOwnerId());
+		filter.setSearchBy(ExpenseFilter.SearchBy.OWNER);
+		filter.setFamily(stats.getType() == ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+		List<ExpenseDTO> expenses = expenseService.getAllExpense(expense.getCreatedBy().getId(), filter);
+		Long amount = 0L;
+		for (ExpenseDTO exp : expenses) {
+			amount += exp.getAmount();
+		}
+		stats.getUserAmount().put(expense.getOwnerId(), amount);
 	}
 
 	private void checkAndUpdateCategoryStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {

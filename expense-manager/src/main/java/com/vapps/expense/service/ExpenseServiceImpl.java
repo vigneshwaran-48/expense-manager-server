@@ -269,10 +269,10 @@ public class ExpenseServiceImpl implements ExpenseService {
 		try {
 			if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
 				FamilyDTO family = familyService.getFamilyById(userId, expense.getOwnerId()).get();
-				return family.getName().toLowerCase().contains(query.toLowerCase());
+				return family.getName().toLowerCase().contains(query.toLowerCase()) || family.getId().equals(query);
 			}
 			UserDTO owner = userService.getUser(expense.getOwnerId()).get();
-			return owner.getName().toLowerCase().contains(query.toLowerCase());
+			return owner.getName().toLowerCase().contains(query.toLowerCase()) || owner.getId().equals(query);
 		} catch (AppException ex) {
 			LOGGER.error("Error while filtering expenses by owner, At expense {} for user {}", expense.getId(),
 					userId);
