@@ -3,6 +3,7 @@ package com.vapps.expense.service;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.service.CategoryService;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
@@ -31,6 +32,9 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 
 	@Autowired
 	private ExpenseService expenseService;
+
+	@Autowired
+	private CategoryService categoryService;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpenseStatsServiceImpl.class);
 
@@ -127,10 +131,40 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		ExpenseStatsDTO stats = getStatsForExpense(expense);
 		checkAndUpdateWeekStats(stats, expense);
 		checkAndUpdateCategoryStats(stats, expense);
+		checkAndUpdateUserExpenseStats(stats, expense);
+		updateStats(stats);
+	}
+
+	private void checkAndUpdateUserExpenseStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+		if (expense.getType() == ExpenseDTO.ExpenseType.FAMILY) {
+			return;
+		}
+		ExpenseFilter filter = new ExpenseFilter();
+		filter.setQuery(expense.getOwnerId());
+		filter.setSearchBy(ExpenseFilter.SearchBy.OWNER);
+		filter.setFamily(stats.getType() == ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+		List<ExpenseDTO> expenses = expenseService.getAllExpense(expense.getCreatedBy().getId(), filter);
+		Long amount = 0L;
+		for (ExpenseDTO exp : expenses) {
+			amount += exp.getAmount();
+		}
+		stats.getUserAmount().put(expense.getOwnerId(), amount);
 	}
 
 	private void checkAndUpdateCategoryStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
+		for (String categoryId : stats.getCategoryAmount().keySet()) {
 
+			stats.getCategoryAmount().put(categoryId, 0L);
+
+			ExpenseFilter filter = new ExpenseFilter();
+			filter.setFamily(stats.getType() == ExpenseStatsDTO.ExpenseStatsType.FAMILY);
+			filter.setCategoryId(categoryId);
+			List<ExpenseDTO> expenses = expenseService.getAllExpense(expense.getCreatedBy().getId(), filter);
+			expenses.forEach(expenseDTO -> {
+				stats.getCategoryAmount()
+						.put(categoryId, stats.getCategoryAmount().get(categoryId) + expenseDTO.getAmount());
+			});
+		}
 	}
 
 	private void checkAndUpdateWeekStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {
