@@ -124,7 +124,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 		if (payload.getAmount() > 0) {
 			expense.setAmount(payload.getAmount());
 		}
-		if (payload.getCategoryId() != null && !expense.getCategory().getId().equals(payload.getCategoryId())) {
+		if (payload.getCategoryId() != null && (expense.getCategory() == null || !expense.getCategory().getId()
+				.equals(payload.getCategoryId()))) {
 			validateExpenseData(userId, payload.getCategoryId(), expense.getType(), expense.getFamily().getId());
 			expense.setCategory(Category.build(categoryService.getCategory(userId, payload.getCategoryId()).get()));
 		}
