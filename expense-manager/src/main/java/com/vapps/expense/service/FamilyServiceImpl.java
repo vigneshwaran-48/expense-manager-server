@@ -465,6 +465,17 @@ public class FamilyServiceImpl implements FamilyService {
 		return familySettings.get().toDTO();
 	}
 
+	@Override
+	@UserIdValidator(positions = 0)
+	@FamilyIdValidator(userIdPosition = 0, positions = 1)
+	public void updateFamilySettings(String userId, String familyId, FamilySettingsDTO settings) throws AppException {
+		// List<FamilyMemberDTO.Role>
+		if (!settings.getFamilyExpenseRoles().contains(FamilyMemberDTO.Role.LEADER)) {
+
+		}
+		familySettingsRepository.update(FamilySettings.build(settings));
+	}
+
 	private void deleteAllJoinRequestsOfUser(String userId) throws AppException {
 		joinRequestRepository.findByRequestUserId(userId)
 				.forEach(request -> joinRequestRepository.deleteById(request.getId()));

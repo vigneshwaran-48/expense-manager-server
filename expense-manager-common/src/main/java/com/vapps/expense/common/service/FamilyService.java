@@ -48,4 +48,6 @@ public interface FamilyService {
 	List<UserDTO> getNonFamilyAndNonInvitedUsers(String userId) throws AppException;
 
 	FamilySettingsDTO getFamilySettings(String userId, String familyId) throws AppException;
+
+	void updateFamilySettings(String userId, String familyId, FamilySettingsDTO settings) throws AppException;
 }
