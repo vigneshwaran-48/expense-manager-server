@@ -6,6 +6,7 @@ import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.util.Endpoints;
+import com.vapps.expense.common.util.FamilyRoleSettings;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -217,6 +218,17 @@ public class FamilyController {
 				new FamilySettingsResponse(HttpStatus.OK.value(), "success", LocalDateTime.now(),
 						request.getServletPath(),
 						settings));
+	}
+
+	@PatchMapping(Endpoints.UPDATE_FAMILY_ROLES_PATH)
+	public ResponseEntity<Response> updateFamilySettingRoles(@PathVariable String familyId,
+			@RequestParam FamilyRoleSettings roleSetting, @RequestParam List<FamilyMemberDTO.Role> roles,
+			Principal principal, HttpServletRequest request)
+			throws AppException {
+		String userId = principal.getName();
+		familyService.updateFamilySettingRoles(userId, familyId, roleSetting, roles);
+		return ResponseEntity.ok(new Response(HttpStatus.OK.value(), "success",
+				LocalDateTime.now(), request.getServletPath()));
 	}
 
 }
