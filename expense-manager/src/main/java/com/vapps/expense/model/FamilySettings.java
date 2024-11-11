@@ -38,6 +38,7 @@ public class FamilySettings {
 		familySettingsDTO.setRemoveMemberRoles(removeMemberRoles);
 		familySettingsDTO.setInviteAcceptRequestRoles(inviteAcceptRequestRoles);
 		familySettingsDTO.setUpdateFamilyRoles(updateFamilyRoles);
+		familySettingsDTO.setCategoryRoles(categoryRoles);
 		return familySettingsDTO;
 	}
 
