@@ -2,6 +2,7 @@ package com.vapps.expense.common.service;
 
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
+import com.vapps.expense.common.util.FamilyRoleSettings;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,4 +49,7 @@ public interface FamilyService {
 	List<UserDTO> getNonFamilyAndNonInvitedUsers(String userId) throws AppException;
 
 	FamilySettingsDTO getFamilySettings(String userId, String familyId) throws AppException;
+
+	void updateFamilySettingRoles(String userId, String familyId, FamilyRoleSettings roleSetting,
+			List<FamilyMemberDTO.Role> roles) throws AppException;
 }

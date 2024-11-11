@@ -38,6 +38,19 @@ public class FamilySettings {
 		familySettingsDTO.setRemoveMemberRoles(removeMemberRoles);
 		familySettingsDTO.setInviteAcceptRequestRoles(inviteAcceptRequestRoles);
 		familySettingsDTO.setUpdateFamilyRoles(updateFamilyRoles);
+		familySettingsDTO.setCategoryRoles(categoryRoles);
 		return familySettingsDTO;
+	}
+
+	public static FamilySettings build(FamilySettingsDTO settingsDTO) {
+		FamilySettings settings = new FamilySettings();
+		settings.setFamily(Family.build(settingsDTO.getFamily()));
+		settings.setId(settingsDTO.getId());
+		settings.setFamilyExpenseRoles(settingsDTO.getFamilyExpenseRoles());
+		settings.setRemoveMemberRoles(settingsDTO.getRemoveMemberRoles());
+		settings.setUpdateFamilyRoles(settingsDTO.getUpdateFamilyRoles());
+		settings.setInviteAcceptRequestRoles(settingsDTO.getInviteAcceptRequestRoles());
+		settings.setCategoryRoles(settingsDTO.getCategoryRoles());
+		return settings;
 	}
 }

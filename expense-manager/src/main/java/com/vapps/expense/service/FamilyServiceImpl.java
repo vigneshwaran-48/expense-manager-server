@@ -5,6 +5,7 @@ import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.*;
+import com.vapps.expense.common.util.FamilyRoleSettings;
 import com.vapps.expense.model.*;
 import com.vapps.expense.repository.FamilyMemberRepository;
 import com.vapps.expense.repository.FamilyRepository;
@@ -465,8 +466,39 @@ public class FamilyServiceImpl implements FamilyService {
 		return familySettings.get().toDTO();
 	}
 
+	@Override
+	@UserIdValidator(positions = 0)
+	@FamilyIdValidator(userIdPosition = 0, positions = 1)
+	public void updateFamilySettingRoles(String userId, String familyId, FamilyRoleSettings roleSetting,
+			List<FamilyMemberDTO.Role> roles)
+			throws AppException {
+		FamilySettingsDTO settings = getFamilySettings(userId, familyId);
+		if (!settings.getUpdateFamilyRoles().contains(getUserRoleInFamily(userId, familyId))) {
+			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to this family settings!");
+		}
+		checkAndLeaderRole(roles);
+		switch (roleSetting) {
+			case CATEGORY_ROLE -> settings.setCategoryRoles(roles);
+			case INVITE_ACCEPT_ROLE -> settings.setInviteAcceptRequestRoles(roles);
+			case REMOVE_MEMBER_ROLE -> settings.setRemoveMemberRoles(roles);
+			case FAMILY_EXPENSE_ROLE -> settings.setFamilyExpenseRoles(roles);
+			case UPDATE_FAMILY_ROLE -> settings.setUpdateFamilyRoles(roles);
+			default -> throw new AppException(roleSetting + " is not handled!");
+		}
+		FamilySettings updatedSettings = familySettingsRepository.update(FamilySettings.build(settings));
+		if (updatedSettings == null) {
+			throw new AppException("Error while updating settings");
+		}
+	}
+
 	private void deleteAllJoinRequestsOfUser(String userId) throws AppException {
 		joinRequestRepository.findByRequestUserId(userId)
 				.forEach(request -> joinRequestRepository.deleteById(request.getId()));
+	}
+
+	private void checkAndLeaderRole(List<FamilyMemberDTO.Role> roles) {
+		if (!roles.contains(FamilyMemberDTO.Role.LEADER)) {
+			roles.add(FamilyMemberDTO.Role.LEADER);
+		}
 	}
 }

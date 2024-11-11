@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
 		Category category = categoryRepository.findById(categoryId).get();
 		if (category.getType() == CategoryDTO.CategoryType.FAMILY) {
 			FamilyMemberDTO.Role role = familyService.getUserRoleInFamily(userId, category.getOwnerId());
-			if (role != FamilyMemberDTO.Role.LEADER && role != FamilyMemberDTO.Role.MAINTAINER) {
+			if (!familyService.getFamilySettings(userId, category.getOwnerId()).getCategoryRoles().contains(role)) {
 				throw new AppException(HttpStatus.FORBIDDEN.value(),
 						"You are not allowed to delete this family's category");
 			}
