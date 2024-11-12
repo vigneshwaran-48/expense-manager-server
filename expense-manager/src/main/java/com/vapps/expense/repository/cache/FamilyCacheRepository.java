@@ -6,6 +6,7 @@ import com.vapps.expense.repository.FamilyRepository;
 import com.vapps.expense.repository.mongo.FamilyMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +34,13 @@ public class FamilyCacheRepository implements FamilyRepository {
 	}
 
 	@Override
-	@Cacheable(value = "family", key = "'family' + #family.getId()")
-	@CacheEvict(value = "familySearch", allEntries = true)
+	@CachePut(value = "family", key = "'family' + #family.getId()")
+	@Caching(
+			evict = {
+					@CacheEvict(value = "familySearch", allEntries = true),
+					@CacheEvict(value = "familyMember", allEntries = true)
+			}
+	)
 	public Family update(Family family) {
 		return familyRepository.save(family);
 	}
