@@ -19,4 +19,6 @@ public interface ExpenseStatsService {
 	void addExpense(ExpenseDTO expense) throws AppException;
 
 	void updateExpense(ExpenseDTO expense) throws AppException;
+
+	void deleteFamilyStats(String userId, String familyId) throws AppException;
 }

@@ -152,6 +152,8 @@ public class FamilyServiceImpl implements FamilyService {
 		}
 		familyMemberRepository.deleteByFamilyId(id);
 		LOGGER.info("Deleted all members relation in the family {}", id);
+		expenseStatsService.deleteFamilyStats(userId, id);
+		LOGGER.info("Deleted family {} stats!", id);
 		familyRepository.deleteById(id);
 		LOGGER.info("Deleted family {}", id);
 	}
