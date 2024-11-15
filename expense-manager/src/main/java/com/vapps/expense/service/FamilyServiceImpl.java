@@ -150,10 +150,10 @@ public class FamilyServiceImpl implements FamilyService {
 		if (userMember.isEmpty() || userMember.get().getRole() != FamilyMemberDTO.Role.LEADER) {
 			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete this family!");
 		}
-		familyMemberRepository.deleteByFamilyId(id);
-		LOGGER.info("Deleted all members relation in the family {}", id);
 		expenseStatsService.deleteFamilyStats(userId, id);
 		LOGGER.info("Deleted family {} stats!", id);
+		familyMemberRepository.deleteByFamilyId(id);
+		LOGGER.info("Deleted all members relation in the family {}", id);
 		familyRepository.deleteById(id);
 		LOGGER.info("Deleted family {}", id);
 	}
