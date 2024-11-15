@@ -1,5 +1,6 @@
 package com.vapps.expense.service;
 
+import com.vapps.expense.annotation.FamilyIdValidator;
 import com.vapps.expense.annotation.UserIdValidator;
 import com.vapps.expense.common.dto.*;
 import com.vapps.expense.common.exception.AppException;
@@ -7,12 +8,13 @@ import com.vapps.expense.common.service.CategoryService;
 import com.vapps.expense.common.service.ExpenseService;
 import com.vapps.expense.common.service.ExpenseStatsService;
 import com.vapps.expense.common.service.FamilyService;
-import com.vapps.expense.model.Category;
 import com.vapps.expense.model.ExpenseStats;
+import com.vapps.expense.model.FamilyMember;
 import com.vapps.expense.repository.ExpenseStatsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -133,6 +135,17 @@ public class ExpenseStatsServiceImpl implements ExpenseStatsService {
 		checkAndUpdateCategoryStats(stats, expense);
 		checkAndUpdateUserExpenseStats(stats, expense);
 		updateStats(stats);
+	}
+
+	@Override
+	@UserIdValidator(positions = 0)
+	@FamilyIdValidator(userIdPosition = 0, positions = 1)
+	public void deleteFamilyStats(String userId, String familyId) throws AppException {
+		FamilyMemberDTO.Role role = familyService.getUserRoleInFamily(userId, familyId);
+		if (role != FamilyMemberDTO.Role.LEADER) {
+			throw new AppException(HttpStatus.FORBIDDEN.value(), "You are not allowed to delete this family!");
+		}
+		expenseStatsRepository.deleteByOwnerIdAndType(familyId, ExpenseStatsDTO.ExpenseStatsType.FAMILY);
 	}
 
 	private void checkAndUpdateUserExpenseStats(ExpenseStatsDTO stats, ExpenseDTO expense) throws AppException {

@@ -49,4 +49,10 @@ public class ExpenseStatsCacheRepository implements ExpenseStatsRepository {
 	public ExpenseStats update(ExpenseStats stats) {
 		return expenseStatsRepository.save(stats);
 	}
+
+	@Override
+	@CacheEvict(value = "expense_stats", allEntries = true)
+	public void deleteByOwnerIdAndType(String ownerId, ExpenseStatsDTO.ExpenseStatsType type) {
+		expenseStatsRepository.deleteByOwnerIdAndType(ownerId, type);
+	}
 }
