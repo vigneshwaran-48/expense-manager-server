@@ -28,14 +28,8 @@ public class SettingsServiceImpl implements SettingsService {
     public SettingsDTO getSettings(String userId) throws AppException {
         Optional<Settings> settings = settingsRepository.findByUserId(userId);
         if (settings.isEmpty()) {
-            Settings settingsModel = new Settings();
-            UserDTO user = userService.getUser(userId).get();
-            settingsModel.setUser(User.build(user));
-            settingsModel = settingsRepository.save(settingsModel);
-            if (settingsModel == null) {
-                throw new AppException("Error while creating settings for user");
-            }
-            settings = Optional.of(settingsModel);
+            settings =
+                    Optional.of(Settings.build(createSettings(userId), User.build(userService.getUser(userId).get())));
         }
         return settings.get().toDTO();
     }
@@ -44,7 +38,7 @@ public class SettingsServiceImpl implements SettingsService {
     @UserIdValidator(positions = 0)
     public SettingsDTO updateSettings(String userId, SettingsDTO settings) throws AppException {
         SettingsDTO existingSettings = getSettings(userId);
-        if (existingSettings.getTheme() != settings.getTheme()) {
+        if (settings.getTheme() != null && existingSettings.getTheme() != settings.getTheme()) {
             existingSettings.setTheme(settings.getTheme());
         }
         if (existingSettings.isDarkMode() != settings.isDarkMode()) {
@@ -62,5 +56,18 @@ public class SettingsServiceImpl implements SettingsService {
     @UserIdValidator(positions = 0)
     public void deleteSettings(String userId) {
         settingsRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    @UserIdValidator(positions = 0)
+    public SettingsDTO createSettings(String userId) throws AppException {
+        Settings settingsModel = new Settings();
+        UserDTO user = userService.getUser(userId).get();
+        settingsModel.setUser(User.build(user));
+        settingsModel = settingsRepository.save(settingsModel);
+        if (settingsModel == null) {
+            throw new AppException("Error while creating settings for user");
+        }
+        return settingsModel.toDTO();
     }
 }

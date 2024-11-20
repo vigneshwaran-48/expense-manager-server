@@ -10,6 +10,7 @@ public class Endpoints {
 	public static final String CATEGORY_API = "/api/category";
 	public static final String EXPENSE_API = "/api/expense";
 	public static final String STATS_API = "/api/stats";
+	public static final String SETTINGS_API = "/api/settings";
 
 	// User APIs
 	public static final String GET_USER_PATH = "/{userId}";
@@ -107,5 +108,4 @@ public class Endpoints {
 
 	public static final String GET_PERSONAL_STATS = STATS_API + GET_PERSONAL_STATS_PATH;
 	public static final String GET_FAMILY_STATS = STATS_API + GET_FAMILY_STATS_PATH;
-
 }

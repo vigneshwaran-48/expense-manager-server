@@ -5,6 +5,7 @@ import com.vapps.expense.common.dto.ExpenseStatsDTO;
 import com.vapps.expense.common.dto.UserDTO;
 import com.vapps.expense.common.exception.AppException;
 import com.vapps.expense.common.service.ExpenseStatsService;
+import com.vapps.expense.common.service.SettingsService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.model.User;
 import com.vapps.expense.repository.UserRepository;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ExpenseStatsService expenseStatsService;
 
+	@Autowired
+	private SettingsService settingsService;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
 	@Override
@@ -44,6 +48,9 @@ public class UserServiceImpl implements UserService {
 				ExpenseStatsDTO.ExpenseStatsType.PERSONAL);
 
 		LOGGER.info("Created stats for user {}", savedUser.getId());
+
+		settingsService.createSettings(savedUser.getId());
+		LOGGER.info("Created settings for user {}", savedUser.getId());
 
 		return savedUser.toDTO();
 	}

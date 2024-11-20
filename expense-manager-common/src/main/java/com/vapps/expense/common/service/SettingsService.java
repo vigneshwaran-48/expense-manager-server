@@ -10,4 +10,6 @@ public interface SettingsService {
     SettingsDTO updateSettings(String userId, SettingsDTO settings) throws AppException;
 
     void deleteSettings(String userId) throws AppException;
+
+    SettingsDTO createSettings(String userId) throws AppException;
 }

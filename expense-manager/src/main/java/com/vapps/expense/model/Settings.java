@@ -13,7 +13,7 @@ public class Settings {
     @Id
     private String id;
     private boolean isDarkMode;
-    private SettingsDTO.Theme theme;
+    private SettingsDTO.Theme theme = SettingsDTO.Theme.BLUE;
 
     @DocumentReference
     private User user;
