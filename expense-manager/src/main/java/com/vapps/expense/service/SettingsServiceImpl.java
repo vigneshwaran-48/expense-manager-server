@@ -38,14 +38,12 @@ public class SettingsServiceImpl implements SettingsService {
     @UserIdValidator(positions = 0)
     public SettingsDTO updateSettings(String userId, SettingsDTO settings) throws AppException {
         SettingsDTO existingSettings = getSettings(userId);
-        if (settings.getTheme() != null && existingSettings.getTheme() != settings.getTheme()) {
-            existingSettings.setTheme(settings.getTheme());
+        if (settings.getTheme() == null) {
+            settings.setTheme(existingSettings.getTheme());
         }
-        if (existingSettings.isDarkMode() != settings.isDarkMode()) {
-            existingSettings.setDarkMode(settings.isDarkMode());
-        }
+        settings.setId(existingSettings.getId());
         User user = User.build(userService.getUser(userId).get());
-        Settings updatedSettings = settingsRepository.update(Settings.build(existingSettings, user));
+        Settings updatedSettings = settingsRepository.update(Settings.build(settings, user));
         if (updatedSettings == null) {
             throw new AppException("Error while updating settings");
         }
