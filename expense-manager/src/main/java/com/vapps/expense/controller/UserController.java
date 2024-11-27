@@ -13,9 +13,8 @@ import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,6 +35,9 @@ public class UserController {
 
     @Autowired
     private FamilyService familyService;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuer;
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserDTO user, HttpServletRequest request)
@@ -102,7 +104,21 @@ public class UserController {
     @PostMapping(Endpoints.LOGOUT_PATH)
     public ResponseEntity<Response> logout(Principal principal, HttpServletRequest request) throws AppException {
         RestTemplate restTemplate = new RestTemplate();
+        String tokenHeaderValue = request.getHeader("Authorization");
+        if (tokenHeaderValue == null || tokenHeaderValue.isBlank()) {
+            throw new AppException(401, "Not authenticated!");
+        }
+        String[] tokenHeaderValueSplit = tokenHeaderValue.split("Bearer ");
+        if (tokenHeaderValueSplit.length < 2) {
+            throw new AppException(401, "Invalid access token");
+        }
 
+        RequestEntity entity =
+                RequestEntity.post(issuer).header("Authorization", "Bearer " + tokenHeaderValueSplit[1]).build();
+        ResponseEntity<String> response = restTemplate.exchange(entity, String.class);
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new AppException(response.getStatusCode().value(), "Error from Authorization server!");
+        }
         return ResponseEntity.ok(
                 new Response(HttpStatus.OK.value(), "Logged out!", LocalDateTime.now(), request.getServletPath()));
     }

@@ -62,6 +62,7 @@ public class SettingsServiceImpl implements SettingsService {
         Settings settingsModel = new Settings();
         UserDTO user = userService.getUser(userId).get();
         settingsModel.setUser(User.build(user));
+        settingsModel.setDarkMode(true);
         settingsModel = settingsRepository.save(settingsModel);
         if (settingsModel == null) {
             throw new AppException("Error while creating settings for user");
