@@ -12,6 +12,8 @@ import com.vapps.expense.common.service.FamilyService;
 import com.vapps.expense.common.service.UserService;
 import com.vapps.expense.common.util.Endpoints;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -38,6 +40,8 @@ public class UserController {
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuer;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserDTO user, HttpServletRequest request)
@@ -114,9 +118,12 @@ public class UserController {
         }
 
         RequestEntity entity =
-                RequestEntity.post(issuer).header("Authorization", "Bearer " + tokenHeaderValueSplit[1]).build();
+                RequestEntity.post(issuer + "/logout").header("Authorization", "Bearer " + tokenHeaderValueSplit[1])
+                        .build();
         ResponseEntity<String> response = restTemplate.exchange(entity, String.class);
-        if (response.getStatusCode() != HttpStatus.OK) {
+        if (response.getStatusCode() == HttpStatus.FOUND) {
+            LOGGER.info(response.getHeaders().get("Location").toString());
+        } else if (response.getStatusCode() != HttpStatus.OK) {
             throw new AppException(response.getStatusCode().value(), "Error from Authorization server!");
         }
         return ResponseEntity.ok(
